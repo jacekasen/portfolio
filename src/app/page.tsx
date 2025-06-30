@@ -33,14 +33,14 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-8 text-center">About Me</h2>
           <div className="prose prose-lg dark:prose-invert mx-auto">
             <p className="text-lg leading-relaxed mb-6">
-              I'm Jan Kasen, a Computer Science student at UCLA graduating in June 2026. 
-              I'm also pursuing an Anthropology minor with a keen interest in language and 
+              I&apos;m Jan Kasen, a Computer Science student at UCLA graduating in June 2026. 
+              I&apos;m also pursuing an Anthropology minor with a keen interest in language and 
               culture and how they shape the way we interact with technology.
             </p>
             <p className="text-lg leading-relaxed mb-6">
-              I'm interested in Full Stack Development and Machine Learning. I'm still 
+              I&apos;m interested in Full Stack Development and Machine Learning. I&apos;m still 
               figuring out which area I want to focus on. I enjoy seeing my vision come 
-              to fruition whenever I build something. I'm drawn to both areas because they 
+              to fruition whenever I build something. I&apos;m drawn to both areas because they 
               help me explore and answer questions about how things work.
             </p>
             <p className="text-lg leading-relaxed">
