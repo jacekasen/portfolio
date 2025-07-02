@@ -1,6 +1,20 @@
 import Image from "next/image";
+import fs from 'fs';
+import path from 'path';
 
-export default function Home() {
+// Function to read and parse the about content
+async function getAboutContent() {
+  const filePath = path.join(process.cwd(), 'content', 'about.md');
+  const content = fs.readFileSync(filePath, 'utf8');
+  
+  // Split content into paragraphs (assuming paragraphs are separated by double newlines)
+  const paragraphs = content.split('\n\n').filter(p => p.trim().length > 0);
+  return paragraphs;
+}
+
+export default async function Home() {
+  const aboutParagraphs = await getAboutContent();
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="container mx-auto px-4 py-16 max-w-4xl">
@@ -32,24 +46,13 @@ export default function Home() {
         <section className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center">About Me</h2>
           <div className="prose prose-lg dark:prose-invert mx-auto">
-            <p className="text-lg leading-relaxed mb-6">
-              I&apos;m Jan Kasen, a Computer Science student at UCLA graduating in June 2026. 
-              I&apos;m also pursuing an Anthropology minor with a keen interest in language and 
-              culture and how they shape the way we interact with technology.
-            </p>
-            <p className="text-lg leading-relaxed mb-6">
-              I&apos;m interested in Full Stack Development and Machine Learning. I&apos;m still 
-              figuring out which area I want to focus on. I enjoy seeing my vision come 
-              to fruition whenever I build something. I&apos;m drawn to both areas because they 
-              help me explore and answer questions about how things work.
-            </p>
-            <p className="text-lg leading-relaxed">
-              In my free time I love going through data and analytics of the NBA and 
-              professional Counter-Strike 2.
-            </p>
+            {aboutParagraphs.map((paragraph, index) => (
+              <p key={index} className="text-lg leading-relaxed mb-6">
+                {paragraph}
+              </p>
+            ))}
           </div>
         </section>
-
       </main>
     </div>
   );
