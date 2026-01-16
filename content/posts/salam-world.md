@@ -12,4 +12,6 @@ I chose React with TypeScript, Tailwind, and Next.js as they seem to be the defa
 
 >please restructure the whole website into an easy to maintain portfolio/blog style website in a documentation style for an aspiring software/machine learning engineer. please make an easy set up for me to write more blog posts as markdown documents. make use of left-hand side bar navigation that can be pulled out
 
-And this reasonbly good-looking web page came out. I am honestly quite happy with it given the limited effort. The whole page is hosted on Vercel. I will be playing around with it further to make it just right right for my taste. 
+And this reasonbly good-looking web page came out. I am honestly quite happy with it given the limited effort. The whole page is hosted on Vercel. I will be playing around with it further to make it just right right for my taste.
+
+Edit: I did spend a couple of hours after writhing this tinkering with the colorrs and getting text alignment between pages right.
