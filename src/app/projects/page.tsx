@@ -11,7 +11,7 @@ const projects = [
     description: 'LLM Generated Portfolio website built with Next.js, Tailwind CSS, and Markdown using Cursor IDE.',
     tags: ['Cursor', 'Next.js', 'React', 'Tailwind'],
     github: 'https://github.com/jankasen/portfolio',
-    demo: 'jacekasen.com/projects',
+    demo: '/projects',
   },
   // Add more projects here
 ];
