@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${postData.title} | Jace Kasen`,
       description: postData.description || 'Blog post',
     };
-  } catch (e) {
+  } catch {
     return {
       title: 'Post Not Found',
     };
@@ -37,7 +37,7 @@ export default async function Post({ params }: Props) {
   let postData;
   try {
     postData = await getPostData(slug);
-  } catch (error) {
+  } catch {
     notFound();
   }
 

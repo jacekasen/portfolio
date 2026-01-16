@@ -13,7 +13,7 @@ export default function Home() {
       <section className="flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12 py-8 md:py-12">
         <div className="flex-1 space-y-6">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Hi, I'm <span className="text-blue-600 dark:text-blue-400">Jace</span>.
+            Hi, I&apos;m <span className="text-blue-600 dark:text-blue-400">Jace</span>.
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl">
             Computer Science student @ UCLA focused on Machine Learning and Software Engineering

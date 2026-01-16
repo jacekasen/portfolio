@@ -1,5 +1,4 @@
 import { Github, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
 
 export const metadata = {
   title: 'Projects | Jace Kasen',
