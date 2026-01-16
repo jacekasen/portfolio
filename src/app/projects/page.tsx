@@ -9,7 +9,7 @@ const projects = [
   {
     title: 'This Portfolio Website',
     description: 'LLM Generated Portfolio website built with Next.js, Tailwind CSS, and Markdown using Cursor IDE.',
-    tags: ['Cursor', 'Next.js', 'React', 'Tailwind'],
+    tags: ['Cursor', 'Next.js', 'React with TypeScript', 'Tailwind CSS', 'Vercel'],
     github: 'https://github.com/jankasen/portfolio',
     demo: '/projects',
   },
@@ -18,12 +18,12 @@ const projects = [
 
 export default function Projects() {
   return (
-    <div className="max-w-5xl mx-auto">
-      <header className="mb-8 md:mb-12">
-        <h1 className="text-3xl font-mono mb-4">
+    <div className="space-y-12 md:space-y-16">
+      <header className="pt-8 md:pt-12">
+        <h1 className="text-4xl md:text-5xl font-mono tracking-tight mb-4">
           Projects
         </h1>
-        <p className="text-lg text-muted">
+        <p className="text-xl text-muted leading-relaxed max-w-xl">
           A collection of my work in software engineering and machine learning.
         </p>
       </header>

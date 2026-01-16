@@ -111,7 +111,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           isExpanded ? "md:ml-64" : "md:ml-20"
         )}
       >
-        <div className="container mx-auto pt-16 px-4 pb-4 md:p-8 max-w-5xl">
+        <div className="pt-16 px-4 pb-4 md:p-8 md:px-12 lg:px-16 max-w-5xl mx-auto">
           {children}
         </div>
       </main>

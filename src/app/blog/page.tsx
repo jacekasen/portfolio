@@ -11,13 +11,13 @@ export default function BlogIndex() {
   const allPostsData = getSortedPostsData();
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <header className="mb-8 md:mb-12">
-        <h1 className="text-3xl font-mono mb-4">
+    <div className="space-y-12 md:space-y-16">
+      <header className="pt-8 md:pt-12">
+        <h1 className="text-4xl md:text-5xl font-mono tracking-tight mb-4">
           Blog
         </h1>
-        <p className="text-lg text-muted">
-          Some of my thoughts and attempts at anwering my questions.
+        <p className="text-xl text-muted leading-relaxed">
+          Some of my thoughts and attempts at answering my questions.
         </p>
       </header>
 
