@@ -20,8 +20,10 @@ export default function Projects() {
   return (
     <div className="max-w-5xl mx-auto">
       <header className="mb-8 md:mb-12">
-        <h1 className="text-4xl font-bold mb-4">Projects</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400">
+        <h1 className="text-3xl font-mono mb-4">
+          Projects
+        </h1>
+        <p className="text-lg text-muted">
           A collection of my work in software engineering and machine learning.
         </p>
       </header>
@@ -30,31 +32,31 @@ export default function Projects() {
         {projects.map((project, index) => (
           <div 
             key={index}
-            className="border border-gray-200 dark:border-gray-800 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white dark:bg-gray-900/50"
+            className="border border-border rounded-xl p-6 hover:shadow-lg transition-shadow bg-surface"
           >
-            <h2 className="text-2xl font-bold mb-3">{project.title}</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6 h-20 overflow-hidden">
+            <h2 className="text-xl font-bold mb-3">{project.title}</h2>
+            <p className="text-muted mb-6 h-20 overflow-hidden text-sm">
               {project.description}
             </p>
             
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap gap-2 mb-6 font-mono text-xs">
               {project.tags.map(tag => (
-                <span key={tag} className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
+                <span key={tag} className="px-2 py-1 bg-accent-light/30 text-accent rounded">
                   {tag}
                 </span>
               ))}
             </div>
             
-            <div className="flex gap-4">
+            <div className="flex gap-4 font-mono text-xs">
               {project.github && (
                 <a 
                   href={project.github} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  className="flex items-center gap-2 text-muted hover:text-accent transition-colors"
                 >
-                  <Github size={18} />
-                  Code
+                  <Github size={16} />
+                  code
                 </a>
               )}
               {project.demo && (
@@ -62,10 +64,10 @@ export default function Projects() {
                   href={project.demo} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  className="flex items-center gap-2 text-muted hover:text-accent transition-colors"
                 >
-                  <ExternalLink size={18} />
-                  Live Demo
+                  <ExternalLink size={16} />
+                  demo
                 </a>
               )}
             </div>

@@ -31,31 +31,31 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       {/* Mobile Toggle Button (visible only when sidebar is closed on mobile) */}
       {!isExpanded && (
         <button
-          className="fixed top-4 left-4 z-50 p-2 rounded-md bg-gray-100 dark:bg-gray-800 md:hidden"
+          className="fixed top-4 left-4 z-50 p-2 rounded-md bg-surface border border-border md:hidden"
           onClick={() => setIsExpanded(true)}
         >
-          <Menu size={24} />
+          <Menu size={24} className="text-accent" />
         </button>
       )}
 
       {/* Sidebar Container */}
       <aside
         className={clsx(
-          "fixed top-0 left-0 h-screen bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out z-40 flex flex-col",
+          "fixed top-0 left-0 h-screen bg-surface border-r border-border transition-all duration-300 ease-in-out z-40 flex flex-col",
           isExpanded ? "w-64 translate-x-0" : "-translate-x-full md:translate-x-0 md:w-20"
         )}
       >
         {/* Header / Toggle */}
-        <div className={clsx("h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800", isExpanded ? "justify-between" : "justify-center")}>
-            <span className={clsx("font-bold text-xl overflow-hidden whitespace-nowrap transition-all duration-300", 
+        <div className={clsx("h-16 flex items-center px-4 border-b border-border", isExpanded ? "justify-between" : "justify-center")}>
+            <span className={clsx("font-mono font-bold text-2xl overflow-hidden whitespace-nowrap transition-all duration-300 text-accent tracking-tight", 
               !isExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
             )}>
-              Portfolio
+              jk
             </span>
             <button 
               onClick={() => setIsExpanded(!isExpanded)}
               className={clsx(
-                "p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800",
+                "p-2 rounded-md hover:bg-accent-light/30 text-accent",
                 isExpanded ? "flex" : "hidden md:flex"
               )}
             >
@@ -64,7 +64,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-6 flex flex-col gap-2 px-3">
+        <nav className="flex-1 py-6 flex flex-col gap-2 px-3 font-mono">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -74,15 +74,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 key={item.name}
                 href={item.href}
                 className={clsx(
-                  "flex items-center p-3 rounded-lg transition-colors overflow-hidden whitespace-nowrap",
+                  "flex items-center p-3 rounded-lg transition-colors overflow-hidden whitespace-nowrap text-sm",
                   isExpanded ? "gap-4" : "justify-center",
                   isActive 
-                    ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" 
-                    : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    ? "bg-accent-light/40 text-accent" 
+                    : "hover:bg-accent-light/20 text-foreground"
                 )}
                 title={!isExpanded ? item.name : undefined}
               >
-                <Icon size={24} className="flex-shrink-0" />
+                <Icon size={20} className="flex-shrink-0" />
                 <span className={clsx("transition-all duration-300", !isExpanded ? "opacity-0 w-0 translate-x-10" : "opacity-100 w-auto translate-x-0")}>
                   {item.name}
                 </span>
@@ -92,12 +92,12 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Footer / Socials */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        <div className="p-4 border-t border-border">
            <div className={clsx("flex gap-4 justify-center transition-all duration-300", !isExpanded ? "flex-col items-center" : "")}>
-              <a href="https://github.com/jacekasen" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100">
+              <a href="https://github.com/jacekasen" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-accent transition-colors">
                 <Github size={20} />
               </a>
-              <a href="https://linkedin.com/in/jacekasen" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100">
+              <a href="https://linkedin.com/in/jacekasen" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-accent transition-colors">
                 <Linkedin size={20} />
               </a>
            </div>

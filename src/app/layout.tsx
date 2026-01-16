@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, PT_Serif } from "next/font/google";
+import { PT_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Shell from "@/components/Shell";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const ptSerif = PT_Serif({
   variable: "--font-pt-serif",
   weight: ["400", "700"],
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
@@ -32,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${ptSerif.variable} antialiased`}
+        className={`${ptSerif.variable} ${jetbrainsMono.variable} antialiased font-serif`}
       >
         <Shell>
           {children}
