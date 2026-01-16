@@ -31,6 +31,11 @@ export default async function About() {
           <p className="text-sm text-muted font-mono">
               computer science student @ ucla
           </p>
+          {postData.updated && (
+            <p className="text-xs text-muted font-mono mt-2 opacity-70">
+              updated: {postData.updated}
+            </p>
+          )}
         </aside>
         
         {/* Main Content */}

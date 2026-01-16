@@ -11,9 +11,7 @@ export interface PostData {
   date: string;
   title: string;
   contentHtml?: string;
-  description?: string;
-  tags?: string[];
-  [key: string]: string | string[] | undefined;
+  [key: string]: any;
 }
 
 export function getSortedPostsData(): PostData[] {
