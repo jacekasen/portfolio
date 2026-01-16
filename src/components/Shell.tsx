@@ -16,7 +16,7 @@ import {
 import { clsx } from 'clsx';
 
 export default function Shell({ children }: { children: React.ReactNode }) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname();
 
   const navItems = [
