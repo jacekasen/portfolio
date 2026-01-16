@@ -1,5 +1,7 @@
-I'm Jan Kasen, a Computer Science student at UCLA graduating in June 2026. I'm also pursuing an Anthropology minor with a keen interest in language and culture and how they shape the way we interact with technology.
+I'm Jace Kasen, a Computer Science student at UCLA with a minor in Anthropology, graduating in June 2026. Originally from Almaty, Kazakhstan, I'm currently based in Westwood and actively seeking software engineering and machine learning internships or full-time opportunities.
 
-I'm interested in Full Stack Development and Machine Learning. I'm still figuring out which area I want to focus on. I enjoy seeing my vision come to fruition whenever I build something. I'm drawn to both areas because they help me explore and answer questions about how things work.
+My technical interests center on machine learning and software development. I'm particularly drawn to how we can build intelligent systems that solve problems or answer our questions, and I'm exploring graduate programs in ML/AI to deepen this work.
 
-In my free time I love going through data and analytics of the NBA and professional Counter-Strike 2.
+What drew me to combine CS with Anthropology was linguistic anthropology, which taught me to examine the assumptions embedded in language and how our word choices index different meanings and social contexts. This perspective influences how I think about building things: being conscious of the implicit biases and frameworks we encode into systems.
+
+Outside of academics, I'm into competitive Counter-Strike 2 and NBA basketball. I follow both closely through data and analysis rather than traditional viewing (HLTV and Basketball Reference are frequent tabs). I listen to podcasts like Thinking Basketball and The Bill Simmons Show to keep up with the league. On this site, you'll find projects where I explore datasets from both communities, combining my interest in sports with my technical skills.
