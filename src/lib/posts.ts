@@ -11,7 +11,9 @@ export interface PostData {
   date: string;
   title: string;
   contentHtml?: string;
-  [key: string]: any;
+  description?: string;
+  tags?: string[];
+  updated?: string;
 }
 
 export function getSortedPostsData(): PostData[] {
@@ -49,18 +51,14 @@ export function getSortedPostsData(): PostData[] {
   });
 }
 
-export function getAllPostIds() {
+export function getAllPostSlugs(): { slug: string }[] {
   if (!fs.existsSync(postsDirectory)) {
     return [];
   }
   const fileNames = fs.readdirSync(postsDirectory);
-  return fileNames.map((fileName) => {
-    return {
-      params: {
-        slug: fileName.replace(/\.md$/, ''),
-      },
-    };
-  });
+  return fileNames.map((fileName) => ({
+    slug: fileName.replace(/\.md$/, ''),
+  }));
 }
 
 export async function getPostData(id: string): Promise<PostData> {
@@ -71,9 +69,7 @@ export async function getPostData(id: string): Promise<PostData> {
   const matterResult = matter(fileContents);
 
   // Use remark to convert markdown into HTML string
-  const processedContent = await remark()
-    .use(html)
-    .process(matterResult.content);
+  const processedContent = await remark().use(html).process(matterResult.content);
   const contentHtml = processedContent.toString();
 
   // Combine the data with the id and contentHtml
@@ -87,11 +83,9 @@ export async function getPostData(id: string): Promise<PostData> {
 export async function getMarkdownData(filePath: string): Promise<PostData> {
   const fileContents = fs.readFileSync(filePath, 'utf8');
   const matterResult = matter(fileContents);
-  const processedContent = await remark()
-    .use(html)
-    .process(matterResult.content);
+  const processedContent = await remark().use(html).process(matterResult.content);
   const contentHtml = processedContent.toString();
-  
+
   return {
     id: path.basename(filePath, '.md'),
     contentHtml,

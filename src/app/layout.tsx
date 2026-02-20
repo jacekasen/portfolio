@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import { PT_Serif, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
-import Shell from "@/components/Shell";
+import type { Metadata } from 'next';
+import { PT_Serif, JetBrains_Mono } from 'next/font/google';
+import './globals.css';
+import Shell from '@/components/Shell';
 
 const ptSerif = PT_Serif({
-  variable: "--font-pt-serif",
-  weight: ["400", "700"],
-  subsets: ["latin"],
+  variable: '--font-pt-serif',
+  weight: ['400', '700'],
+  subsets: ['latin'],
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
+  variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Jace Kasen",
+  title: 'Jace Kasen',
   description: "Jace Kasen's Personal Website",
 };
 
@@ -26,12 +26,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${ptSerif.variable} ${jetbrainsMono.variable} antialiased font-serif`}
-      >
-        <Shell>
-          {children}
-        </Shell>
+      <body className={`${ptSerif.variable} ${jetbrainsMono.variable} font-serif antialiased`}>
+        <Shell>{children}</Shell>
       </body>
     </html>
   );

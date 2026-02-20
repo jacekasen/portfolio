@@ -12,28 +12,22 @@ export default async function About() {
 
   return (
     <div>
-      <header className="pt-8 md:pt-12 mb-2">
+      <header className="mb-2 pt-8 md:pt-12">
         <div className="space-y-6">
-          <h1 className="text-4xl md:text-5xl font-mono tracking-tight">
-            About Me
-          </h1>
-          <p className="text-xl text-muted leading-relaxed max-w-xl">
+          <h1 className="font-mono text-4xl tracking-tight md:text-5xl">About Me</h1>
+          <p className="text-muted max-w-xl text-xl leading-relaxed">
             computer science student @ ucla
           </p>
           {postData.updated && (
-            <p className="text-xs text-muted font-mono opacity-70">
-              updated: {postData.updated}
-            </p>
+            <p className="text-muted font-mono text-xs opacity-70">updated: {postData.updated}</p>
           )}
         </div>
       </header>
-      
+
       <div className="max-w-3xl">
-        <div 
-          className="prose prose-lg dark:prose-invert max-w-none
-            prose-headings:font-bold prose-a:text-accent
-            prose-code:font-mono prose-code:text-accent prose-code:bg-accent-light/20"
-          dangerouslySetInnerHTML={{ __html: postData.contentHtml || '' }} 
+        <div
+          className="prose prose-lg dark:prose-invert prose-headings:font-bold prose-a:text-accent prose-code:font-mono prose-code:text-accent prose-code:bg-accent-light/20 max-w-none"
+          dangerouslySetInnerHTML={{ __html: postData.contentHtml || '' }}
         />
       </div>
     </div>
