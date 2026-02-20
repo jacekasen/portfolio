@@ -1,0 +1,18 @@
+---
+title: "Why I Changed My Name (Again)"
+date: "2026-02-19"
+description: "For real, again?"
+tags: [Jace Kasen, Jan Kasen, Zhansultan Kuikenov]
+---
+
+I was named Zhansultan (Жансултан) Kuikenov by my father. The word "zhan" ("zhan" sounds basically like it looks if you know that "zh" is the sound in the middle of the word "measure." ) means "soul" in Kazakh, and "sultan" means ruler or king. As a kid, I interpreted my name to mean that I was an empathetic ruler with a big heart. During my time in Almaty, Kazakhstan, I never met a single person with this first name, and I ran into difficulties with people spelling it correctly. It was written as "Zhasulian" on award certificates, and my name was announced in our school's official daily planner as "Zhasulan." Things like that happen with unusual names. For context, this name does combine two very common root words that many Kazakh names are built from, so it is not all that odd in the broader sense.
+
+When I was 14, I went to study at Concord College in a small village in rural Shropshire, England. During my first term I styled my name as Zhan to keep it short and manageable. However, the transliteration of the letter "Ж" to "Zh" is not intuitive to anyone without a background in Russian, so I started going by Jean, pronounced as the French name, which was close enough.
+
+Around 2017, the Kazakhstani government decided to switch from the Cyrillic alphabet to the Latin one, likely to distance the country from Russia and supposedly to make the language easier for foreigners to learn. Amusingly, the officially released alphabet went through several iterations before reaching its current form. A government iterating on its own national alphabet does not exactly inspire confidence that they really thought it through. Either way, the letter "Ж" was changed to transliterate as "J", which is much nicer looking and as close as you can get to the proper pronunciation.
+
+In 2018, upon turning 16, I decided to change my name officially to just Жан/Jan for simplicity and to reduce friction in English-speaking contexts. As my parents divorced when I was young and I was raised exclusively by my mother's side of the family, I also wanted my last name to reflect me personally rather than someone who was never meaningfully present in my life. To do that, I followed the Kazakh tradition of taking the name of a paternal ancestor, which I chose based on how it sounded. The proper transliteration would be Kassen, but I liked the look of Kasen and the way it is pronounced KAY-sen in English. At 16 you can legally change your name in Kazakhstan with the approval of just one parent, which also happens to be the age at which your official government ID is issued.
+
+This made introducing myself and having my name read aloud much easier. One thing I knew going in was the "Yan" pronunciation common in some European languages, and I decided to live with it. What I did not fully anticipate was how often I would still need to explain things to people, and the mild but persistent frustration of that friction every time I met someone new.
+
+I eventually decided to lean further into English-speaking contexts by deriving something new from my original name. Zhansultan -> Jansultan -> Jan Sultan -> J S -> Jay Es, Jayes -> Jace. I liked the connection and listed it as my preferred name in the UCLA system. I still go by Жан with Russian speakers, but Jace with everyone else. I do feel some tension about whether this reflects a kind of insecurity in my own identity. But I also genuinely value the reduced friction, and Jace Kasen flows nicely, so there is that.

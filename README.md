@@ -66,9 +66,9 @@ Create a new `.md` file in `content/posts/`:
 
 ```markdown
 ---
-title: My Post Title
-date: 2026-01-15
-description: A short summary of the post.
+title: "My Post Title"
+date: "2026-01-15"
+description: "A short summary of the post."
 tags: [tag1, tag2]
 ---
 
