@@ -26,7 +26,7 @@ export default async function About() {
 
       <div className="max-w-3xl">
         <div
-          className="prose prose-lg dark:prose-invert prose-headings:font-bold prose-a:text-accent prose-code:font-mono prose-code:text-accent prose-code:bg-accent-light/20 max-w-none"
+          className="prose prose-lg prose-headings:font-bold prose-a:text-accent prose-code:font-mono prose-code:text-accent prose-code:bg-accent-light/20 max-w-none"
           dangerouslySetInnerHTML={{ __html: postData.contentHtml || '' }}
         />
       </div>

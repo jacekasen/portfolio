@@ -23,18 +23,6 @@
   --font-mono: var(--font-jetbrains-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1A1412;
-    --foreground: #F5EBE0;
-    --accent: #D4A574;
-    --accent-light: #8B5A2B;
-    --surface: #2D2118;
-    --muted: #9C8B7A;
-    --border: #3D2F24;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
