@@ -31,9 +31,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       )}
 
       <aside
+        onClick={!isExpanded ? () => setIsExpanded(true) : undefined}
         className={cn(
           'bg-surface border-border fixed top-0 left-0 z-40 flex h-screen flex-col border-r transition-all duration-300 ease-in-out',
-          isExpanded ? 'w-64 translate-x-0' : '-translate-x-full md:w-20 md:translate-x-0',
+          isExpanded ? 'w-64 translate-x-0' : '-translate-x-full md:w-14 md:translate-x-0 md:cursor-e-resize',
         )}
       >
         <div
@@ -52,7 +53,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </span>
           <button
             data-testid="sidebar-toggle"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
             className={cn(
               'hover:bg-accent-light/30 text-accent rounded-md p-2',
               isExpanded ? 'flex' : 'hidden md:flex',
@@ -72,6 +73,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={(e) => e.stopPropagation()}
                 className={cn(
                   'flex items-center overflow-hidden rounded-lg p-3 text-sm whitespace-nowrap transition-colors',
                   isExpanded ? 'gap-4' : 'justify-center',
@@ -108,6 +110,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               href={siteConfig.socials.github}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="text-muted hover:text-accent transition-colors"
             >
               <Github size={20} />
@@ -116,6 +119,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               href={siteConfig.socials.linkedin}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="text-muted hover:text-accent transition-colors"
             >
               <Linkedin size={20} />
@@ -127,7 +131,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <main
         className={cn(
           'min-h-screen transition-all duration-300 ease-in-out',
-          isExpanded ? 'md:ml-64' : 'md:ml-20',
+          isExpanded ? 'md:ml-64' : 'md:ml-14',
         )}
       >
         <div className="mx-auto max-w-5xl px-4 pt-16 pb-4 md:p-8 md:px-12 lg:px-16">{children}</div>
