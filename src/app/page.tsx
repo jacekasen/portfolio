@@ -13,7 +13,7 @@ export default function Home() {
     <div className="space-y-16 md:space-y-20">
       {/* Hero Section */}
       <section className="pt-8 md:pt-12">
-        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center md:gap-16">
+        <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:gap-16">
           <div className="flex-1">
             <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">Jace Kasen</h1>
             <p className="text-muted mb-6 font-mono text-sm">
@@ -60,7 +60,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative h-48 w-48 flex-shrink-0 md:h-56 md:w-56">
+          <div className="relative h-48 w-48 flex-shrink-0 order-first md:order-last md:h-56 md:w-56">
             <Image
               src="/hero_shot.png"
               alt="Jace Kasen"
