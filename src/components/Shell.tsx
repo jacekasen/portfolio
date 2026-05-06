@@ -1,15 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, User, Code, Menu, ChevronLeft, Github, Linkedin } from 'lucide-react';
+import { Home, BookOpen, User, Code, Menu, ChevronLeft, Github, Linkedin, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/lib/config';
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-expanded');
+    if (saved !== null) setIsExpanded(saved === 'true');
+    // Enable transitions only after the restored state has been painted
+    requestAnimationFrame(() => requestAnimationFrame(() => setMounted(true)));
+  }, []);
+
+  const toggle = (value: boolean) => {
+    setIsExpanded(value);
+    localStorage.setItem('sidebar-expanded', String(value));
+  };
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -24,16 +37,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <button
           data-testid="mobile-menu-toggle"
           className="bg-surface border-border fixed top-4 left-4 z-50 rounded-md border p-2 md:hidden"
-          onClick={() => setIsExpanded(true)}
+          onClick={() => toggle(true)}
         >
           <Menu size={24} className="text-accent" />
         </button>
       )}
 
       <aside
-        onClick={!isExpanded ? () => setIsExpanded(true) : undefined}
+        onClick={!isExpanded ? () => toggle(true) : undefined}
         className={cn(
-          'bg-surface border-border fixed top-0 left-0 z-40 flex h-screen flex-col border-r transition-all duration-300 ease-in-out',
+          'bg-surface border-border fixed top-0 left-0 z-40 flex h-screen flex-col overflow-hidden border-r duration-300 ease-in-out',
+          mounted && 'transition-[width,transform]',
           isExpanded ? 'w-64 translate-x-0' : '-translate-x-full md:w-14 md:translate-x-0 md:cursor-e-resize',
         )}
       >
@@ -53,17 +67,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </span>
           <button
             data-testid="sidebar-toggle"
-            onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+            onClick={(e) => { e.stopPropagation(); toggle(!isExpanded); }}
             className={cn(
-              'hover:bg-accent-light/30 text-accent rounded-md p-2',
-              isExpanded ? 'flex' : 'hidden md:flex',
+              'hover:bg-accent-light/30 text-accent',
+              isExpanded ? 'flex items-center rounded-lg p-3' : 'hidden md:flex md:items-center md:justify-center md:rounded-lg md:p-3',
             )}
           >
             {isExpanded ? <ChevronLeft size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-2 px-3 py-6 font-mono">
+        <nav className="flex flex-1 flex-col gap-1 px-2 py-4 font-mono">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -75,8 +89,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
-                  'flex items-center overflow-hidden rounded-lg p-3 text-sm whitespace-nowrap transition-colors',
-                  isExpanded ? 'gap-4' : 'justify-center',
+                  'flex items-center overflow-hidden text-sm whitespace-nowrap transition-colors',
+                  isExpanded ? 'gap-4 rounded-lg p-3' : 'justify-center rounded-lg p-3',
                   isActive
                     ? 'bg-accent-light/40 text-accent'
                     : 'hover:bg-accent-light/20 text-foreground',
@@ -124,23 +138,25 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             >
               <Linkedin size={20} />
             </a>
+            <a
+              href={siteConfig.socials.email}
+              onClick={(e) => e.stopPropagation()}
+              className="text-muted hover:text-accent transition-colors"
+            >
+              <Mail size={20} />
+            </a>
           </div>
         </div>
       </aside>
 
-      <main
-        className={cn(
-          'min-h-screen transition-all duration-300 ease-in-out',
-          isExpanded ? 'md:ml-64' : 'md:ml-14',
-        )}
-      >
+      <main className="min-h-screen md:ml-14">
         <div className="mx-auto max-w-5xl px-4 pt-16 pb-4 md:p-8 md:px-12 lg:px-16">{children}</div>
       </main>
 
       {isExpanded && (
         <div
           className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={() => setIsExpanded(false)}
+          onClick={() => toggle(false)}
         />
       )}
     </div>
