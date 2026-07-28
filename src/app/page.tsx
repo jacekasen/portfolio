@@ -17,10 +17,10 @@ export default function Home() {
           <div className="flex-1">
             <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">Jace Kasen</h1>
             <p className="text-muted mb-6 font-mono text-sm">
-              Computer Science Student @ UCLA
+              Computer Science Graduate @ UCLA
             </p>
             <p className="text-foreground mb-8 max-w-lg leading-relaxed">
-              CS Major + Anthropology Minor at UCLA, graduating June 2026. Looking for software engineering and
+              CS Major + Anthropology Minor, UCLA Class of 2026. Looking for software engineering and
               machine learning roles.
             </p>
             <div className="mb-8 flex flex-wrap gap-6 font-mono text-sm">
