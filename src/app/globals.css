@@ -2,13 +2,13 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #FDF8F3;
-  --foreground: #3D2914;
-  --accent: #8B5A2B;
-  --accent-light: #D4A574;
-  --surface: #F5EBE0;
-  --muted: #9C8B7A;
-  --border: #E0D5C8;
+  --background: #fbf7f2;
+  --foreground: #37281d;
+  --accent: #7a4f28;
+  --accent-light: #c99560;
+  --surface: #f6efe7;
+  --muted: #6f6257;
+  --border: #e6ddd4;
 }
 
 @theme inline {
@@ -27,10 +27,21 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-pt-serif), Georgia, 'Times New Roman', serif;
+  background-image:
+    radial-gradient(circle at top left, rgba(122, 79, 40, 0.06), transparent 30%),
+    radial-gradient(circle at top right, rgba(201, 149, 96, 0.08), transparent 28%);
+  background-attachment: fixed;
   scrollbar-gutter: stable;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Monospace styling for technical elements */
 code, kbd, pre, samp {
   font-family: var(--font-jetbrains-mono), 'Courier New', monospace;
+}
+
+::selection {
+  background: rgba(122, 79, 40, 0.18);
+  color: var(--foreground);
 }

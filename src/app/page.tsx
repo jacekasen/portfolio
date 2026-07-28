@@ -10,29 +10,29 @@ export default function Home() {
   const recentPosts = allPostsData.slice(0, 3);
 
   return (
-    <div className="space-y-16 md:space-y-20">
+    <div className="space-y-14 md:space-y-18">
       {/* Hero Section */}
-      <section className="pt-8 md:pt-12">
-        <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:gap-16">
-          <div className="flex-1">
+      <section className="pt-4 md:pt-8">
+        <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:gap-14">
+          <div className="flex-1 max-w-2xl">
             <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">Jace Kasen</h1>
-            <p className="text-muted mb-6 font-mono text-sm">
+            <p className="text-muted mb-5 font-mono text-sm uppercase tracking-[0.16em]">
               Computer Science Graduate @ UCLA
             </p>
-            <p className="text-foreground mb-8 max-w-lg leading-relaxed">
+            <p className="text-foreground mb-7 max-w-xl leading-7">
               CS Major + Anthropology Minor, UCLA Class of 2026. Looking for software engineering and
               machine learning roles.
             </p>
-            <div className="mb-8 flex flex-wrap gap-6 font-mono text-sm">
+            <div className="mb-7 flex flex-wrap gap-6 font-mono text-sm">
               <Link
                 href="/projects"
-                className="text-accent hover:underline inline-flex items-center gap-1.5 transition-colors"
+                className="text-accent inline-flex items-center gap-1.5 transition-colors hover:underline"
               >
                 Projects →
               </Link>
               <Link
                 href="/about"
-                className="text-accent hover:underline inline-flex items-center gap-1.5 transition-colors"
+                className="text-accent inline-flex items-center gap-1.5 transition-colors hover:underline"
               >
                 About →
               </Link>
@@ -42,7 +42,7 @@ export default function Home() {
                 href={siteConfig.socials.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-accent transition-colors"
+                className="transition-colors hover:text-accent"
               >
                 <Github size={20} />
               </a>
@@ -50,21 +50,22 @@ export default function Home() {
                 href={siteConfig.socials.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-accent transition-colors"
+                className="transition-colors hover:text-accent"
               >
                 <Linkedin size={20} />
               </a>
-              <a href={siteConfig.socials.email} className="hover:text-accent transition-colors">
+              <a href={siteConfig.socials.email} className="transition-colors hover:text-accent">
                 <Mail size={20} />
               </a>
             </div>
           </div>
 
-          <div className="relative h-48 w-48 flex-shrink-0 order-first md:order-last md:h-56 md:w-56">
+          <div className="relative order-first h-48 w-48 flex-shrink-0 md:order-last md:h-56 md:w-56">
             <Image
               src="/hero_shot.png"
               alt="Jace Kasen"
               fill
+              sizes="(min-width: 768px) 14rem, 12rem"
               className="rounded-full object-cover"
               priority
             />
@@ -74,7 +75,7 @@ export default function Home() {
 
       {/* Recent Posts Section */}
       <section>
-        <div className="border-border mb-6 flex items-center justify-between border-b pb-3">
+        <div className="border-border/80 mb-6 flex items-center justify-between border-b pb-3">
           <h2 className="font-mono text-2xl">Recent Writing</h2>
           <Link
             href="/blog"

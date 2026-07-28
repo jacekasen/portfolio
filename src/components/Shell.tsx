@@ -1,28 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, User, Code, Menu, ChevronLeft, Github, Linkedin, Mail } from 'lucide-react';
+import { Home, BookOpen, User, Code, Menu, X, Github, Linkedin, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/lib/config';
 
 export default function Shell({ children }: { children: React.ReactNode }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const saved = localStorage.getItem('sidebar-expanded');
-    if (saved !== null) setIsExpanded(saved === 'true');
-    // Enable transitions only after the restored state has been painted
-    requestAnimationFrame(() => requestAnimationFrame(() => setMounted(true)));
-  }, []);
-
-  const toggle = (value: boolean) => {
-    setIsExpanded(value);
-    localStorage.setItem('sidebar-expanded', String(value));
-  };
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -31,134 +18,109 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'Projects', href: '/projects', icon: Code },
   ];
 
-  return (
-    <div className="bg-background min-h-screen">
-      {!isExpanded && (
-        <button
-          data-testid="mobile-menu-toggle"
-          className="bg-surface border-border fixed top-4 left-4 z-50 rounded-md border p-2 md:hidden"
-          onClick={() => toggle(true)}
-        >
-          <Menu size={24} className="text-accent" />
-        </button>
-      )}
+  const isActiveHref = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href));
 
-      <aside
-        onClick={!isExpanded ? () => toggle(true) : undefined}
-        className={cn(
-          'bg-surface border-border fixed top-0 left-0 z-40 flex h-screen flex-col overflow-hidden border-r duration-300 ease-in-out',
-          mounted && 'transition-[width,transform]',
-          isExpanded ? 'w-64 translate-x-0' : '-translate-x-full md:w-14 md:translate-x-0 md:cursor-e-resize',
-        )}
-      >
-        <div
-          className={cn(
-            'border-border flex h-16 items-center border-b px-4',
-            isExpanded ? 'justify-between' : 'justify-center',
-          )}
-        >
-          <span
-            className={cn(
-              'text-accent overflow-hidden font-mono text-2xl font-bold tracking-tight whitespace-nowrap transition-all duration-300',
-              !isExpanded ? 'w-0 opacity-0' : 'w-auto opacity-100',
-            )}
+  const year = new Date().getFullYear();
+
+  return (
+    <div className="bg-background flex min-h-screen flex-col">
+      <header className="bg-surface/90 border-border/80 fixed top-0 left-0 z-40 w-full border-b backdrop-blur-sm">
+        <div className="relative flex h-16 items-center px-4 md:px-8 lg:px-12">
+          <Link
+            href="/"
+            className="text-accent font-mono text-xl font-bold tracking-tight md:text-2xl"
+            onClick={() => setMenuOpen(false)}
           >
             jk
-          </span>
-          <button
-            data-testid="sidebar-toggle"
-            onClick={(e) => { e.stopPropagation(); toggle(!isExpanded); }}
-            className={cn(
-              'hover:bg-accent-light/30 text-accent',
-              isExpanded ? 'flex items-center rounded-lg p-3' : 'hidden md:flex md:items-center md:justify-center md:rounded-lg md:p-3',
-            )}
-          >
-            {isExpanded ? <ChevronLeft size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+          </Link>
 
-        <nav className="flex flex-1 flex-col gap-1 px-2 py-4 font-mono">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-
-            return (
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 font-mono text-sm md:flex">
+            {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={(e) => e.stopPropagation()}
                 className={cn(
-                  'flex items-center overflow-hidden text-sm whitespace-nowrap transition-colors',
-                  isExpanded ? 'gap-4 rounded-lg p-3' : 'justify-center rounded-lg p-3',
-                  isActive
-                    ? 'bg-accent-light/40 text-accent'
-                    : 'hover:bg-accent-light/20 text-foreground',
+                  'rounded-md px-3 py-2 transition-colors',
+                  isActiveHref(item.href)
+                    ? 'bg-accent-light/25 text-accent'
+                    : 'hover:bg-accent-light/15 text-foreground',
                 )}
-                title={!isExpanded ? item.name : undefined}
               >
-                <Icon size={20} className="flex-shrink-0" />
-                <span
-                  className={cn(
-                    'transition-all duration-300',
-                    !isExpanded
-                      ? 'w-0 translate-x-10 opacity-0'
-                      : 'w-auto translate-x-0 opacity-100',
-                  )}
-                >
-                  {item.name}
-                </span>
+                {item.name}
               </Link>
-            );
-          })}
-        </nav>
+            ))}
+          </nav>
 
-        <div className="border-border border-t p-4">
-          <div
-            className={cn(
-              'flex justify-center gap-4 transition-all duration-300',
-              !isExpanded ? 'flex-col items-center' : '',
-            )}
+          <button
+            data-testid="mobile-menu-toggle"
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            className="text-accent ml-auto md:hidden"
+            onClick={() => setMenuOpen((open) => !open)}
           >
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div data-testid="mobile-menu" className="bg-surface border-border/80 border-t md:hidden">
+            <nav className="flex flex-col gap-1 p-4 font-mono text-sm">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 rounded-md p-3 transition-colors',
+                      isActiveHref(item.href)
+                        ? 'bg-accent-light/25 text-accent'
+                        : 'hover:bg-accent-light/15 text-foreground',
+                    )}
+                  >
+                    <Icon size={20} />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+      </header>
+
+      <main className="flex-1 pt-16">
+        <div className="mx-auto max-w-5xl px-4 py-8 md:px-12 md:py-12 lg:px-16">{children}</div>
+      </main>
+
+      <footer className="border-border/80 border-t">
+        <div className="text-muted mx-auto flex max-w-5xl flex-col items-center gap-2 px-4 py-4 md:flex-row md:justify-between md:px-12 lg:px-16">
+          <p className="font-mono text-xs">
+            © {year} {siteConfig.name}
+          </p>
+          <div className="flex items-center gap-4">
             <a
               href={siteConfig.socials.github}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="text-muted hover:text-accent transition-colors"
+              className="transition-colors hover:text-accent"
             >
-              <Github size={20} />
+              <Github size={15} />
             </a>
             <a
               href={siteConfig.socials.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="text-muted hover:text-accent transition-colors"
+              className="transition-colors hover:text-accent"
             >
-              <Linkedin size={20} />
+              <Linkedin size={15} />
             </a>
-            <a
-              href={siteConfig.socials.email}
-              onClick={(e) => e.stopPropagation()}
-              className="text-muted hover:text-accent transition-colors"
-            >
-              <Mail size={20} />
+            <a href={siteConfig.socials.email} className="transition-colors hover:text-accent">
+              <Mail size={15} />
             </a>
           </div>
         </div>
-      </aside>
-
-      <main className="min-h-screen md:ml-14">
-        <div className="mx-auto max-w-5xl px-4 pt-16 pb-4 md:p-8 md:px-12 lg:px-16">{children}</div>
-      </main>
-
-      {isExpanded && (
-        <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={() => toggle(false)}
-        />
-      )}
+      </footer>
     </div>
   );
 }

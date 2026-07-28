@@ -28,17 +28,17 @@ const projects = [
 
 export default function Projects() {
   return (
-    <div className="space-y-12 md:space-y-16">
-      <header className="pt-8 md:pt-12">
-        <h1 className="mb-4 font-mono text-4xl tracking-tight md:text-5xl">Projects</h1>
-        <p className="text-muted text-xl leading-relaxed">
+    <div className="space-y-10 md:space-y-14">
+      <header className="pt-4 md:pt-8">
+        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">Projects</h1>
+        <p className="text-muted max-w-2xl text-lg leading-7">
           Software engineering and machine learning work.
         </p>
       </header>
 
-      <div className="space-y-10">
+      <div className="space-y-8 md:space-y-10">
         {projects.map((project, index) => (
-          <article key={index} className="border-border border-b pb-8">
+          <article key={index} className="border-border/80 border-b pb-8">
             <div className="mb-2 flex flex-col md:flex-row md:items-baseline md:justify-between">
               <h2 className="text-xl font-bold">{project.title}</h2>
               <div className="text-muted flex flex-shrink-0 items-center gap-4 font-mono text-xs whitespace-nowrap md:ml-4">
@@ -47,7 +47,7 @@ export default function Projects() {
                     href={project.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-accent flex items-center gap-1 transition-colors"
+                    className="flex items-center gap-1 transition-colors hover:text-accent"
                   >
                     <Github size={13} />
                     code
@@ -56,7 +56,7 @@ export default function Projects() {
                 {project.demo && (
                   <Link
                     href={project.demo}
-                    className="hover:text-accent flex items-center gap-1 transition-colors"
+                    className="flex items-center gap-1 transition-colors hover:text-accent"
                   >
                     <ExternalLink size={13} />
                     post
@@ -69,7 +69,7 @@ export default function Projects() {
 
             <div className="flex flex-wrap gap-2 font-mono text-xs">
               {project.tags.map((tag) => (
-                <span key={tag} className="bg-accent-light/30 text-accent rounded px-2 py-1">
+                <span key={tag} className="bg-accent-light/20 text-accent rounded px-2 py-1">
                   {tag}
                 </span>
               ))}

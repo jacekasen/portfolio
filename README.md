@@ -1,6 +1,6 @@
 # Portfolio — Jace Kasen
 
-A personal portfolio and blog built with Next.js, featuring markdown-powered content, a responsive sidebar layout, and a warm earthy design system with dark mode support.
+A personal portfolio and blog built with Next.js, featuring markdown-powered content, a responsive top navigation layout, and a warm earthy design system with dark mode support.
 
 ## Tech Stack
 

@@ -38,22 +38,21 @@ describe('Shell Component', () => {
     expect(screen.getByRole('link', { name: /projects/i })).toBeInTheDocument();
   });
 
-  it('expands sidebar when toggle is clicked', () => {
+  it('opens the mobile menu when toggle is clicked', () => {
     render(
       <Shell>
         <div>Content</div>
       </Shell>,
     );
 
-    const logo = screen.getByText('jk');
-    expect(logo).toHaveClass('opacity-0');
+    expect(screen.queryByTestId('mobile-menu')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('mobile-menu-toggle'));
 
-    expect(logo).toHaveClass('opacity-100');
+    expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
   });
 
-  it('collapses sidebar when toggle is clicked again', () => {
+  it('closes the mobile menu when toggle is clicked again', () => {
     render(
       <Shell>
         <div>Content</div>
@@ -61,10 +60,9 @@ describe('Shell Component', () => {
     );
 
     fireEvent.click(screen.getByTestId('mobile-menu-toggle'));
-    const logo = screen.getByText('jk');
-    expect(logo).toHaveClass('opacity-100');
+    expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId('sidebar-toggle'));
-    expect(logo).toHaveClass('opacity-0');
+    fireEvent.click(screen.getByTestId('mobile-menu-toggle'));
+    expect(screen.queryByTestId('mobile-menu')).not.toBeInTheDocument();
   });
 });
