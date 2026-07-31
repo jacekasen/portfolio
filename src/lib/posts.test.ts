@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { getSortedPostsData } from './posts';
 import fs from 'fs';
 
@@ -19,13 +19,15 @@ vi.mock('path', async () => {
 vi.mock('gray-matter', () => ({
   default: (fileContents: string) => {
     // Simple parser mock
-    const [_, metaString, content] = fileContents.split('---');
+    const [, metaString = '', content] = fileContents.split('---');
     const data = metaString
       .trim()
       .split('\n')
-      .reduce((acc: any, line) => {
+      .reduce<Record<string, string>>((acc, line) => {
         const [key, value] = line.split(': ');
-        acc[key] = value.replace(/"/g, ''); // Simple cleanup
+        if (key && value) {
+          acc[key] = value.replace(/"/g, ''); // Simple cleanup
+        }
         return acc;
       }, {});
     return { data, content: content?.trim() || '' };
@@ -38,18 +40,18 @@ describe('getSortedPostsData', () => {
   });
 
   it('should return empty array if directory does not exist', () => {
-    (fs.existsSync as any).mockReturnValue(false);
+    (fs.existsSync as unknown as Mock).mockReturnValue(false);
     const posts = getSortedPostsData();
     expect(posts).toEqual([]);
   });
 
   it('should return sorted posts', () => {
-    (fs.existsSync as any).mockReturnValue(true);
+    (fs.existsSync as unknown as Mock).mockReturnValue(true);
     // Mock readdirSync
-    (fs.readdirSync as any).mockReturnValue(['a.md', 'b.md']);
+    (fs.readdirSync as unknown as Mock).mockReturnValue(['a.md', 'b.md']);
 
     // Mock readFileSync
-    (fs.readFileSync as any).mockImplementation((path: string) => {
+    (fs.readFileSync as unknown as Mock).mockImplementation((path: string) => {
       if (path.includes('a.md')) {
         return '---\ntitle: Post A\ndate: 2023-01-01\n---\nContent A';
       }
