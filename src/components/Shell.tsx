@@ -3,7 +3,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, User, Code, Menu, X, Github, Linkedin, Mail } from 'lucide-react';
+import {
+  Home,
+  BookOpen,
+  User,
+  Code,
+  TrendingUp,
+  Menu,
+  X,
+  Github,
+  Linkedin,
+  Mail,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/lib/config';
 
@@ -15,10 +26,12 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'Home', href: '/', icon: Home },
     { name: 'About', href: '/about', icon: User },
     { name: 'Blog', href: '/blog', icon: BookOpen },
-    { name: 'Projects', href: '/projects', icon: Code },
+    { name: 'Projects', href: '/projects', icon: Code, exact: true },
+    { name: 'NBA Analysis', href: '/projects/nba', icon: TrendingUp },
   ];
 
-  const isActiveHref = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href));
+  const isActiveHref = (href: string, exact = false) =>
+    pathname === href || (!exact && href !== '/' && pathname.startsWith(`${href}/`));
 
   const year = new Date().getFullYear();
 
@@ -41,7 +54,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={cn(
                   'rounded-md px-3 py-2 transition-colors',
-                  isActiveHref(item.href)
+                  isActiveHref(item.href, item.exact)
                     ? 'bg-accent-light/25 text-accent'
                     : 'hover:bg-accent-light/15 text-foreground',
                 )}
@@ -74,7 +87,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     onClick={() => setMenuOpen(false)}
                     className={cn(
                       'flex items-center gap-3 rounded-md p-3 transition-colors',
-                      isActiveHref(item.href)
+                      isActiveHref(item.href, item.exact)
                         ? 'bg-accent-light/25 text-accent'
                         : 'hover:bg-accent-light/15 text-foreground',
                     )}
@@ -103,7 +116,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               href={siteConfig.socials.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-accent"
+              className="hover:text-accent transition-colors"
             >
               <Github size={15} />
             </a>
@@ -111,11 +124,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               href={siteConfig.socials.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-accent"
+              className="hover:text-accent transition-colors"
             >
               <Linkedin size={15} />
             </a>
-            <a href={siteConfig.socials.email} className="transition-colors hover:text-accent">
+            <a href={siteConfig.socials.email} className="hover:text-accent transition-colors">
               <Mail size={15} />
             </a>
           </div>

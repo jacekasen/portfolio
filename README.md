@@ -16,21 +16,26 @@ A personal portfolio and blog built with Next.js, featuring markdown-powered con
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
 The site will be available at `http://localhost:3000`.
 
+To enable the NBA Peak Analysis page, replace the placeholders in `.env.local` with the project
+URL and publishable key from the Supabase Connect panel. The database must contain a publicly
+readable `nba_player_seasons` table.
+
 ## Scripts
 
-| Command              | Description                    |
-| -------------------- | ------------------------------ |
-| `npm run dev`        | Start development server       |
-| `npm run build`      | Production build               |
-| `npm run start`      | Serve production build         |
-| `npm run lint`       | Run ESLint                     |
-| `npm run test`       | Run tests with Vitest          |
-| `npm run format`     | Format code with Prettier      |
+| Command                | Description                      |
+| ---------------------- | -------------------------------- |
+| `npm run dev`          | Start development server         |
+| `npm run build`        | Production build                 |
+| `npm run start`        | Serve production build           |
+| `npm run lint`         | Run ESLint                       |
+| `npm run test`         | Run tests with Vitest            |
+| `npm run format`       | Format code with Prettier        |
 | `npm run format:check` | Check formatting without writing |
 
 ## Project Structure
@@ -50,6 +55,7 @@ src/
 └── lib/
     ├── config.ts           # Site-wide constants (social links, etc.)
     ├── posts.ts            # Markdown/blog post utilities
+    ├── supabase.ts         # Supabase database client
     └── utils.ts            # Shared helpers (cn, etc.)
 
 content/
@@ -66,9 +72,9 @@ Create a new `.md` file in `content/posts/`:
 
 ```markdown
 ---
-title: "My Post Title"
-date: "2026-01-15"
-description: "A short summary of the post."
+title: 'My Post Title'
+date: '2026-01-15'
+description: 'A short summary of the post.'
 tags: [tag1, tag2]
 ---
 

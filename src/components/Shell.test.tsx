@@ -36,6 +36,7 @@ describe('Shell Component', () => {
     expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /projects/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /nba analysis/i })).toBeInTheDocument();
   });
 
   it('opens the mobile menu when toggle is clicked', () => {

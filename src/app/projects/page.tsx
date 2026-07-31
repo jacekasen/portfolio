@@ -8,6 +8,14 @@ export const metadata = {
 
 const projects = [
   {
+    title: 'NBA Peak Analysis',
+    description:
+      'An interactive exploration of NBA player peaks using cleaned Basketball Reference season data stored in Supabase.',
+    tags: ['Python', 'Pandas', 'Supabase', 'PostgreSQL', 'Next.js'],
+    github: 'https://github.com/jacekasen/nba-peak-analysis',
+    demo: '/projects/nba',
+  },
+  {
     title: 'MD/HD Vehicle Detection via Satellite Imagery',
     description:
       'Fine-tuned a Faster R-CNN (ResNet50-FPN) on the DOTA aerial dataset to detect medium and heavy-duty trucks in Google Maps satellite tiles. Generated a vehicle density heat map over the UCLA campus area to inform EV charging infrastructure planning.',
@@ -47,7 +55,7 @@ export default function Projects() {
                     href={project.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 transition-colors hover:text-accent"
+                    className="hover:text-accent flex items-center gap-1 transition-colors"
                   >
                     <Github size={13} />
                     code
@@ -56,10 +64,10 @@ export default function Projects() {
                 {project.demo && (
                   <Link
                     href={project.demo}
-                    className="flex items-center gap-1 transition-colors hover:text-accent"
+                    className="hover:text-accent flex items-center gap-1 transition-colors"
                   >
                     <ExternalLink size={13} />
-                    post
+                    view
                   </Link>
                 )}
               </div>
