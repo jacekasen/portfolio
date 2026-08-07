@@ -7,7 +7,6 @@ import {
   Home,
   BookOpen,
   User,
-  Code,
   TrendingUp,
   Menu,
   X,
@@ -26,12 +25,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'Home', href: '/', icon: Home },
     { name: 'About', href: '/about', icon: User },
     { name: 'Blog', href: '/blog', icon: BookOpen },
-    { name: 'Projects', href: '/projects', icon: Code, exact: true },
     { name: 'NBA Analysis', href: '/projects/nba', icon: TrendingUp },
   ];
 
-  const isActiveHref = (href: string, exact = false) =>
-    pathname === href || (!exact && href !== '/' && pathname.startsWith(`${href}/`));
+  const isActiveHref = (href: string) =>
+    pathname === href || (href !== '/' && pathname.startsWith(`${href}/`));
 
   const year = new Date().getFullYear();
 
@@ -54,7 +52,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={cn(
                   'rounded-md px-3 py-2 transition-colors',
-                  isActiveHref(item.href, item.exact)
+                  isActiveHref(item.href)
                     ? 'bg-accent-light/25 text-accent'
                     : 'hover:bg-accent-light/15 text-foreground',
                 )}
@@ -87,7 +85,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     onClick={() => setMenuOpen(false)}
                     className={cn(
                       'flex items-center gap-3 rounded-md p-3 transition-colors',
-                      isActiveHref(item.href, item.exact)
+                      isActiveHref(item.href)
                         ? 'bg-accent-light/25 text-accent'
                         : 'hover:bg-accent-light/15 text-foreground',
                     )}
@@ -103,11 +101,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </header>
 
       <main className="flex-1 pt-16">
-        <div className="mx-auto max-w-5xl px-4 py-8 md:px-12 md:py-12 lg:px-16">{children}</div>
+        <div className="mx-auto max-w-6xl px-4 py-8 md:px-12 md:py-12 lg:px-16">{children}</div>
       </main>
 
       <footer className="border-border/80 border-t">
-        <div className="text-muted mx-auto flex max-w-5xl flex-col items-center gap-2 px-4 py-4 md:flex-row md:justify-between md:px-12 lg:px-16">
+        <div className="text-muted mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-4 md:flex-row md:justify-between md:px-12 lg:px-16">
           <p className="font-mono text-xs">
             © {year} {siteConfig.name}
           </p>

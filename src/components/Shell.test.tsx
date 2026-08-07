@@ -35,7 +35,7 @@ describe('Shell Component', () => {
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /projects/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^projects$/i })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /nba analysis/i })).toBeInTheDocument();
   });
 

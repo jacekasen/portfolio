@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getSortedPostsData } from '@/lib/posts';
+import { projects } from '@/lib/projects';
 import { siteConfig } from '@/lib/config';
 import { format, parseISO } from 'date-fns';
-import { Github, Linkedin, Mail } from 'lucide-react';
+import { ExternalLink, Github, Linkedin, Mail } from 'lucide-react';
 
 export default function Home() {
   const allPostsData = getSortedPostsData();
-  const recentPosts = allPostsData.slice(0, 3);
+  const recentPosts = allPostsData.slice(0, 10);
 
   return (
     <div className="space-y-14 md:space-y-18">
@@ -25,7 +26,7 @@ export default function Home() {
             </p>
             <div className="mb-7 flex flex-wrap gap-6 font-mono text-sm">
               <Link
-                href="/projects"
+                href="/#projects"
                 className="text-accent inline-flex items-center gap-1.5 transition-colors hover:underline"
               >
                 Projects →
@@ -70,6 +71,53 @@ export default function Home() {
               priority
             />
           </div>
+        </div>
+      </section>
+
+      {/* Projects Section */}
+      <section id="projects" className="scroll-mt-24">
+        <div className="border-border/80 mb-6 border-b pb-3">
+          <h2 className="font-mono text-2xl">Projects</h2>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          {projects.map((project) => (
+            <article key={project.title} className="border-border/80 bg-surface/50 border p-5">
+              <h3 className="mb-2 text-lg font-bold">{project.title}</h3>
+              <p className="text-muted mb-4 line-clamp-3 text-sm leading-6">
+                {project.description}
+              </p>
+              <div className="mb-4 flex flex-wrap gap-2 font-mono text-xs">
+                {project.tags.slice(0, 3).map((tag) => (
+                  <span key={tag} className="bg-accent-light/20 text-accent rounded px-2 py-1">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-4 font-mono text-xs">
+                {project.demo && (
+                  <Link
+                    href={project.demo}
+                    className="hover:text-accent inline-flex items-center gap-1 transition-colors"
+                  >
+                    <ExternalLink size={13} />
+                    view project
+                  </Link>
+                )}
+                {project.github && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-accent inline-flex items-center gap-1 transition-colors"
+                  >
+                    <Github size={13} />
+                    code
+                  </a>
+                )}
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 

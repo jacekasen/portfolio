@@ -249,7 +249,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         </>
       )}
 
-      <Link href="/projects" className="text-accent inline-block font-mono text-sm hover:underline">
+      <Link href="/#projects" className="text-accent inline-block font-mono text-sm hover:underline">
         ← back to projects
       </Link>
     </div>
@@ -282,7 +282,7 @@ function SupabaseSetupMessage() {
           publishable key from the Supabase Connect panel.
         </p>
       </div>
-      <Link href="/projects" className="text-accent font-mono text-sm hover:underline">
+      <Link href="/#projects" className="text-accent font-mono text-sm hover:underline">
         ← back to projects
       </Link>
     </div>
