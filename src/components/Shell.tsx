@@ -3,17 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Home,
-  BookOpen,
-  User,
-  TrendingUp,
-  Menu,
-  X,
-  Github,
-  Linkedin,
-  Mail,
-} from 'lucide-react';
+import { Home, BookOpen, User, TrendingUp, Menu, X, Github, Linkedin, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/lib/config';
 
@@ -25,7 +15,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'Home', href: '/', icon: Home },
     { name: 'About', href: '/about', icon: User },
     { name: 'Blog', href: '/blog', icon: BookOpen },
-    { name: 'NBA Analysis', href: '/projects/nba', icon: TrendingUp },
+    { name: 'NBA Performance Trends', href: '/projects/nba', icon: TrendingUp },
   ];
 
   const isActiveHref = (href: string) =>

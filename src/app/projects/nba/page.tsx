@@ -4,7 +4,7 @@ import { PlayerAutocomplete } from '@/components/PlayerAutocomplete';
 import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 
 export const metadata = {
-  title: 'NBA Peak Analysis | Jace Kasen',
+  title: 'NBA Performance Trends | Jace Kasen',
   description: 'Explore how an NBA player’s performance changes as they age.',
 };
 
@@ -105,7 +105,9 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
           Basketball Reference · 1976–2026
         </p>
-        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">NBA Peak Analysis</h1>
+        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">
+          NBA Performance Trends
+        </h1>
         <p className="text-muted max-w-2xl text-lg leading-7">
           Trace how a player&apos;s performance rises, peaks, and changes across their career.
         </p>
@@ -275,7 +277,9 @@ function SupabaseSetupMessage() {
   return (
     <div className="space-y-8 pt-4 md:pt-8">
       <header>
-        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">NBA Peak Analysis</h1>
+        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">
+          NBA Performance Trends
+        </h1>
         <p className="text-muted max-w-2xl text-lg leading-7">
           The page is ready, but its Supabase environment variables have not been configured.
         </p>

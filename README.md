@@ -22,7 +22,7 @@ npm run dev
 
 The site will be available at `http://localhost:3000`.
 
-To enable the NBA Peak Analysis page, replace the placeholders in `.env.local` with the project
+To enable the NBA Performance Trends page, replace the placeholders in `.env.local` with the project
 URL and publishable key from the Supabase Connect panel. The database must contain a publicly
 readable `nba_player_seasons` table.
 
