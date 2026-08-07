@@ -172,6 +172,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
             <div className="border-border bg-background rounded-lg border p-3 md:p-5">
               <NbaMetricChart
                 metricLabel={metricDetails.shortLabel}
+                valueDigits={metricDetails.digits}
                 referenceLine={{
                   label: metricDetails.referenceLabel,
                   value: metricDetails.reference,
@@ -249,7 +250,10 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         </>
       )}
 
-      <Link href="/#projects" className="text-accent inline-block font-mono text-sm hover:underline">
+      <Link
+        href="/#projects"
+        className="text-accent inline-block font-mono text-sm hover:underline"
+      >
         ← back to projects
       </Link>
     </div>
