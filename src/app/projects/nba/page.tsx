@@ -38,6 +38,15 @@ const METRICS = {
     reference: 0.1,
     referenceLabel: 'League average: .100',
   },
+  vorp: {
+    label: 'Value Over Replacement Player',
+    shortLabel: 'VORP',
+    digits: 1,
+    min: -5,
+    max: 15,
+    reference: 0,
+    referenceLabel: 'Replacement level: 0',
+  },
   per: {
     label: 'Player Efficiency Rating',
     shortLabel: 'PER',
@@ -58,6 +67,7 @@ type NbaSeasonRow = {
   per: number;
   bpm: number;
   ws: number;
+  vorp: number;
   ws_per_48: number;
 };
 
@@ -81,7 +91,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
   const supabase = createSupabaseClient();
   const { data, error: queryError } = await supabase
     .from('nba_player_seasons')
-    .select('player_name, year_id, age, per, bpm, ws, ws_per_48')
+    .select('player_name, year_id, age, per, bpm, ws, vorp, ws_per_48')
     .ilike('player_name', requestedPlayer)
     .order('age', { ascending: true })
     .returns<NbaSeasonRow[]>();
