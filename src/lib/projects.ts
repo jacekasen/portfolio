@@ -8,9 +8,9 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    title: 'NBA Performance Trends',
+    title: 'NBA Analysis',
     description:
-      'An interactive exploration of NBA player peaks using cleaned Basketball Reference season data stored in Supabase.',
+      'Interactive analyses of individual NBA career trends and league-wide peak performance using Basketball Reference data.',
     tags: ['Python', 'Pandas', 'Supabase', 'PostgreSQL', 'Next.js'],
     github: 'https://github.com/jacekasen/nba-peak-analysis',
     demo: '/projects/nba',

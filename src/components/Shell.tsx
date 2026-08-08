@@ -15,11 +15,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'Home', href: '/', icon: Home },
     { name: 'About', href: '/about', icon: User },
     { name: 'Blog', href: '/blog', icon: BookOpen },
-    { name: 'NBA Performance Trends', href: '/projects/nba', icon: TrendingUp },
+    { name: 'NBA Analysis', href: '/projects/nba', icon: TrendingUp },
   ];
 
-  const isActiveHref = (href: string) =>
-    pathname === href || (href !== '/' && pathname.startsWith(`${href}/`));
+  const activeHref = navItems
+    .filter(({ href }) => pathname === href || (href !== '/' && pathname.startsWith(`${href}/`)))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+  const isActiveHref = (href: string) => href === activeHref;
 
   const year = new Date().getFullYear();
 
