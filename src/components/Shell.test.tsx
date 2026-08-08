@@ -8,9 +8,11 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/lib/config', () => ({
   siteConfig: {
+    name: 'Jace Kasen',
     socials: {
       github: 'https://github.com/test',
       linkedin: 'https://linkedin.com/in/test',
+      email: 'mailto:test@example.com',
     },
   },
 }));
@@ -32,11 +34,11 @@ describe('Shell Component', () => {
       </Shell>,
     );
 
-    expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /work/i })).toHaveAttribute('href', '/work');
     expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /^projects$/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /writing/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /nba analysis/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /résumé/i })).toBeInTheDocument();
   });
 
   it('opens the mobile menu when toggle is clicked', () => {

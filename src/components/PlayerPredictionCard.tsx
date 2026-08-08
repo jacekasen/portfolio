@@ -168,8 +168,7 @@ export function PlayerPredictionUnavailable() {
       </h2>
       <div className="border-border bg-surface rounded-lg border p-5">
         <p className="text-muted text-sm">
-          An ML estimate is not available for this player. Predictions require a qualified season
-          with enough games, minutes, and advanced-metric history.
+          An ML estimate is not available for this player. Predictions require active players with at least 3 seasons of data and a minimum of 500 career minutes played.
         </p>
       </div>
     </section>

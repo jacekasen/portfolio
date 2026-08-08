@@ -1,6 +1,9 @@
 export interface Project {
   title: string;
+  eyebrow: string;
+  kind: 'independent' | 'coursework';
   description: string;
+  buildDetails: string;
   tags: string[];
   github: string | null;
   demo: string | null;
@@ -8,35 +11,51 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    title: 'NBA Analysis',
+    title: 'NBA Performance Analysis',
+    eyebrow: 'A project I started for fun',
+    kind: 'independent',
     description:
-      'Interactive analyses of individual NBA career trends and league-wide peak performance using Basketball Reference data.',
-    tags: ['Python', 'Pandas', 'Supabase', 'PostgreSQL', 'Next.js'],
+      'I have followed the NBA closely since 2019, and the question of when a player peaks - or whether a developing player will keep getting better - comes up all the time. I could have looked up the usual answer, but I wanted to investigate it myself for fun.',
+    buildDetails:
+      'I also wanted to plot one-number metrics year by year so I could see the bigger picture of a player’s career. That turned into data ingestion, PostgreSQL, server-side queries, player search, interactive charts, and a small forecasting layer.',
+    tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL'],
     github: 'https://github.com/jacekasen/nba-peak-analysis',
     demo: '/projects/nba',
   },
   {
-    title: 'Decoding Wrist EMG to Text',
+    title: 'FinSight',
+    eyebrow: 'Made for a software engineering course',
+    kind: 'coursework',
     description:
-      'Compared sequence models for decoding typed text from wrist EMG signals. A bidirectional LSTM beat the TDS convolution baseline, a GRU, a ResNet18 + LSTM hybrid, and a Transformer encoder, cutting test character error rate from 24.18% to 18.95%.',
-    tags: ['Python', 'PyTorch', 'Deep Learning', 'LSTM', 'Transformers', 'CTC'],
+      'A cross-platform budgeting app with authentication, transaction tracking, financial goals, dashboards, and social accountability features.',
+    buildDetails:
+      'I worked on the React Native client, REST API, authentication flow, permissions, and PostgreSQL schema.',
+    tags: ['React Native', 'TypeScript', 'Node.js', 'PostgreSQL'],
+    github: null,
+    demo: null,
+  },
+  {
+    title: 'Decoding Wrist EMG to Text',
+    eyebrow: 'Made for a machine learning course',
+    kind: 'coursework',
+    description:
+      'A sequence-modeling project that translates wrist-muscle signals into typed text.',
+    buildDetails:
+      'Built a shared preprocessing and evaluation pipeline, compared several architectures, and analyzed where each approach struggled.',
+    tags: ['Python', 'PyTorch', 'Sequence Models', 'CTC'],
     github: 'https://github.com/jacekasen/ece-c147a-project-submission',
     demo: '/blog/2026-03-20-emg-to-text-decoding',
   },
   {
-    title: 'MD/HD Vehicle Detection via Satellite Imagery',
+    title: 'Heavy-Duty Vehicle Site Selection',
+    eyebrow: 'Made for a computer vision course',
+    kind: 'coursework',
     description:
-      'Fine-tuned a Faster R-CNN (ResNet50-FPN) on the DOTA aerial dataset to detect medium and heavy-duty trucks in Google Maps satellite tiles. Generated a vehicle density heat map over the UCLA campus area to inform EV charging infrastructure planning.',
-    tags: ['Python', 'PyTorch', 'Computer Vision', 'ResNet50', 'FPN', 'Google Maps API'],
+      'A computer-vision workflow for identifying heavy-duty vehicles in aerial imagery and mapping likely charging demand.',
+    buildDetails:
+      'Built image tiling, annotation conversion, model training, inference, and mapping steps into one working pipeline.',
+    tags: ['Python', 'PyTorch', 'Computer Vision', 'Geospatial'],
     github: null,
     demo: '/blog/2025-12-13-team41-truckdetection',
-  },
-  {
-    title: 'This Portfolio Website',
-    description:
-      'Portfolio and blog built with Next.js, Tailwind CSS, and Markdown, developed using Cursor IDE.',
-    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
-    github: 'https://github.com/jankasen/portfolio',
-    demo: null,
   },
 ];

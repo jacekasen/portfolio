@@ -15,8 +15,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Jace Kasen',
-  description: "Jace Kasen's Personal Website",
+  title: {
+    default: 'Jace Kasen · Software Engineer',
+    template: '%s · Jace Kasen',
+  },
+  description:
+    'Jace Kasen builds software, follows basketball too closely, and writes about language and identity.',
 };
 
 export default function RootLayout({

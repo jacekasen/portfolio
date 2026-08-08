@@ -1,6 +1,7 @@
 export const siteConfig = {
   name: 'Jace Kasen',
-  description: "Jace Kasen's Personal Website",
+  description:
+    'Software, basketball, language, identity, and the occasional question that gets out of hand.',
   socials: {
     github: 'https://github.com/jacekasen',
     linkedin: 'https://linkedin.com/in/jacekasen',

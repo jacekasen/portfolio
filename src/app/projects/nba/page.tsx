@@ -4,7 +4,7 @@ import { ArrowRight, LineChart, Mountain } from 'lucide-react';
 export const metadata = {
   title: 'NBA Analysis | Jace Kasen',
   description:
-    'Interactive NBA analysis exploring individual career trends and league-wide peak performance.',
+    'Two interactive ways to look at how NBA players change over the course of a career.',
 };
 
 const analyses = [
@@ -33,12 +33,13 @@ export default function NbaAnalysisPage() {
     <div className="space-y-12 pt-4 md:pt-8">
       <header className="max-w-4xl">
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-          Basketball Reference · Interactive research
+          A basketball question that got slightly out of hand
         </p>
         <h1 className="mb-4 font-mono text-4xl tracking-tight md:text-6xl">NBA Analysis</h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
-          Two ways to examine performance over an NBA career: follow one player season by season, or
-          step back to see when players across the league tend to reach their prime.
+          I wanted to know when NBA players really peak. That turned into two ways of looking at a
+          career: follow one player season by season, or step back and compare patterns across the
+          league.
         </p>
       </header>
 
@@ -80,10 +81,7 @@ export default function NbaAnalysisPage() {
         })}
       </section>
 
-      <Link
-        href="/#projects"
-        className="text-accent inline-block font-mono text-sm hover:underline"
-      >
+      <Link href="/work" className="text-accent inline-block font-mono text-sm hover:underline">
         ← back to all projects
       </Link>
     </div>

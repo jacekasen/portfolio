@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@plugin "@tailwindcss/typography";
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 :root {
   --background: #fbf7f2;
@@ -23,6 +23,11 @@
   --font-mono: var(--font-jetbrains-mono);
 }
 
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -31,13 +36,15 @@ body {
     radial-gradient(circle at top left, rgba(122, 79, 40, 0.06), transparent 30%),
     radial-gradient(circle at top right, rgba(201, 149, 96, 0.08), transparent 28%);
   background-attachment: fixed;
-  scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 /* Monospace styling for technical elements */
-code, kbd, pre, samp {
+code,
+kbd,
+pre,
+samp {
   font-family: var(--font-jetbrains-mono), 'Courier New', monospace;
 }
 

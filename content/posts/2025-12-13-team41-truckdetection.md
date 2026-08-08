@@ -1,6 +1,6 @@
 ---
 title: "Computer Vision for Medium/Heavy-Duty Vehicle Detection via Satellite Imagery"
-date: "2026-05-05"
+date: "2025-12-13"
 description: "We fine-tuned a ResNet50-FPN detector on the DOTA aerial dataset and applied it to Google satellite tiles to locate medium/heavy-duty truck parking clusters for EV charging planning."
 tags: ["Computer Vision", "Machine Learning", "UCLA", "Python"]
 ---

@@ -3,8 +3,8 @@ import { getSortedPostsData } from '@/lib/posts';
 import { format, parseISO } from 'date-fns';
 
 export const metadata = {
-  title: 'Blog | Jace Kasen',
-  description: 'Writing about software engineering, machine learning, and more.',
+  title: 'Writing | Jace Kasen',
+  description: 'Notes on software, basketball, language, identity, and whatever else sticks.',
 };
 
 export default function BlogIndex() {
@@ -13,9 +13,9 @@ export default function BlogIndex() {
   return (
     <div className="space-y-10 md:space-y-14">
       <header className="pt-4 md:pt-8">
-        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">Blog</h1>
+        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">Writing</h1>
         <p className="text-muted max-w-2xl text-lg leading-7">
-          Some of my thoughts and attempts at answering my questions.
+          Mostly attempts to answer questions I could not quite leave alone.
         </p>
       </header>
 

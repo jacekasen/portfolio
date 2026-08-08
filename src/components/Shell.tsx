@@ -3,7 +3,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, User, TrendingUp, Menu, X, Github, Linkedin, Mail } from 'lucide-react';
+import {
+  BookOpen,
+  BriefcaseBusiness,
+  Download,
+  Github,
+  Linkedin,
+  Mail,
+  Menu,
+  TrendingUp,
+  User,
+  X,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/lib/config';
 
@@ -12,14 +23,20 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const navItems = [
-    { name: 'Home', href: '/', icon: Home },
+    { name: 'Work', href: '/work', icon: BriefcaseBusiness },
     { name: 'About', href: '/about', icon: User },
-    { name: 'Blog', href: '/blog', icon: BookOpen },
+    { name: 'Writing', href: '/blog', icon: BookOpen },
     { name: 'NBA Analysis', href: '/projects/nba', icon: TrendingUp },
+    { name: 'Résumé', href: '/jace-kasen-resume.pdf', icon: Download },
   ];
 
   const activeHref = navItems
-    .filter(({ href }) => pathname === href || (href !== '/' && pathname.startsWith(`${href}/`)))
+    .filter(
+      ({ href }) =>
+        !href.includes('#') &&
+        !href.endsWith('.pdf') &&
+        (pathname === href || pathname.startsWith(`${href}/`)),
+    )
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
   const isActiveHref = (href: string) => href === activeHref;
 
@@ -37,7 +54,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             jk
           </Link>
 
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 font-mono text-sm md:flex">
+          <nav className="absolute left-[50vw] hidden -translate-x-1/2 items-center gap-1 font-mono text-sm md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -109,6 +126,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               className="hover:text-accent transition-colors"
             >
               <Github size={15} />
+              <span className="sr-only">GitHub</span>
             </a>
             <a
               href={siteConfig.socials.linkedin}
@@ -117,9 +135,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               className="hover:text-accent transition-colors"
             >
               <Linkedin size={15} />
+              <span className="sr-only">LinkedIn</span>
             </a>
             <a href={siteConfig.socials.email} className="hover:text-accent transition-colors">
               <Mail size={15} />
+              <span className="sr-only">Email</span>
             </a>
           </div>
         </div>
