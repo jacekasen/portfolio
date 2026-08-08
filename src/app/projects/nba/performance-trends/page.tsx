@@ -1,11 +1,18 @@
 import Link from 'next/link';
 import { NbaMetricChart, type MetricSeries } from '@/components/NbaMetricChart';
 import { PlayerAutocomplete } from '@/components/PlayerAutocomplete';
+import {
+  PlayerPredictionCard,
+  PlayerPredictionUnavailable,
+  type ObservedPredictionOutcome,
+  type PlayerPrediction,
+} from '@/components/PlayerPredictionCard';
 import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 
 export const metadata = {
   title: 'NBA Performance Trends | Jace Kasen',
-  description: 'Explore how an NBA player’s performance changes as they age.',
+  description:
+    'Explore how an NBA player’s performance changes with age and view a machine-learning outlook for their next qualified season.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -59,6 +66,7 @@ const METRICS = {
 } as const;
 
 type MetricKey = keyof typeof METRICS;
+const METRIC_ORDER: MetricKey[] = ['bpm', 'vorp', 'ws_per_48', 'ws', 'per'];
 
 type NbaSeasonRow = {
   player_name: string;
@@ -89,12 +97,26 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
   }
 
   const supabase = createSupabaseClient();
-  const { data, error: queryError } = await supabase
-    .from('nba_player_seasons')
-    .select('player_name, year_id, age, per, bpm, ws, vorp, ws_per_48')
-    .ilike('player_name', requestedPlayer)
-    .order('age', { ascending: true })
-    .returns<NbaSeasonRow[]>();
+  const [seasonResult, predictionResult] = await Promise.all([
+    supabase
+      .from('nba_player_seasons')
+      .select('player_name, year_id, age, per, bpm, ws, vorp, ws_per_48')
+      .ilike('player_name', requestedPlayer)
+      .order('age', { ascending: true })
+      .returns<NbaSeasonRow[]>(),
+    supabase
+      .from('player_predictions')
+      .select(
+        'player_id, player_name, season, age, current_bpm, trajectory, improving_probability, stable_probability, regressing_probability, peak_probability, predicted_bpm_delta, prediction_factors, model_version, updated_at',
+      )
+      .ilike('player_name', requestedPlayer)
+      .limit(1)
+      .returns<PlayerPrediction[]>(),
+  ]);
+
+  const { data, error: queryError } = seasonResult;
+  const prediction = predictionResult.data?.[0] ?? null;
+  const observedOutcome = prediction ? getObservedOutcome(data ?? [], prediction) : undefined;
 
   const series: MetricSeries[] = data?.length
     ? [
@@ -108,31 +130,30 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         },
       ]
     : [];
+  const playerSeries = series[0];
+  const latestPoint = playerSeries?.points.at(-1);
+  const peakPoint = playerSeries?.points.reduce((best, point) =>
+    point.value > best.value ? point : best,
+  );
 
   return (
-    <div className="space-y-9 pt-4 md:pt-8">
-      <header>
+    <div className="space-y-14 pt-4 md:pt-8">
+      <header className="max-w-4xl">
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
           Basketball Reference · 1976–2026
         </p>
         <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">
           NBA Performance Trends
         </h1>
-        <p className="text-muted max-w-2xl text-lg leading-7">
-          Trace how a player&apos;s performance rises, peaks, and changes across their career.
+        <p className="text-muted max-w-3xl text-lg leading-8">
+          Follow one player from season-by-season performance to a probabilistic forecast of what
+          comes next.
         </p>
-        <div className="mt-4 flex flex-wrap gap-5 font-mono text-sm">
-          <Link href="/projects/nba/peak-performance" className="text-accent hover:underline">
-            explore the aggregate peak-performance analysis →
-          </Link>
-          <Link href="/projects/nba" className="text-accent hover:underline">
-            all NBA analyses →
-          </Link>
-        </div>
       </header>
 
       <form
-        className="border-border bg-surface grid gap-5 rounded-lg border p-5 md:grid-cols-[1fr_1.6fr_auto] md:items-start"
+        aria-label="Choose player and statistic"
+        className="border-border bg-surface grid gap-5 rounded-lg border p-5 md:grid-cols-[1fr_1.6fr_auto] md:items-start md:p-6"
         action="/projects/nba/performance-trends"
         method="get"
       >
@@ -143,9 +164,9 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
             defaultValue={metric}
             className="border-border bg-background h-11 rounded border px-3"
           >
-            {Object.entries(METRICS).map(([value, details]) => (
+            {METRIC_ORDER.map((value) => (
               <option key={value} value={value}>
-                {details.label}
+                {METRICS[value].label}
               </option>
             ))}
           </select>
@@ -166,7 +187,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
           type="submit"
           className="bg-accent text-background h-11 rounded px-5 font-mono text-sm transition-opacity hover:opacity-90 md:mt-6"
         >
-          view trend
+          update view
         </button>
       </form>
 
@@ -180,15 +201,36 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
       ) : (
         <>
           <section aria-labelledby="chart-title">
-            <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
-              <div>
-                <h2 id="chart-title" className="font-mono text-2xl">
-                  {series[0].name}&apos;s {metricDetails.shortLabel} by age
-                </h2>
-                <p className="text-muted mt-1 text-sm">{metricDetails.label}</p>
-              </div>
-              <p className="text-muted font-mono text-xs">Player age →</p>
+            <div className="mb-6">
+              <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
+                01 · Career arc
+              </p>
+              <h2 id="chart-title" className="font-mono text-2xl md:text-3xl">
+                {playerSeries.name} · {metricDetails.shortLabel}
+              </h2>
+              <p className="text-muted mt-2 text-sm">
+                {metricDetails.label} across {playerSeries.points.length} recorded seasons.
+              </p>
             </div>
+
+            <div className="mb-5 grid gap-3 sm:grid-cols-3">
+              <CareerStat
+                label="Latest"
+                value={formatMetric(latestPoint!.value, metricDetails.digits)}
+                detail={`${metricDetails.shortLabel} · ${latestPoint!.season}`}
+              />
+              <CareerStat
+                label="Career high"
+                value={formatMetric(peakPoint.value, metricDetails.digits)}
+                detail={`Age ${peakPoint.age} · ${peakPoint.season}`}
+              />
+              <CareerStat
+                label="Career span"
+                value={`${playerSeries.points.length} seasons`}
+                detail={`Ages ${playerSeries.points[0].age}–${latestPoint!.age}`}
+              />
+            </div>
+
             <div className="border-border bg-background rounded-lg border p-3 md:p-5">
               <NbaMetricChart
                 metricLabel={metricDetails.shortLabel}
@@ -209,73 +251,74 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
             </p>
           </section>
 
-          <section aria-labelledby="peaks-title">
-            <h2 id="peaks-title" className="mb-4 font-mono text-2xl">
-              Peak performance
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {series.map((player) => {
-                const peak = player.points.reduce((best, point) =>
-                  point.value > best.value ? point : best,
-                );
-                return (
-                  <article
-                    key={player.name}
-                    className="border-border bg-surface rounded border p-4"
-                  >
-                    <p className="text-muted mb-3 truncate font-mono text-xs">{player.name}</p>
-                    <p className="text-3xl font-bold">
-                      {formatMetric(peak.value, metricDetails.digits)}
-                    </p>
-                    <p className="text-muted mt-1 text-sm">
-                      {metricDetails.shortLabel} · age {peak.age} · {peak.season}
-                    </p>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
+          {prediction && !predictionResult.error ? (
+            <PlayerPredictionCard prediction={prediction} observedOutcome={observedOutcome} />
+          ) : (
+            <PlayerPredictionUnavailable />
+          )}
 
           <section aria-labelledby="data-title">
-            <h2 id="data-title" className="mb-4 font-mono text-2xl">
-              Season data
+            <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
+              03 · Season log
+            </p>
+            <h2 id="data-title" className="font-mono text-2xl">
+              Season-by-season record
             </h2>
-            <div className="border-border overflow-x-auto rounded border">
-              <table className="w-full min-w-[560px] text-left text-sm">
-                <thead className="bg-accent-light/15 font-mono text-xs uppercase">
-                  <tr>
-                    <th className="px-3 py-2">Player</th>
-                    <th className="px-3 py-2">Age</th>
-                    <th className="px-3 py-2">Season</th>
-                    <th className="px-3 py-2">{metricDetails.shortLabel}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {series.flatMap((player) =>
-                    player.points.map((point) => (
-                      <tr key={`${player.name}-${point.season}`} className="border-border border-t">
-                        <td className="px-3 py-2">{player.name}</td>
-                        <td className="px-3 py-2">{point.age}</td>
-                        <td className="px-3 py-2 font-mono">{point.season}</td>
-                        <td className="px-3 py-2">
-                          {formatMetric(point.value, metricDetails.digits)}
-                        </td>
-                      </tr>
-                    )),
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <p className="text-muted mt-2 mb-5 text-sm">
+              Open the complete table for the selected statistic.
+            </p>
+            <details className="border-border bg-surface group overflow-hidden rounded-lg border">
+              <summary className="hover:bg-accent-light/10 flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-mono text-sm transition-colors">
+                <span>View {playerSeries.points.length} seasons</span>
+                <span className="text-accent group-open:rotate-45" aria-hidden="true">
+                  +
+                </span>
+              </summary>
+              <div className="border-border overflow-x-auto border-t">
+                <table className="w-full min-w-[560px] text-left text-sm">
+                  <thead className="bg-accent-light/15 font-mono text-xs uppercase">
+                    <tr>
+                      <th className="px-3 py-2">Player</th>
+                      <th className="px-3 py-2">Age</th>
+                      <th className="px-3 py-2">Season</th>
+                      <th className="px-3 py-2">{metricDetails.shortLabel}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {series.flatMap((player) =>
+                      player.points.map((point) => (
+                        <tr
+                          key={`${player.name}-${point.season}`}
+                          className="border-border border-t"
+                        >
+                          <td className="px-3 py-2">{player.name}</td>
+                          <td className="px-3 py-2">{point.age}</td>
+                          <td className="px-3 py-2 font-mono">{point.season}</td>
+                          <td className="px-3 py-2">
+                            {formatMetric(point.value, metricDetails.digits)}
+                          </td>
+                        </tr>
+                      )),
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </details>
           </section>
         </>
       )}
 
-      <Link
-        href="/projects/nba"
-        className="text-accent inline-block font-mono text-sm hover:underline"
+      <nav
+        aria-label="Related NBA analysis"
+        className="border-border flex flex-wrap gap-x-8 gap-y-3 border-t pt-6 font-mono text-sm"
       >
-        ← all NBA analyses
-      </Link>
+        <Link href="/projects/nba/peak-performance" className="text-accent hover:underline">
+          explore aggregate peak performance →
+        </Link>
+        <Link href="/projects/nba" className="text-accent hover:underline">
+          all NBA analyses →
+        </Link>
+      </nav>
     </div>
   );
 }
@@ -289,6 +332,40 @@ function formatMetric(value: number, digits: number) {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value);
+}
+
+function CareerStat({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <article className="border-border bg-surface rounded border p-4">
+      <p className="text-muted font-mono text-xs tracking-wide uppercase">{label}</p>
+      <p className="mt-2 font-mono text-2xl">{value}</p>
+      <p className="text-muted mt-1 text-xs">{detail}</p>
+    </article>
+  );
+}
+
+function getObservedOutcome(
+  seasons: NbaSeasonRow[],
+  prediction: PlayerPrediction,
+): ObservedPredictionOutcome | undefined {
+  if (prediction.current_bpm === null) return undefined;
+
+  const forecastSeasonStart = Number.parseInt(prediction.season.slice(0, 4), 10);
+  if (!Number.isFinite(forecastSeasonStart)) return undefined;
+
+  const nextSeason = seasons.find(
+    (season) => Number.parseInt(season.year_id.slice(0, 4), 10) === forecastSeasonStart,
+  );
+  if (!nextSeason) return undefined;
+
+  const bpmDelta = Number(nextSeason.bpm) - Number(prediction.current_bpm);
+  if (!Number.isFinite(bpmDelta)) return undefined;
+
+  return {
+    season: nextSeason.year_id,
+    bpmDelta,
+    trajectory: bpmDelta > 0.5 ? 'improving' : bpmDelta < -0.5 ? 'regressing' : 'stable',
+  };
 }
 
 function SupabaseSetupMessage() {

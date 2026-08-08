@@ -13,8 +13,8 @@ const analyses = [
     href: '/projects/nba/performance-trends',
     eyebrow: 'Individual careers · 1976–2026',
     description:
-      'Search for an NBA player and trace how BPM, Win Shares, WS/48, VORP, and PER change throughout their career.',
-    detail: 'Interactive player search and season-level chart',
+      'Search for an NBA player, trace five advanced metrics across their career, and explore an ML outlook for their next qualified season.',
+    detail: 'Interactive career chart and probabilistic forecast',
     icon: LineChart,
   },
   {
