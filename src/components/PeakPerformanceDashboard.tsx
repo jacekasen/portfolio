@@ -92,12 +92,12 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
       <ChartSection
         eyebrow="01 · Shape"
         title={`${details.shortLabel} performance by age`}
-        description="Average qualifying-season performance with a 95% confidence interval. Hover or click an age to inspect its estimate and sample size."
+        description="Average qualifying-season performance with a 95% confidence interval. Hover an age to inspect its estimate and sample size."
       >
         <AgingCurveChart metric={metric} data={data} />
       </ChartSection>
 
-      <div className="grid gap-10 xl:grid-cols-2">
+      <div className="grid gap-12">
         <ChartSection
           eyebrow="02 · Distribution"
           title="When individual players peak"
@@ -109,7 +109,7 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
         <ChartSection
           eyebrow="03 · Robustness"
           title="Raw versus smoothed peak age"
-          description="Points near the diagonal retain the same peak estimate after smoothing. Hover a point to identify the player."
+          description="Bubbles group players with the same raw and smoothed peak ages; larger bubbles represent more players. Hover a bubble for the count and examples."
         >
           <RawVsSmoothedScatter metric={metric} data={data} />
         </ChartSection>
@@ -222,7 +222,6 @@ function StatCard({ label, value }: { label: string; value: string }) {
 function AgingCurveChart({ metric, data }: { metric: MetricKey; data: PeakPerformanceData }) {
   const [showAllAges, setShowAllAges] = useState(false);
   const [hoveredAge, setHoveredAge] = useState<number | null>(null);
-  const [selectedAge, setSelectedAge] = useState<number | null>(null);
   const details = METRICS[metric];
   const allPoints = data.curves[metric];
   const points = showAllAges
@@ -241,11 +240,12 @@ function AgingCurveChart({ metric, data }: { metric: MetricKey; data: PeakPerfor
   const xFor = (age: number) =>
     PADDING.left + ((age - xMin) / Math.max(xMax - xMin, 1)) * plotWidth;
   const yFor = (value: number) =>
-    PADDING.top + ((yMax - value) / Math.max(yMax - yMin, 1)) * curveHeight;
+    PADDING.top + ((yMax - value) / Math.max(yMax - yMin, Number.EPSILON)) * curveHeight;
   const maxCount = Math.max(...points.map((point) => point.count));
   const highestMean = points.reduce((best, point) => (point.mean > best.mean ? point : best));
-  const activeAge = hoveredAge ?? selectedAge ?? highestMean.age;
+  const activeAge = hoveredAge ?? highestMean.age;
   const activePoint = points.find((point) => point.age === activeAge) ?? highestMean;
+  const showTooltip = hoveredAge !== null;
   const linePath = points
     .map((point, index) => `${index === 0 ? 'M' : 'L'} ${xFor(point.age)} ${yFor(point.mean)}`)
     .join(' ');
@@ -266,7 +266,6 @@ function AgingCurveChart({ metric, data }: { metric: MetricKey; data: PeakPerfor
           onClick={() => {
             setShowAllAges((value) => !value);
             setHoveredAge(null);
-            setSelectedAge(null);
           }}
           className="text-accent font-mono text-xs hover:underline"
         >
@@ -286,7 +285,6 @@ function AgingCurveChart({ metric, data }: { metric: MetricKey; data: PeakPerfor
             const age = Math.round(xMin + ((pointerX - PADDING.left) / plotWidth) * (xMax - xMin));
             if (age >= xMin && age <= xMax) setHoveredAge(age);
           }}
-          onClick={() => setSelectedAge(activeAge)}
         >
           {yTicks.map((tick) => (
             <g key={tick}>
@@ -316,8 +314,8 @@ function AgingCurveChart({ metric, data }: { metric: MetricKey; data: PeakPerfor
               key={point.age}
               cx={xFor(point.age)}
               cy={yFor(point.mean)}
-              r={point.age === activePoint.age ? 6 : 3}
-              fill={point.age === activePoint.age ? details.color : 'var(--background)'}
+              r={point.age === hoveredAge ? 6 : 3}
+              fill={point.age === hoveredAge ? details.color : 'var(--background)'}
               stroke={details.color}
               strokeWidth="2"
             />
@@ -359,23 +357,25 @@ function AgingCurveChart({ metric, data }: { metric: MetricKey; data: PeakPerfor
               </text>
             ))}
 
-          <ChartTooltip
-            x={xFor(activePoint.age)}
-            y={yFor(activePoint.mean)}
-            lines={[
-              `Age ${activePoint.age}`,
-              `${details.shortLabel}: ${activePoint.mean.toFixed(details.digits)}`,
-              `95% CI: ${activePoint.lower.toFixed(details.digits)}–${activePoint.upper.toFixed(details.digits)}`,
-              `n = ${activePoint.count.toLocaleString()} seasons`,
-            ]}
-            width={190}
-            chartWidth={CHART_WIDTH}
-          />
+          {showTooltip && (
+            <ChartTooltip
+              x={xFor(activePoint.age)}
+              y={yFor(activePoint.mean)}
+              lines={[
+                `Age ${activePoint.age}`,
+                `${details.shortLabel}: ${activePoint.mean.toFixed(details.digits)}`,
+                `95% CI: ${activePoint.lower.toFixed(details.digits)}–${activePoint.upper.toFixed(details.digits)}`,
+                `n = ${activePoint.count.toLocaleString()} seasons`,
+              ]}
+              width={190}
+              chartWidth={CHART_WIDTH}
+            />
+          )}
         </svg>
       </div>
       <p className="text-muted px-2 pb-1 text-xs">
-        The shaded interval narrows where more qualifying player-seasons are observed. Click to pin
-        an age; use the toggle to inspect the sparse late-career tail.
+        The shaded interval narrows where more qualifying player-seasons are observed. Hover an age
+        for details; use the toggle to inspect the sparse late-career tail.
       </p>
     </div>
   );
@@ -508,17 +508,32 @@ function PeakAgeHistogram({ metric, data }: { metric: MetricKey; data: PeakPerfo
 }
 
 function RawVsSmoothedScatter({ metric, data }: { metric: MetricKey; data: PeakPerformanceData }) {
-  const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
+  const [hoveredPair, setHoveredPair] = useState<string | null>(null);
   const details = METRICS[metric];
   const robustness = data.robustness[metric];
-  const points = useMemo(
-    () =>
-      data.players.flatMap((player) => {
-        const peak = player.peaks[metric];
-        return peak ? [{ id: player.id, name: player.name, raw: peak[0], smooth: peak[1] }] : [];
-      }),
-    [data.players, metric],
-  );
+  const bubbles = useMemo(() => {
+    const grouped = new Map<
+      string,
+      { key: string; raw: number; smooth: number; names: string[] }
+    >();
+
+    data.players.forEach((player) => {
+      const peak = player.peaks[metric];
+      if (!peak) return;
+
+      const key = `${peak[0]}-${peak[1]}`;
+      const bubble = grouped.get(key) ?? {
+        key,
+        raw: peak[0],
+        smooth: peak[1],
+        names: [],
+      };
+      bubble.names.push(player.name);
+      grouped.set(key, bubble);
+    });
+
+    return Array.from(grouped.values()).sort((a, b) => b.names.length - a.names.length);
+  }, [data.players, metric]);
   const width = 450;
   const height = 420;
   const padding = { top: 24, right: 24, bottom: 52, left: 54 };
@@ -532,7 +547,8 @@ function RawVsSmoothedScatter({ metric, data }: { metric: MetricKey; data: PeakP
     padding.left + ((age - domainMin) / (domainMax - domainMin)) * plotSize;
   const yFor = (age: number) =>
     padding.top + ((domainMax - age) / (domainMax - domainMin)) * plotSize;
-  const activePoint = hoveredPlayer ? points.find((point) => point.id === hoveredPlayer) : null;
+  const maxBubbleCount = Math.max(...bubbles.map((bubble) => bubble.names.length));
+  const activeBubble = hoveredPair ? bubbles.find((bubble) => bubble.key === hoveredPair) : null;
 
   return (
     <div>
@@ -543,14 +559,15 @@ function RawVsSmoothedScatter({ metric, data }: { metric: MetricKey; data: PeakP
         <span>
           <span className="text-muted">same exact age:</span> {robustness.samePercent.toFixed(1)}%
         </span>
+        <span className="text-muted">bubble area = players</span>
       </div>
       <div className="overflow-x-auto">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="h-auto min-w-[420px] md:w-full"
           role="img"
-          aria-label={`${details.label} raw versus smoothed player peak ages. Correlation ${robustness.correlation.toFixed(3)}.`}
-          onPointerLeave={() => setHoveredPlayer(null)}
+          aria-label={`${details.label} raw versus smoothed player peak ages grouped into bubbles sized by player count. Correlation ${robustness.correlation.toFixed(3)}.`}
+          onPointerLeave={() => setHoveredPair(null)}
         >
           {[20, 25, 30, 35, 40].map((age) => (
             <g key={age}>
@@ -595,18 +612,25 @@ function RawVsSmoothedScatter({ metric, data }: { metric: MetricKey; data: PeakP
             strokeDasharray="6 5"
             strokeWidth="1.5"
           />
-          {points.map((point) => (
-            <circle
-              key={point.id}
-              cx={xFor(point.raw)}
-              cy={yFor(point.smooth)}
-              r={hoveredPlayer === point.name ? 5 : 2.6}
-              fill={details.color}
-              opacity={hoveredPlayer === null || hoveredPlayer === point.name ? 0.45 : 0.12}
-              onPointerEnter={() => setHoveredPlayer(point.id)}
-              className="cursor-crosshair"
-            />
-          ))}
+          {bubbles.map((bubble) => {
+            const selected = hoveredPair === bubble.key;
+            const radius = 3 + Math.sqrt(bubble.names.length / maxBubbleCount) * 8;
+
+            return (
+              <circle
+                key={bubble.key}
+                cx={xFor(bubble.raw)}
+                cy={yFor(bubble.smooth)}
+                r={selected ? radius + 2 : radius}
+                fill={details.color}
+                opacity={hoveredPair === null || selected ? 0.62 : 0.14}
+                stroke={selected ? 'var(--foreground)' : 'var(--background)'}
+                strokeWidth={selected ? 1.5 : 1}
+                onPointerEnter={() => setHoveredPair(bubble.key)}
+                className="cursor-crosshair"
+              />
+            );
+          })}
           <text
             x={padding.left + plotSize / 2}
             y={height - 3}
@@ -624,16 +648,19 @@ function RawVsSmoothedScatter({ metric, data }: { metric: MetricKey; data: PeakP
           >
             smoothed peak age
           </text>
-          {activePoint && (
+          {activeBubble && (
             <ChartTooltip
-              x={xFor(activePoint.raw)}
-              y={yFor(activePoint.smooth)}
+              x={xFor(activeBubble.raw)}
+              y={yFor(activeBubble.smooth)}
               lines={[
-                activePoint.name,
-                `Raw: age ${activePoint.raw}`,
-                `Smoothed: age ${activePoint.smooth}`,
+                `${activeBubble.names.length} ${activeBubble.names.length === 1 ? 'player' : 'players'}`,
+                `Raw ${activeBubble.raw} → smoothed ${activeBubble.smooth}`,
+                ...activeBubble.names.slice(0, 3),
+                ...(activeBubble.names.length > 3
+                  ? [`+${activeBubble.names.length - 3} more`]
+                  : []),
               ]}
-              width={175}
+              width={210}
               chartWidth={width}
             />
           )}

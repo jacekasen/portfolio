@@ -44,9 +44,9 @@ export default async function PeakPerformancePage() {
           <div>
             <h2 className="font-mono text-lg font-bold">The middle half of observed peak ages</h2>
             <p className="text-muted mt-1 max-w-2xl leading-7">
-              A single age hides meaningful variation. The distribution—and how sensitive it is to
-              metric choice and smoothing—is more informative than declaring one definitive NBA
-              peak.
+              A single age hides meaningful variation. The distribution—and its sensitivity to
+              metric choice and smoothing—is more informative than declaring one definitive NBA peak
+              age.
             </p>
           </div>
         </div>
@@ -68,8 +68,8 @@ export default async function PeakPerformancePage() {
           <p>
             Observed peak age is the center of the strongest exact three-season window; all three
             seasons must be consecutive. Confidence intervals describe uncertainty around mean
-            observed performance at each age, not a single “true” peak age. Active careers are
-            right-censored and may peak later.
+            observed performance at each age, not a single “true” peak age. Active players’ peaks
+            are based on their careers so far and may change in future seasons.
           </p>
         </div>
         <p className="text-muted mt-5 font-mono text-xs">
