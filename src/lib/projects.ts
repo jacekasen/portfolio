@@ -16,6 +16,14 @@ export const projects: Project[] = [
     demo: '/projects/nba',
   },
   {
+    title: 'Decoding Wrist EMG to Text',
+    description:
+      'Compared sequence models for decoding typed text from wrist EMG signals. A bidirectional LSTM beat the TDS convolution baseline, a GRU, a ResNet18 + LSTM hybrid, and a Transformer encoder, cutting test character error rate from 24.18% to 18.95%.',
+    tags: ['Python', 'PyTorch', 'Deep Learning', 'LSTM', 'Transformers', 'CTC'],
+    github: 'https://github.com/jacekasen/ece-c147a-project-submission',
+    demo: '/blog/2026-03-20-emg-to-text-decoding',
+  },
+  {
     title: 'MD/HD Vehicle Detection via Satellite Imagery',
     description:
       'Fine-tuned a Faster R-CNN (ResNet50-FPN) on the DOTA aerial dataset to detect medium and heavy-duty trucks in Google Maps satellite tiles. Generated a vehicle density heat map over the UCLA campus area to inform EV charging infrastructure planning.',
