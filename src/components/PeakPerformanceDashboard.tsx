@@ -27,6 +27,12 @@ const METRICS: Record<
     color: '#297a51',
     digits: 1,
   },
+  vorp: {
+    label: 'Value Over Replacement Player',
+    shortLabel: 'VORP',
+    color: '#c05a3a',
+    digits: 1,
+  },
   ws_per_48: {
     label: 'Win Shares per 48 Minutes',
     shortLabel: 'WS/48',
@@ -35,7 +41,7 @@ const METRICS: Record<
   },
 };
 
-const METRIC_ORDER = Object.keys(METRICS) as MetricKey[];
+const METRIC_ORDER: MetricKey[] = ['bpm', 'vorp', 'ws_per_48', 'ws', 'per'];
 const CHART_WIDTH = 900;
 const CHART_HEIGHT = 430;
 const PADDING = { top: 28, right: 28, bottom: 78, left: 66 };
@@ -121,7 +127,7 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
               What survives scrutiny
             </p>
-            <h2 className="mb-3 font-mono text-2xl">A broad prime, not a magic birthday</h2>
+            <h2 className="mb-3 font-mono text-2xl">Your prime years are broad</h2>
             <p className="text-muted leading-7">
               Across {summary.count.toLocaleString()} qualifying modern-era careers, the median
               observed {details.shortLabel} peak is age {formatAge(summary.median)}, while the
@@ -156,7 +162,7 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
             Peak estimates across metrics
           </h2>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {METRIC_ORDER.map((key) => {
             const metricSummary = data.summaries[key];
             const selected = key === metric;

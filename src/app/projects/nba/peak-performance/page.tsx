@@ -5,7 +5,7 @@ import { getPeakPerformanceData } from '@/lib/peak-performance';
 export const metadata = {
   title: 'NBA Peak Performance Analysis | Jace Kasen',
   description:
-    'Interactive analysis of when NBA players reach peak performance across BPM, PER, Win Shares, and Win Shares per 48 minutes.',
+    'Interactive analysis of when NBA players reach peak performance across BPM, PER, Win Shares, VORP, and Win Shares per 48 minutes.',
 };
 
 export default async function PeakPerformancePage() {
@@ -23,7 +23,7 @@ export default async function PeakPerformancePage() {
         </h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
           An interactive look at {data.meta.eligiblePlayers.toLocaleString()} qualifying careers
-          suggests a broad prime rather than one universal peak age. Across four advanced metrics,
+          suggests a broad prime rather than one universal peak age. Across five advanced metrics,
           the typical player’s strongest observed three-season stretch arrives around age 25–26.
         </p>
         <div className="mt-6 flex flex-wrap gap-5 font-mono text-sm">

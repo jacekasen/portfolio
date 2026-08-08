@@ -22,7 +22,7 @@ const analyses = [
     href: '/projects/nba/peak-performance',
     eyebrow: 'League-wide patterns · Updated through 2025–26',
     description:
-      'Explore when qualifying NBA careers reached their strongest consecutive three-season stretch across four advanced metrics.',
+      'Explore when qualifying NBA careers reached their strongest consecutive three-season stretch across five advanced metrics.',
     detail: 'Interactive age curves, distributions, and comparisons',
     icon: Mountain,
   },

@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 
-export type PeakMetricKey = 'bpm' | 'per' | 'ws' | 'ws_per_48';
+export type PeakMetricKey = 'bpm' | 'per' | 'ws' | 'vorp' | 'ws_per_48';
 
 export type PeakCurvePoint = {
   age: number;
@@ -66,6 +66,7 @@ type SeasonRow = {
   per: number;
   bpm: number;
   ws: number;
+  vorp: number;
   ws_per_48: number;
 };
 
@@ -74,7 +75,7 @@ type PeakResult = {
   smoothAge: number;
 };
 
-const METRICS: PeakMetricKey[] = ['bpm', 'per', 'ws', 'ws_per_48'];
+const METRICS: PeakMetricKey[] = ['bpm', 'per', 'ws', 'vorp', 'ws_per_48'];
 const START_SEASON = '1992-93';
 const PAGE_SIZE = 1000;
 const MINIMUM_GAMES = 40;
@@ -82,7 +83,7 @@ const MINIMUM_MINUTES = 1000;
 const STRICT_GAMES = 50;
 const STRICT_MINUTES = 1500;
 
-export const getPeakPerformanceData = unstable_cache(buildPeakPerformanceData, ['nba-peak-v3'], {
+export const getPeakPerformanceData = unstable_cache(buildPeakPerformanceData, ['nba-peak-v4'], {
   revalidate: 86_400,
   tags: ['nba-peak-performance'],
 });
@@ -166,7 +167,7 @@ async function fetchSeasonRows(): Promise<SeasonRow[]> {
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabase
       .from('nba_player_seasons')
-      .select('player_name, player_url, year_id, age, games, mp, per, bpm, ws, ws_per_48')
+      .select('player_name, player_url, year_id, age, games, mp, per, bpm, ws, vorp, ws_per_48')
       .gte('year_id', START_SEASON)
       .order('year_id', { ascending: true })
       .order('player_url', { ascending: true })
@@ -195,6 +196,7 @@ function normalizeRow(row: SeasonRow): SeasonRow {
     per: Number(row.per),
     bpm: Number(row.bpm),
     ws: Number(row.ws),
+    vorp: Number(row.vorp),
     ws_per_48: Number(row.ws_per_48),
   };
 }
@@ -202,7 +204,9 @@ function normalizeRow(row: SeasonRow): SeasonRow {
 function isValidRow(row: SeasonRow) {
   return (
     Boolean(row.player_name && row.player_url && row.year_id) &&
-    [row.age, row.games, row.mp, row.per, row.bpm, row.ws, row.ws_per_48].every(Number.isFinite)
+    [row.age, row.games, row.mp, row.per, row.bpm, row.ws, row.vorp, row.ws_per_48].every(
+      Number.isFinite,
+    )
   );
 }
 
