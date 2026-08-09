@@ -247,41 +247,6 @@ export function SalaryExplorer({
           </label>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <StatCard
-            label="Salary cap"
-            value={formatSalary(salaryCap)}
-            detail={salaryCap === null ? 'No cap value for this season' : shownSeason}
-            muted={salaryCap === null}
-          />
-          <StatCard
-            label="Known payroll"
-            value={formatSalary(summary.knownPayroll)}
-            detail={`${summary.knownCount} of ${summary.totalRecords} records have amounts`}
-            muted={summary.knownPayroll === null}
-          />
-          <StatCard
-            label="Payroll / cap"
-            value={formatPercent(summary.payrollVsCap)}
-            detail={summary.payrollVsCap === null ? 'Needs a cap and a payroll' : 'Known salaries'}
-            muted={summary.payrollVsCap === null}
-          />
-          <StatCard
-            label="Largest cap share"
-            value={formatPercent(summary.largestCapShare)}
-            detail={
-              summary.topEarner ? repairPlayerName(summary.topEarner.player_name) : 'No records'
-            }
-            muted={summary.largestCapShare === null}
-          />
-          <StatCard
-            label="Highest salary"
-            value={formatSalary(summary.topEarner?.salary ?? null)}
-            detail={summary.topEarner ? formatSalaryExact(summary.topEarner.salary) : 'No records'}
-            muted={!summary.topEarner}
-          />
-        </div>
-
         {shownSeasonEntry?.sparse ? (
           <p className="border-accent-light bg-accent-light/10 rounded border-l-2 px-4 py-3 text-sm leading-6">
             <strong className="font-mono text-xs tracking-wide uppercase">Sparse season</strong>
@@ -395,6 +360,41 @@ export function SalaryExplorer({
 
         <MethodologyNote updatedAt={index.updatedAt} />
       </section>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <StatCard
+          label="Salary cap"
+          value={formatSalary(salaryCap)}
+          detail={salaryCap === null ? 'No cap value for this season' : shownSeason}
+          muted={salaryCap === null}
+        />
+        <StatCard
+          label="Known payroll"
+          value={formatSalary(summary.knownPayroll)}
+          detail={`${summary.knownCount} of ${summary.totalRecords} records have amounts`}
+          muted={summary.knownPayroll === null}
+        />
+        <StatCard
+          label="Payroll / cap"
+          value={formatPercent(summary.payrollVsCap)}
+          detail={summary.payrollVsCap === null ? 'Needs a cap and a payroll' : 'Known salaries'}
+          muted={summary.payrollVsCap === null}
+        />
+        <StatCard
+          label="Largest cap share"
+          value={formatPercent(summary.largestCapShare)}
+          detail={
+            summary.topEarner ? repairPlayerName(summary.topEarner.player_name) : 'No records'
+          }
+          muted={summary.largestCapShare === null}
+        />
+        <StatCard
+          label="Highest salary"
+          value={formatSalary(summary.topEarner?.salary ?? null)}
+          detail={summary.topEarner ? formatSalaryExact(summary.topEarner.salary) : 'No records'}
+          muted={!summary.topEarner}
+        />
+      </div>
 
       {player ? (
         <PlayerSalaryPanel
