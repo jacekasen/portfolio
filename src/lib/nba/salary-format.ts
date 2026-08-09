@@ -3,8 +3,8 @@ import {
   type PlayerSalaryRow,
   type SalaryIndex,
   type SeasonIndexEntry,
-} from '@/lib/salaries';
-import { teamName } from '@/lib/nba-teams';
+} from '@/lib/nba/salaries';
+import { teamName } from '@/lib/nba/teams';
 
 /**
  * Formatting and derivation helpers for the salary explorer.

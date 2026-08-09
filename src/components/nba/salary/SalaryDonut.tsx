@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { PlayerSalaryRow } from '@/lib/salaries';
+import type { PlayerSalaryRow } from '@/lib/nba/salaries';
 import {
   formatPercent,
   formatSalary,
@@ -9,7 +9,7 @@ import {
   qualityLabel,
   repairPlayerName,
   type PayrollComposition,
-} from '@/lib/salary-format';
+} from '@/lib/nba/salary-format';
 import { cn } from '@/lib/utils';
 import { EmptyState, InspectorCard, segmentColor } from './chart-ui';
 import { inspectorRows, rowKey } from './SalaryBars';

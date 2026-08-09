@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { PeakPerformanceDashboard } from '@/components/PeakPerformanceDashboard';
-import { getPeakPerformanceData } from '@/lib/peak-performance';
+import { PeakPerformanceDashboard } from '@/components/nba/PeakPerformanceDashboard';
+import { getPeakPerformanceData } from '@/lib/nba/peak-performance';
 
 export const metadata = {
   title: 'NBA Peak Performance Analysis | Jace Kasen',

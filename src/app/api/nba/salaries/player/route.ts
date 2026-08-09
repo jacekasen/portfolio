@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { getPlayerSalaryHistory } from '@/lib/salaries';
+import { getPlayerSalaryHistory } from '@/lib/nba/salaries';
 
 const PLAYER_ID_PATTERN = /^[a-z0-9]{3,24}$/;
 

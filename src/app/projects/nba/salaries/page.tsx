@@ -3,7 +3,7 @@ import {
   SalaryExplorer,
   type SalaryExplorerInitialState,
   type ViewMode,
-} from '@/components/salary/SalaryExplorer';
+} from '@/components/nba/salary/SalaryExplorer';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import {
   getPlayerSalaryHistory,
@@ -12,8 +12,8 @@ import {
   type PlayerSalaryRow,
   type SalaryIndex,
   type TeamSeasonSalaries,
-} from '@/lib/salaries';
-import { resolveSeason, resolveTeam, type SalaryMeasure } from '@/lib/salary-format';
+} from '@/lib/nba/salaries';
+import { resolveSeason, resolveTeam, type SalaryMeasure } from '@/lib/nba/salary-format';
 
 export const metadata = {
   title: 'NBA Salary Cap Explorer | Jace Kasen',

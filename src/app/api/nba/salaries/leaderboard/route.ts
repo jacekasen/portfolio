@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { getCapShareLeaders } from '@/lib/salaries';
+import { getCapShareLeaders } from '@/lib/nba/salaries';
 
 const SEASON_PATTERN = /^\d{4}-\d{2}$/;
 const DEFAULT_LIMIT = 25;

@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { NbaMetricChart, type MetricSeries } from '@/components/NbaMetricChart';
-import { PlayerAutocomplete } from '@/components/PlayerAutocomplete';
+import { MetricChart, type MetricSeries } from '@/components/nba/MetricChart';
+import { PlayerAutocomplete } from '@/components/nba/PlayerAutocomplete';
 import {
   PlayerPredictionCard,
   PlayerPredictionUnavailable,
   type ObservedPredictionOutcome,
   type PlayerPrediction,
-} from '@/components/PlayerPredictionCard';
+} from '@/components/nba/PlayerPredictionCard';
 import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 
 export const metadata = {
@@ -232,7 +232,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
             </div>
 
             <div className="border-border bg-background rounded-lg border p-3 md:p-5">
-              <NbaMetricChart
+              <MetricChart
                 metricLabel={metricDetails.shortLabel}
                 valueDigits={metricDetails.digits}
                 referenceLine={{

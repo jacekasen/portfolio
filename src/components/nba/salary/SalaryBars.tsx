@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { PlayerSalaryRow } from '@/lib/salaries';
+import type { PlayerSalaryRow } from '@/lib/nba/salaries';
 import {
   formatMeasure,
   formatPercent,
@@ -11,8 +11,8 @@ import {
   repairPlayerName,
   sortSalaryRows,
   type SalaryMeasure,
-} from '@/lib/salary-format';
-import { teamName } from '@/lib/nba-teams';
+} from '@/lib/nba/salary-format';
+import { teamName } from '@/lib/nba/teams';
 import { cn } from '@/lib/utils';
 import { chartDomain, InspectorCard, niceTicks, segmentColor } from './chart-ui';
 

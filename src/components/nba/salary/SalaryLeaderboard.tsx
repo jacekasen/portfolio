@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { PlayerSalaryRow } from '@/lib/salaries';
+import type { PlayerSalaryRow } from '@/lib/nba/salaries';
 import {
   formatPercent,
   formatSalary,
   formatSalaryExact,
   qualityLabel,
   repairPlayerName,
-} from '@/lib/salary-format';
-import { teamName } from '@/lib/nba-teams';
+} from '@/lib/nba/salary-format';
+import { teamName } from '@/lib/nba/teams';
 import { cn } from '@/lib/utils';
 import { EmptyState, segmentColor } from './chart-ui';
 

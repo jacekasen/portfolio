@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { PeakMetricKey, PeakPerformanceData } from '@/lib/peak-performance';
+import type { PeakMetricKey, PeakPerformanceData } from '@/lib/nba/peak-performance';
 
 type MetricKey = PeakMetricKey;
 

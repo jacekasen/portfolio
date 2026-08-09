@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SalaryExplorer, type SalaryExplorerInitialState } from './SalaryExplorer';
-import type { PlayerSalaryRow, SalaryIndex, TeamSeasonSalaries } from '@/lib/salaries';
+import type { PlayerSalaryRow, SalaryIndex, TeamSeasonSalaries } from '@/lib/nba/salaries';
 
 const SALARY_CAP = 140_588_000;
 

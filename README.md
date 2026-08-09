@@ -83,35 +83,52 @@ of every total rather than counted as zero.
 
 ## Project Structure
 
+Site-wide code sits at the top of `components/` and `lib/`; anything that only serves one project
+lives in a folder named for it (today, `nba/`).
+
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx          # Root layout (fonts, Shell wrapper)
-│   ├── page.tsx            # Home page (hero + recent posts)
-│   ├── about/page.tsx      # About page
+├── app/                        # Routes only — App Router pages and handlers
+│   ├── layout.tsx              # Root layout (fonts, Shell wrapper)
+│   ├── page.tsx                # Home page (hero + recent posts)
+│   ├── about/page.tsx          # About page
 │   ├── blog/
-│   │   ├── page.tsx        # Blog index
-│   │   └── [slug]/page.tsx # Individual post
-│   ├── projects/
-│   │   └── nba/            # NBA analyses (trends, peak performance, salaries)
-│   └── api/nba/            # Server-side Supabase queries for the NBA pages
+│   │   ├── page.tsx            # Blog index
+│   │   └── [slug]/page.tsx     # Individual post
+│   ├── projects/nba/           # NBA analyses (trends, peak performance, salaries)
+│   └── api/nba/                # Server-side Supabase queries for the NBA pages
 ├── components/
-│   ├── Shell.tsx           # Sidebar navigation shell
-│   └── salary/             # Salary cap explorer (bars, donut, history, leaderboard)
+│   ├── Shell.tsx               # Site navigation shell
+│   └── nba/                    # NBA analysis UI
+│       ├── MetricChart.tsx     # Career metric chart (performance trends)
+│       ├── PlayerAutocomplete.tsx
+│       ├── PlayerPredictionCard.tsx
+│       ├── PeakPerformanceDashboard.tsx
+│       └── salary/             # Salary cap explorer (bars, donut, history, leaderboard)
 └── lib/
-    ├── config.ts           # Site-wide constants (social links, etc.)
-    ├── nba-teams.ts        # Franchise abbreviation → full team name
-    ├── posts.ts            # Markdown/blog post utilities
-    ├── salaries.ts         # Salary table queries (player_salaries, salary_caps, …)
-    ├── salary-format.ts    # Cap share / payroll share formatting and derivations
-    ├── supabase.ts         # Supabase database client
-    └── utils.ts            # Shared helpers (cn, etc.)
+    ├── config.ts               # Site-wide constants (social links, etc.)
+    ├── posts.ts                # Markdown/blog post utilities
+    ├── projects.ts             # Project showcase content
+    ├── supabase.ts             # Supabase database client
+    ├── utils.ts                # Shared helpers (cn, etc.)
+    └── nba/
+        ├── peak-performance.ts # Peak-age aggregation
+        ├── salaries.ts         # Salary table queries (player_salaries, salary_caps, …)
+        ├── salary-format.ts    # Cap share / payroll share formatting and derivations
+        └── teams.ts            # Franchise abbreviation → full team name
 
 content/
-├── posts/                  # Blog posts as .md files
-│   └── *.md                # Frontmatter: title, date, description, tags
-└── about.md                # About page content
+├── posts/                      # Blog posts as .md files
+│   └── *.md                    # Frontmatter: title, date, description, tags
+└── about.md                    # About page content
 ```
+
+Conventions:
+
+- Tests sit next to the code they cover (`salaries.ts` / `salaries.test.ts`).
+- `PascalCase.tsx` exports one main component; `kebab-case.ts` is a module of helpers.
+- Imports use the `@/` alias, never deep relative paths across folders.
+- Images referenced by posts belong in `public/images/`, not in `content/`.
 
 ## Adding Content
 

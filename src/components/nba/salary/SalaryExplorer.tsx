@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { PlayerSalaryRow, SalaryIndex, TeamSeasonSalaries } from '@/lib/salaries';
+import type { PlayerSalaryRow, SalaryIndex, TeamSeasonSalaries } from '@/lib/nba/salaries';
 import {
   buildPayrollComposition,
   formatPercent,
@@ -11,8 +11,8 @@ import {
   resolveTeam,
   summarizeTeamSeason,
   type SalaryMeasure,
-} from '@/lib/salary-format';
-import { teamLabel, teamName } from '@/lib/nba-teams';
+} from '@/lib/nba/salary-format';
+import { teamLabel, teamName } from '@/lib/nba/teams';
 import { EmptyState, StatCard, ToggleGroup } from './chart-ui';
 import { PayrollCapStrip, SalaryBars } from './SalaryBars';
 import { SalaryDonut } from './SalaryDonut';

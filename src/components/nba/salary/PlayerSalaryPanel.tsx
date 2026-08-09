@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
-import type { PlayerSalaryRow } from '@/lib/salaries';
+import type { PlayerSalaryRow } from '@/lib/nba/salaries';
 import {
   careerPeak,
   formatPercent,
@@ -14,8 +14,8 @@ import {
   qualityLabel,
   repairPlayerName,
   type SalaryMeasure,
-} from '@/lib/salary-format';
-import { teamName } from '@/lib/nba-teams';
+} from '@/lib/nba/salary-format';
+import { teamName } from '@/lib/nba/teams';
 import { cn } from '@/lib/utils';
 import { chartDomain, EmptyState, InspectorCard, niceTicks } from './chart-ui';
 

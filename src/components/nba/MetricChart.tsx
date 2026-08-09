@@ -11,7 +11,7 @@ export type MetricSeries = {
   }[];
 };
 
-type NbaMetricChartProps = {
+type MetricChartProps = {
   metricLabel: string;
   valueDigits: number;
   referenceLine: {
@@ -34,13 +34,13 @@ const SERIES_COLORS = ['#7a4f28', '#2563a8', '#297a51', '#8b4a8f', '#b45309'];
 const MIN_AGE = 18;
 const MAX_AGE = 42;
 
-export function NbaMetricChart({
+export function MetricChart({
   metricLabel,
   valueDigits,
   referenceLine,
   scale,
   series,
-}: NbaMetricChartProps) {
+}: MetricChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedPoint, setSelectedPoint] = useState<SelectedPoint | null>(null);
 

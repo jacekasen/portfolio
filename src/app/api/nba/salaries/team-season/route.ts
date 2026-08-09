@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { getTeamSeasonSalaries } from '@/lib/salaries';
+import { getTeamSeasonSalaries } from '@/lib/nba/salaries';
 
 const TEAM_PATTERN = /^[A-Z]{2,4}$/;
 const SEASON_PATTERN = /^\d{4}-\d{2}$/;
