@@ -257,7 +257,8 @@ export default function Home() {
             If you are hiring a software engineer, I would be glad to talk.
           </h2>
           <p className="text-muted max-w-2xl text-lg leading-7">
-            I care more about the project, the team, and the chance to learn than a specific job title, so I'm open to a variety of roles.
+            I care more about the project, the team, and the chance to learn than a specific job
+            title, so I&apos;m open to a variety of roles.
           </p>
         </div>
         <div className="flex flex-wrap gap-3 md:justify-end">

@@ -1,7 +1,7 @@
 ---
-title: "Why I Changed My Name (Again)"
-date: "2026-02-19"
-description: "For real, again?"
+title: 'Why I Changed My Name (Again)'
+date: '2026-02-19'
+description: 'For real, again?'
 tags: [Jace Kasen, Jan Kasen, Zhansultan Kuikenov]
 ---
 

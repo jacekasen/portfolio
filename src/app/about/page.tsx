@@ -20,7 +20,7 @@ export default async function About() {
       </header>
 
       <div
-        className="prose prose-lg prose-headings:font-bold prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-code:text-accent prose-code:bg-accent-light/20 prose-code:px-1 prose-code:rounded prose-blockquote:border-accent prose-blockquote:text-muted prose-img:rounded-lg max-w-none font-serif prose-p:leading-7"
+        className="prose prose-lg prose-headings:font-bold prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-code:text-accent prose-code:bg-accent-light/20 prose-code:px-1 prose-code:rounded prose-blockquote:border-accent prose-blockquote:text-muted prose-img:rounded-lg prose-p:leading-7 max-w-none font-serif"
         dangerouslySetInnerHTML={{ __html: postData.contentHtml || '' }}
       />
     </div>

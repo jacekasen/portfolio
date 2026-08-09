@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 type PlayerAutocompleteProps = {
   defaultValue: string;
@@ -16,11 +16,19 @@ export function PlayerAutocomplete({ defaultValue, inputId }: PlayerAutocomplete
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isOpen, setIsOpen] = useState(false);
 
+  const inlineSuggestion = useMemo(() => {
+    if (!isOpen || query.length < 2) return null;
+
+    const activeSuggestion = activeIndex >= 0 ? suggestions[activeIndex] : undefined;
+    const candidate =
+      activeSuggestion ?? suggestions.find((player) => startsWithQuery(player, query));
+
+    return candidate && startsWithQuery(candidate, query) && candidate !== query ? candidate : null;
+  }, [activeIndex, isOpen, query, suggestions]);
+
   useEffect(() => {
     const trimmedQuery = query.trim();
     if (trimmedQuery.length < 2 || trimmedQuery === committedQuery) {
-      setSuggestions([]);
-      setIsOpen(false);
       return;
     }
 
@@ -60,16 +68,55 @@ export function PlayerAutocomplete({ defaultValue, inputId }: PlayerAutocomplete
     setIsOpen(false);
   };
 
+  const acceptInlineSuggestion = () => {
+    if (!inlineSuggestion) return false;
+    choosePlayer(inlineSuggestion);
+    return true;
+  };
+
   return (
     <div className="relative">
+      {inlineSuggestion && (
+        <div
+          aria-hidden="true"
+          data-testid="inline-player-suggestion"
+          className="pointer-events-none absolute inset-0 z-10 flex h-11 items-center overflow-hidden rounded border border-transparent px-3 whitespace-pre"
+        >
+          <span className="text-transparent">{query}</span>
+          <span className="text-muted/50">{inlineSuggestion.slice(query.length)}</span>
+        </div>
+      )}
+
       <input
         id={inputId}
         name="player"
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => {
+          setQuery(event.target.value);
+          setSuggestions([]);
+          setActiveIndex(-1);
+          setIsOpen(false);
+        }}
         onFocus={() => setIsOpen(suggestions.length > 0)}
         onBlur={() => window.setTimeout(() => setIsOpen(false), 100)}
         onKeyDown={(event) => {
+          if (event.key === 'Tab' && inlineSuggestion) {
+            event.preventDefault();
+            acceptInlineSuggestion();
+            return;
+          }
+
+          if (
+            event.key === 'ArrowRight' &&
+            inlineSuggestion &&
+            event.currentTarget.selectionStart === query.length &&
+            event.currentTarget.selectionEnd === query.length
+          ) {
+            event.preventDefault();
+            acceptInlineSuggestion();
+            return;
+          }
+
           if (event.key === 'Enter') {
             if (isOpen && suggestions.length > 0) {
               event.preventDefault();
@@ -97,11 +144,11 @@ export function PlayerAutocomplete({ defaultValue, inputId }: PlayerAutocomplete
         placeholder="LeBron James"
         autoComplete="off"
         role="combobox"
-        aria-autocomplete="list"
+        aria-autocomplete="both"
         aria-expanded={isOpen}
         aria-controls={listboxId}
         aria-activedescendant={activeIndex >= 0 ? `${listboxId}-${activeIndex}` : undefined}
-        className="border-border bg-background h-11 w-full min-w-0 rounded border px-3"
+        className="border-border bg-background relative h-11 w-full min-w-0 rounded border px-3"
       />
 
       {isOpen && (
@@ -125,12 +172,34 @@ export function PlayerAutocomplete({ defaultValue, inputId }: PlayerAutocomplete
                   index === activeIndex ? 'bg-accent-light/20 text-accent' : 'hover:bg-surface'
                 }`}
               >
-                {player}
+                <HighlightedPlayerName player={player} query={query} />
               </button>
             </li>
           ))}
         </ul>
       )}
     </div>
+  );
+}
+
+function startsWithQuery(player: string, query: string) {
+  return player.toLocaleLowerCase().startsWith(query.toLocaleLowerCase());
+}
+
+function HighlightedPlayerName({ player, query }: { player: string; query: string }) {
+  const matchStart = player.toLocaleLowerCase().indexOf(query.trim().toLocaleLowerCase());
+
+  if (matchStart < 0 || !query.trim()) return player;
+
+  const matchEnd = matchStart + query.trim().length;
+
+  return (
+    <>
+      {player.slice(0, matchStart)}
+      <mark className="bg-accent-light/25 rounded-sm text-inherit">
+        {player.slice(matchStart, matchEnd)}
+      </mark>
+      {player.slice(matchEnd)}
+    </>
   );
 }

@@ -1,8 +1,8 @@
 ---
-title: "Ethnography of Education: Engagement and Authority at a UCLA Math Circle"
-date: "2026-03-01"
-description: "An ethnographic study of how students signal engagement and instructors negotiate authority in a non-compulsory math enrichment classroom."
-tags: ["Anthropology", "UCLA", "Education", "Ethnography"]
+title: 'Ethnography of Education: Engagement and Authority at a UCLA Math Circle'
+date: '2026-03-01'
+description: 'An ethnographic study of how students signal engagement and instructors negotiate authority in a non-compulsory math enrichment classroom.'
+tags: ['Anthropology', 'UCLA', 'Education', 'Ethnography']
 ---
 
 > Written for ANTHRO-152R: Language, Culture and Education at UCLA, Winter 2026.
@@ -119,14 +119,14 @@ The study has clear limitations. Two sessions is a small sample, and the relianc
 
 ## References
 
-Dyer, E. B., Machaka, N., Parr, E. D., & Krist, C. (2021). Understanding joint exploration: The epistemic positioning in collaborative activity in a secondary mathematics classroom. In *Proceedings of the 43rd Annual Meeting of the North American Chapter of the International Group for the Psychology of Mathematics Education* (pp. 546-553).
+Dyer, E. B., Machaka, N., Parr, E. D., & Krist, C. (2021). Understanding joint exploration: The epistemic positioning in collaborative activity in a secondary mathematics classroom. In _Proceedings of the 43rd Annual Meeting of the North American Chapter of the International Group for the Psychology of Mathematics Education_ (pp. 546-553).
 
-Friedman, D. A. (2017). Negotiating epistemic authority and co-constructing difference: Socializing "nonnative speaker" teachers in a U.S. graduate program in TESOL. *Linguistics and Education*, 42, 14-23.
+Friedman, D. A. (2017). Negotiating epistemic authority and co-constructing difference: Socializing "nonnative speaker" teachers in a U.S. graduate program in TESOL. _Linguistics and Education_, 42, 14-23.
 
-Goffman, E. (1979). Footing. *Semiotica*, 25(1-2), 1-29.
+Goffman, E. (1979). Footing. _Semiotica_, 25(1-2), 1-29.
 
-Goffman, E. (1989). On fieldwork. *Journal of Contemporary Ethnography*, 18(2), 123-132.
+Goffman, E. (1989). On fieldwork. _Journal of Contemporary Ethnography_, 18(2), 123-132.
 
-Reeve, J., & Cheon, S. H. (2021). Autonomy-supportive teaching: Its malleability, benefits, and potential to improve educational practice. *Educational Psychologist*, 56(1), 54-77.
+Reeve, J., & Cheon, S. H. (2021). Autonomy-supportive teaching: Its malleability, benefits, and potential to improve educational practice. _Educational Psychologist_, 56(1), 54-77.
 
-Wine, L. (2008). Toward a deeper understanding of framing, footing, and alignment. *Working Papers in TESOL & Applied Linguistics*, 8(2), 1-21.
+Wine, L. (2008). Toward a deeper understanding of framing, footing, and alignment. _Working Papers in TESOL & Applied Linguistics_, 8(2), 1-21.

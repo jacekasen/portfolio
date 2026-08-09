@@ -1,8 +1,8 @@
 ---
-title: "Educational Autoethnography"
-date: "2026-02-15"
-description: "On growing up trilingual in Almaty and what anthropology taught me about language, power, and belonging in educational institutions."
-tags: ["Anthropology", "UCLA", "Language", "Kazakhstan"]
+title: 'Educational Autoethnography'
+date: '2026-02-15'
+description: 'On growing up trilingual in Almaty and what anthropology taught me about language, power, and belonging in educational institutions.'
+tags: ['Anthropology', 'UCLA', 'Language', 'Kazakhstan']
 ---
 
 > Written for ANTHRO-152R: Language, Culture and Education at UCLA, Winter 2026.
@@ -45,14 +45,14 @@ None of these relationships are simply about communication. Language is also abo
 
 ## References
 
-Bourdieu, P. (1986). The forms of capital. In J. G. Richardson (Ed.), *Handbook of theory and research for the sociology of education* (pp. 241-258). Greenwood.
+Bourdieu, P. (1986). The forms of capital. In J. G. Richardson (Ed.), _Handbook of theory and research for the sociology of education_ (pp. 241-258). Greenwood.
 
-Gilbertson, J. (2016). Cosmopolitan learning: Making merit and reproducing privilege in Indian education. *Anthropology & Education Quarterly*, 47(4), 353-368.
+Gilbertson, J. (2016). Cosmopolitan learning: Making merit and reproducing privilege in Indian education. _Anthropology & Education Quarterly_, 47(4), 353-368.
 
-Myers-Scotton, C. (1993). Elite closure as a powerful language strategy: The African case. *International Journal of the Sociology of Language*, 103, 149-163.
+Myers-Scotton, C. (1993). Elite closure as a powerful language strategy: The African case. _International Journal of the Sociology of Language_, 103, 149-163.
 
-Nieto, S., & Bode, P. (2013). *Affirming diversity: The sociopolitical context of multicultural education* (6th ed.). Pearson.
+Nieto, S., & Bode, P. (2013). _Affirming diversity: The sociopolitical context of multicultural education_ (6th ed.). Pearson.
 
-Ochs, E., & Schieffelin, B. B. (2009). Language acquisition and socialization: Three developmental stories and their implications. In R. A. Shweder, B. B. Schieffelin, & E. Ochs (Eds.), *The child: An encyclopedic companion* (pp. 1-21). University of Chicago Press.
+Ochs, E., & Schieffelin, B. B. (2009). Language acquisition and socialization: Three developmental stories and their implications. In R. A. Shweder, B. B. Schieffelin, & E. Ochs (Eds.), _The child: An encyclopedic companion_ (pp. 1-21). University of Chicago Press.
 
-Rosa, J. (2019). *Looking like a language, sounding like a race: Raciolinguistic ideologies and the learning of Latinidad*. Oxford University Press.
+Rosa, J. (2019). _Looking like a language, sounding like a race: Raciolinguistic ideologies and the learning of Latinidad_. Oxford University Press.

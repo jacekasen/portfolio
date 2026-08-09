@@ -75,13 +75,13 @@ All models share the preprocessing and feature extraction pipeline described abo
 
 ### 3.1. Final quantitative comparison
 
-| Model | Parameters | Best Val CER (%) | Test CER (%) |
-| :--- | ---: | ---: | ---: |
-| TDS baseline | 5.3M | 22.55 | 24.18 |
-| Bidirectional LSTM | 18.4M | 19.14 | **18.95** |
-| Bidirectional GRU | 13.9M | **18.14** | 26.09 |
-| ResNet18 + LSTM | 21.8M | 29.97 | 28.42 |
-| Transformer | 3.8M | 24.04 | N/A |
+| Model              | Parameters | Best Val CER (%) | Test CER (%) |
+| :----------------- | ---------: | ---------------: | -----------: |
+| TDS baseline       |       5.3M |            22.55 |        24.18 |
+| Bidirectional LSTM |      18.4M |            19.14 |    **18.95** |
+| Bidirectional GRU  |      13.9M |        **18.14** |        26.09 |
+| ResNet18 + LSTM    |      21.8M |            29.97 |        28.42 |
+| Transformer        |       3.8M |            24.04 |          N/A |
 
 The bidirectional LSTM achieved the best overall performance, reducing test CER from 24.18% for the baseline to 18.95%. This represents the largest improvement among all tested architectures.
 
@@ -109,11 +109,11 @@ To better understand the Transformer's training behavior, I trained it well beyo
 
 Decomposing test CER into insertion, deletion, and substitution error rates:
 
-| Model | Test CER | Test IER | Test DER | Test SER |
-| :--- | ---: | ---: | ---: | ---: |
-| Bidirectional LSTM | 18.95 | 2.77 | 2.57 | 13.62 |
-| Bidirectional GRU | 26.09 | 12.25 | 0.48 | 13.36 |
-| TDS baseline | 24.18 | 6.27 | 2.14 | 15.78 |
+| Model              | Test CER | Test IER | Test DER | Test SER |
+| :----------------- | -------: | -------: | -------: | -------: |
+| Bidirectional LSTM |    18.95 |     2.77 |     2.57 |    13.62 |
+| Bidirectional GRU  |    26.09 |    12.25 |     0.48 |    13.36 |
+| TDS baseline       |    24.18 |     6.27 |     2.14 |    15.78 |
 
 Comparing the LSTM to the baseline, the largest improvement comes from a substantial reduction in insertion errors (6.27% to 2.77%). Substitution errors are also reduced moderately (15.78% to 13.62%), while deletion errors increase slightly (2.14% to 2.57%). The reduction in insertion errors accounts for the majority of the CER improvement, with additional gains from fewer substitutions.
 
@@ -151,4 +151,4 @@ Among the evaluated models, the bidirectional LSTM achieved the best overall per
 
 [2] ECE-C147 course project specification and assignment materials, University of California, Los Angeles, Winter 2026.
 
-[3] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention Is All You Need," *Advances in Neural Information Processing Systems*, 2017.
+[3] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention Is All You Need," _Advances in Neural Information Processing Systems_, 2017.

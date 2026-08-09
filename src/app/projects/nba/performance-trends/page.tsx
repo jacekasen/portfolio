@@ -180,7 +180,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
             Player
           </label>
           <PlayerAutocomplete inputId="nba-player-search" defaultValue={requestedPlayer} />
-          <span className="text-muted text-xs">Enter the player&apos;s full name.</span>
+          <span className="text-muted text-xs">Enter the player name.</span>
         </div>
 
         <button

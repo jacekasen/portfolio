@@ -1,8 +1,8 @@
 ---
-title: "Computer Vision for Medium/Heavy-Duty Vehicle Detection via Satellite Imagery"
-date: "2025-12-13"
-description: "We fine-tuned a ResNet50-FPN detector on the DOTA aerial dataset and applied it to Google satellite tiles to locate medium/heavy-duty truck parking clusters for EV charging planning."
-tags: ["Computer Vision", "Machine Learning", "UCLA", "Python"]
+title: 'Computer Vision for Medium/Heavy-Duty Vehicle Detection via Satellite Imagery'
+date: '2025-12-13'
+description: 'We fine-tuned a ResNet50-FPN detector on the DOTA aerial dataset and applied it to Google satellite tiles to locate medium/heavy-duty truck parking clusters for EV charging planning.'
+tags: ['Computer Vision', 'Machine Learning', 'UCLA', 'Python']
 ---
 
 > We fine-tuned a ResNet50-FPN detector on the DOTA aerial dataset and applied it to Google satellite tiles to locate medium/heavy-duty truck parking clusters for EV charging planning.
@@ -106,11 +106,11 @@ The utility is implemented in Python and relies on the `requests` library to int
 
 **Table 1: Google query parameters**
 
-| Parameter | Value | Justification |
-| :--- | :--- | :--- |
-| maptype | satellite | Specifies the imagery type. |
-| zoom | 20 (Max) | Zoom level 20 provides maximum detail, necessary for distinguishing between subtle visual characteristics of medium-duty (Class 3-6) and heavy-duty (Class 7-8) vehicles. |
-| size | 640x640 | Standard size for typical computer vision input tiles. |
+| Parameter | Value     | Justification                                                                                                                                                             |
+| :-------- | :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| maptype   | satellite | Specifies the imagery type.                                                                                                                                               |
+| zoom      | 20 (Max)  | Zoom level 20 provides maximum detail, necessary for distinguishing between subtle visual characteristics of medium-duty (Class 3-6) and heavy-duty (Class 7-8) vehicles. |
+| size      | 640x640   | Standard size for typical computer vision input tiles.                                                                                                                    |
 
 The script requires a valid Google Maps API Key, which must have the Maps Static API enabled. The key is managed via command line or environment variables for security.
 
@@ -182,7 +182,7 @@ For future work, we will use the identified locations and the assigned vehicle d
 
 ## 7. References
 
-[1] D. Clar-Garcia, H. Campello-Vicente, M. Fabra-Rodriguez, and E. Velasco-Sanchez, "Research on Battery Electric Vehicles' DC Fast Charging Noise Emissions: Proposals to Reduce Environmental Noise Caused by Fast Charging Stations," *World Electric Vehicle Journal 2025, Vol. 16, Page 42*, vol. 16, no. 1, p. 42, Jan. 2025, doi: 10.3390/WEVJ16010042.
+[1] D. Clar-Garcia, H. Campello-Vicente, M. Fabra-Rodriguez, and E. Velasco-Sanchez, "Research on Battery Electric Vehicles' DC Fast Charging Noise Emissions: Proposals to Reduce Environmental Noise Caused by Fast Charging Stations," _World Electric Vehicle Journal 2025, Vol. 16, Page 42_, vol. 16, no. 1, p. 42, Jan. 2025, doi: 10.3390/WEVJ16010042.
 
 [2] "Alternative Fuels Data Center: Maps and Data - Types of Vehicles by Weight Class." Accessed: Dec. 12, 2025. [Online]. Available: https://afdc.energy.gov/data/10381
 
@@ -190,4 +190,4 @@ For future work, we will use the identified locations and the assigned vehicle d
 
 [4] "DOTA." Accessed: Dec. 12, 2025. [Online]. Available: https://captain-whu.github.io/DOTA/
 
-[5] P. Y. Chen, J. W. Hsieh, M. Gochoo, C. Y. Wang, and H. Y. M. Liao, "Smaller Object Detection for Real-Time Embedded Traffic Flow Estimation Using Fish-Eye Cameras," *Proceedings - International Conference on Image Processing, ICIP*, vol. 2019-September, pp. 2956–2960, Sep. 2019, doi: 10.1109/ICIP.2019.8803719.
+[5] P. Y. Chen, J. W. Hsieh, M. Gochoo, C. Y. Wang, and H. Y. M. Liao, "Smaller Object Detection for Real-Time Embedded Traffic Flow Estimation Using Fish-Eye Cameras," _Proceedings - International Conference on Image Processing, ICIP_, vol. 2019-September, pp. 2956–2960, Sep. 2019, doi: 10.1109/ICIP.2019.8803719.
