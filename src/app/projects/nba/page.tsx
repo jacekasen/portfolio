@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, LineChart, Mountain } from 'lucide-react';
+import { ArrowRight, CircleDollarSign, LineChart, Mountain } from 'lucide-react';
 
 export const metadata = {
   title: 'NBA Analysis | Jace Kasen',
   description:
-    'Two interactive ways to look at how NBA players change over the course of a career.',
+    'Three interactive ways to look at how NBA players change — and how much they cost — over the course of a career.',
 };
 
 const analyses = [
@@ -26,6 +26,15 @@ const analyses = [
     detail: 'Interactive age curves, distributions, and comparisons',
     icon: Mountain,
   },
+  {
+    title: 'NBA Salary Cap Explorer',
+    href: '/projects/nba/salaries',
+    eyebrow: 'Contracts by era · 1984-85 onward',
+    description:
+      'Compare what players cost by the only measure that survives inflation: salary as a share of that season’s salary cap.',
+    detail: 'Team payroll breakdowns and career cap share histories',
+    icon: CircleDollarSign,
+  },
 ] as const;
 
 export default function NbaAnalysisPage() {
@@ -37,13 +46,16 @@ export default function NbaAnalysisPage() {
         </p>
         <h1 className="mb-4 font-mono text-4xl tracking-tight md:text-6xl">NBA Analysis</h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
-          I wanted to know when NBA players really peak. That turned into two ways of looking at a
-          career: follow one player season by season, or step back and compare patterns across the
-          league.
+          I wanted to know when NBA players really peak. That turned into three ways of looking at a
+          career: follow one player season by season, step back and compare patterns across the
+          league, or ask what all of it cost against the salary cap of the day.
         </p>
       </header>
 
-      <section className="grid gap-5 md:grid-cols-2" aria-label="NBA analysis projects">
+      <section
+        className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+        aria-label="NBA analysis projects"
+      >
         {analyses.map((analysis, index) => {
           const Icon = analysis.icon;
 

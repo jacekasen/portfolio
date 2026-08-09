@@ -22,9 +22,52 @@ npm run dev
 
 The site will be available at `http://localhost:3000`.
 
-To enable the NBA Performance Trends page, replace the placeholders in `.env.local` with the project
-URL and publishable key from the Supabase Connect panel. The database must contain a publicly
-readable `nba_player_seasons` table.
+To enable the NBA pages, replace the placeholders in `.env.local` with the project URL and
+publishable key from the Supabase Connect panel. No other environment variables are needed, and the
+service-role key must never be added here — every query runs through the publishable key only.
+
+| Page                          | Route                              | Supabase tables                                          |
+| ----------------------------- | ---------------------------------- | -------------------------------------------------------- |
+| NBA Performance Trends        | `/projects/nba/performance-trends` | `nba_player_seasons`, `player_predictions`               |
+| NBA Peak Performance Analysis | `/projects/nba/peak-performance`   | `nba_player_seasons`                                     |
+| NBA Salary Cap Explorer       | `/projects/nba/salaries`           | `player_salaries`, `salary_caps`, `team_season_salaries` |
+
+All of these tables must be publicly readable (the `anon` role needs `select`).
+
+## NBA Salary Cap Explorer
+
+`/projects/nba/salaries` explores NBA salaries as a share of the salary cap, because nominal dollars
+are not comparable across eras:
+
+```text
+cap share = salary / salary cap × 100
+```
+
+The page is populated by the salary pipeline in the [Board Man Gets Paid](https://github.com/jacekasen/nba)
+analysis repository (`salary/`), which publishes `player_salaries`, `salary_caps`, and
+`team_season_salaries`. The frontend never scrapes Basketball Reference; it only reads those tables.
+
+Visualizations:
+
+- **Team payroll against the cap** — every contract stacked into one bar, with a 100% marker that
+  payroll is allowed to pass.
+- **Roster bars** — one horizontal bar per salary record, sorted by cap share (or by nominal salary
+  with the measure toggle).
+- **Donut** — team payroll composition. Segments are `team_payroll_share` (salary ÷ known team
+  payroll), never cap share, and the view disables itself when a team-season is too thinly covered
+  to be a whole.
+- **Player history** — a career cap share line for the selected player, drawing every team record in
+  seasons split across teams.
+- **Cap share leaders** — a cross-era leaderboard, filterable by season.
+
+Team and season live in the URL, so a view is shareable:
+`/projects/nba/salaries?team=LAC&season=2024-25&player=leonaka01` (plus optional `view=donut` and
+`measure=salary`).
+
+Queries are scoped per view through `/api/nba/salaries/*`: the season/team inventory, then one
+team-season, and player history or leaderboard rows only when asked for. The full salary history is
+never shipped to the browser. Records with no salary amount are shown as _not recorded_ and left out
+of every total rather than counted as zero.
 
 ## Scripts
 
@@ -49,12 +92,18 @@ src/
 │   ├── blog/
 │   │   ├── page.tsx        # Blog index
 │   │   └── [slug]/page.tsx # Individual post
-│   └── projects/page.tsx   # Projects showcase
+│   ├── projects/
+│   │   └── nba/            # NBA analyses (trends, peak performance, salaries)
+│   └── api/nba/            # Server-side Supabase queries for the NBA pages
 ├── components/
-│   └── Shell.tsx           # Sidebar navigation shell
+│   ├── Shell.tsx           # Sidebar navigation shell
+│   └── salary/             # Salary cap explorer (bars, donut, history, leaderboard)
 └── lib/
     ├── config.ts           # Site-wide constants (social links, etc.)
+    ├── nba-teams.ts        # Franchise abbreviation → full team name
     ├── posts.ts            # Markdown/blog post utilities
+    ├── salaries.ts         # Salary table queries (player_salaries, salary_caps, …)
+    ├── salary-format.ts    # Cap share / payroll share formatting and derivations
     ├── supabase.ts         # Supabase database client
     └── utils.ts            # Shared helpers (cn, etc.)
 
