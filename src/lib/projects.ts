@@ -15,9 +15,9 @@ export const projects: Project[] = [
     eyebrow: 'A project I started for fun',
     kind: 'independent',
     description:
-      'I have followed the NBA closely since 2019, and the question of when a player peaks - or whether a developing player will keep getting better - comes up all the time. I could have looked up the usual answer, but I wanted to investigate it myself for fun.',
+      'I have followed the NBA closely since 2019, and the answer to the question of when players peak has been loosey goosey to me, or whether a developing player will keep getting better or are they still two years away from being two years away comes up often. I could have looked up the usual answer, but I wanted to investigate it myself for fun.',
     buildDetails:
-      'I also wanted to plot one-number metrics year by year so I could see the bigger picture of a player’s career. That turned into data ingestion, PostgreSQL, server-side queries, player search, interactive charts, and a small forecasting layer.',
+      'I also wanted to plot one-number metrics year by year so I could see the bigger picture of a player’s career. Stats are widely available but visualizations aren\'t. That turned into data ingestion, PostgreSQL, server-side queries, player search, interactive charts, and a small forecasting layer.',
     tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL'],
     github: 'https://github.com/jacekasen/nba-peak-analysis',
     demo: '/projects/nba',
