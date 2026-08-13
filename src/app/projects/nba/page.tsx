@@ -52,10 +52,7 @@ export default function NbaAnalysisPage() {
         </p>
       </header>
 
-      <section
-        className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
-        aria-label="NBA analysis projects"
-      >
+      <section className="flex max-w-4xl flex-col gap-5" aria-label="NBA analysis projects">
         {analyses.map((analysis, index) => {
           const Icon = analysis.icon;
 
@@ -63,9 +60,9 @@ export default function NbaAnalysisPage() {
             <Link
               key={analysis.href}
               href={analysis.href}
-              className="group border-border bg-surface hover:border-accent flex min-h-[330px] flex-col rounded-lg border p-6 transition-colors md:p-8"
+              className="group border-border bg-surface hover:border-accent flex flex-col rounded-lg border p-6 transition-colors md:p-8"
             >
-              <div className="mb-10 flex items-start justify-between gap-4">
+              <div className="mb-6 flex items-start justify-between gap-4">
                 <span className="text-accent font-mono text-xs">0{index + 1}</span>
                 <span className="bg-accent-light/20 text-accent rounded-md p-3">
                   <Icon aria-hidden="true" size={24} strokeWidth={1.7} />
