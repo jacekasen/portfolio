@@ -36,7 +36,7 @@ export default async function PeakPerformancePage() {
         </div>
       </header>
 
-      <section className="border-border bg-accent-light/10 rounded-lg border p-5 md:p-7">
+      <section className="bg-ink rounded-lg p-5 md:p-7">
         <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
           <p className="font-mono text-5xl font-bold md:text-6xl">
             {bpmSummary.q1}–{bpmSummary.q3}

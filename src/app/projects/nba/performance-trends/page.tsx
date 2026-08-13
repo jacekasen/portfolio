@@ -194,7 +194,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
       {queryError ? (
         <DatabaseError />
       ) : series.length === 0 ? (
-        <div className="border-border rounded border p-5">
+        <div className="bg-surface rounded p-5">
           <h2 className="mb-2 font-mono text-lg">Player not found</h2>
           <p className="text-muted">Check the spelling and enter the player&apos;s full name.</p>
         </div>
@@ -379,7 +379,7 @@ function SupabaseSetupMessage() {
           The page is ready, but its Supabase environment variables have not been configured.
         </p>
       </header>
-      <div className="border-border bg-accent-light/10 rounded border p-5">
+      <div className="bg-ink rounded p-5">
         <p className="font-mono text-sm">
           Copy <code>.env.example</code> to <code>.env.local</code>, then add the project URL and
           publishable key from the Supabase Connect panel.
@@ -394,7 +394,7 @@ function SupabaseSetupMessage() {
 
 function DatabaseError() {
   return (
-    <div className="border-border rounded border p-5">
+    <div className="bg-surface rounded p-5">
       <h2 className="mb-2 font-mono text-lg">Could not load the NBA data</h2>
       <p className="text-muted">
         Check that <code>nba_player_seasons</code> exists and its public read policy is enabled.

@@ -44,7 +44,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="bg-background flex min-h-screen flex-col">
-      <header className="bg-surface/90 border-border/80 fixed top-0 left-0 z-40 w-full border-b backdrop-blur-sm">
+      <header className="on-ink bg-ink text-on-ink fixed top-0 left-0 z-40 w-full">
         <div className="relative flex h-16 items-center px-4 md:px-8 lg:px-12">
           <Link
             href="/"
@@ -62,8 +62,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 className={cn(
                   'rounded-md px-3 py-2 transition-colors',
                   isActiveHref(item.href)
-                    ? 'bg-accent-light/25 text-accent'
-                    : 'hover:bg-accent-light/15 text-foreground',
+                    ? 'bg-accent text-background font-bold'
+                    : 'text-on-ink-muted hover:text-on-ink hover:bg-black/5',
                 )}
               >
                 {item.name}
@@ -83,7 +83,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </div>
 
         {menuOpen && (
-          <div data-testid="mobile-menu" className="bg-surface border-border/80 border-t md:hidden">
+          <div data-testid="mobile-menu" className="bg-ink md:hidden">
             <nav className="flex flex-col gap-1 p-4 font-mono text-sm">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -95,8 +95,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     className={cn(
                       'flex items-center gap-3 rounded-md p-3 transition-colors',
                       isActiveHref(item.href)
-                        ? 'bg-accent-light/25 text-accent'
-                        : 'hover:bg-accent-light/15 text-foreground',
+                        ? 'bg-accent text-background font-bold'
+                        : 'text-on-ink-muted hover:text-on-ink hover:bg-black/5',
                     )}
                   >
                     <Icon size={20} />
@@ -113,19 +113,19 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-12 md:py-12 lg:px-16">{children}</div>
       </main>
 
-      <footer className="border-border/80 border-t">
-        <div className="text-muted mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-4 md:flex-row md:justify-between md:px-12 lg:px-16">
+      <footer className="on-ink bg-ink text-on-ink-muted mt-16">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-6 md:flex-row md:justify-between md:px-12 lg:px-16">
           <p className="font-mono text-xs">
             © {year} {siteConfig.name}
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <a
               href={siteConfig.socials.github}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-accent transition-colors"
             >
-              <Github size={15} />
+              <Github size={17} />
               <span className="sr-only">GitHub</span>
             </a>
             <a
@@ -134,11 +134,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               rel="noopener noreferrer"
               className="hover:text-accent transition-colors"
             >
-              <Linkedin size={15} />
+              <Linkedin size={17} />
               <span className="sr-only">LinkedIn</span>
             </a>
             <a href={siteConfig.socials.email} className="hover:text-accent transition-colors">
-              <Mail size={15} />
+              <Mail size={17} />
               <span className="sr-only">Email</span>
             </a>
           </div>

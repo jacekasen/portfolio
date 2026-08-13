@@ -60,31 +60,31 @@ export default function NbaAnalysisPage() {
             <Link
               key={analysis.href}
               href={analysis.href}
-              className="group border-border bg-surface hover:border-accent flex flex-col rounded-lg border p-6 transition-colors md:p-8"
+              className="group bg-surface hover:bg-ink flex flex-col gap-5 rounded-lg p-6 transition-colors sm:flex-row sm:items-start md:gap-8 md:p-8"
             >
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <span className="text-accent font-mono text-xs">0{index + 1}</span>
-                <span className="bg-accent-light/20 text-accent rounded-md p-3">
-                  <Icon aria-hidden="true" size={24} strokeWidth={1.7} />
-                </span>
+              <span className="bg-accent text-background w-fit shrink-0 rounded-md p-3 md:p-4">
+                <Icon aria-hidden="true" size={24} strokeWidth={1.7} />
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-muted mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs tracking-[0.12em] uppercase">
+                  <span className="text-accent">0{index + 1}</span>
+                  <span className="min-w-0">{analysis.eyebrow}</span>
+                </p>
+                <h2 className="mb-3 font-mono text-2xl tracking-tight md:text-3xl">
+                  {analysis.title}
+                </h2>
+                <p className="text-muted max-w-2xl leading-7">{analysis.description}</p>
+                <p className="text-muted bg-background mt-4 inline-block rounded-md px-3 py-1.5 font-mono text-[0.68rem] leading-5 tracking-[0.04em] sm:rounded-full">
+                  {analysis.detail}
+                </p>
               </div>
 
-              <p className="text-muted mb-3 font-mono text-xs tracking-[0.12em] uppercase">
-                {analysis.eyebrow}
-              </p>
-              <h2 className="mb-4 font-mono text-2xl tracking-tight md:text-3xl">
-                {analysis.title}
-              </h2>
-              <p className="text-muted leading-7">{analysis.description}</p>
-
-              <div className="border-border mt-auto flex items-center justify-between gap-4 border-t pt-6">
-                <span className="text-muted text-xs">{analysis.detail}</span>
-                <ArrowRight
-                  aria-hidden="true"
-                  className="text-accent shrink-0 transition-transform group-hover:translate-x-1"
-                  size={20}
-                />
-              </div>
+              <ArrowRight
+                aria-hidden="true"
+                className="text-accent shrink-0 self-end transition-transform group-hover:translate-x-1 sm:self-center"
+                size={22}
+              />
             </Link>
           );
         })}

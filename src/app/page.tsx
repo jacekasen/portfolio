@@ -27,13 +27,17 @@ export default function Home() {
       <section className="pt-3 md:pt-10">
         <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_15rem] md:gap-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="max-w-3xl">
+            <p className="text-accent mb-4 font-mono text-xs tracking-[0.16em] uppercase">
+              Software engineer · Vancouver, BC
+            </p>
             <h1 className="mb-6 text-4xl leading-[1.08] font-bold tracking-[-0.025em] text-balance md:text-6xl lg:text-7xl">
               Hey, I&apos;m Jace.
             </h1>
             <p className="text-muted mb-8 max-w-2xl text-lg leading-8 md:text-xl">
-              I&apos;m from Kazakhstan and recently graduated from UCLA with a degree in computer
-              science and a minor in anthropology. I&apos;m currently looking for work in software
-              engineering.
+              I&apos;m from Kazakhstan, graduated from UCLA with a degree in computer science and a
+              minor in anthropology, and I&apos;m now working toward an M.S. in computer science at
+              Northeastern University in Vancouver. I&apos;m looking for summer 2027 internships and
+              full-time software engineering roles.
             </p>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -53,7 +57,7 @@ export default function Home() {
               </a>
               <a
                 href={siteConfig.socials.email}
-                className="text-accent inline-flex items-center gap-2 px-2 py-3 font-mono text-sm hover:underline"
+                className="text-accent inline-flex items-center gap-2 px-2 py-3 font-mono text-sm font-bold hover:underline"
               >
                 Email me <Mail size={16} />
               </a>
@@ -63,7 +67,7 @@ export default function Home() {
           <div className="relative mx-auto aspect-[4/5] w-56 md:w-full">
             <div className="border-accent-light/50 absolute -right-3 -bottom-3 h-full w-full border" />
             <Image
-              src="/hero_shot.png"
+              src="/profile_pic.jpg"
               alt="Portrait of Jace Kasen"
               fill
               sizes="(min-width: 1024px) 18rem, (min-width: 768px) 15rem, 14rem"
@@ -90,21 +94,19 @@ export default function Home() {
           </p>
         </div>
 
-        <article className="bg-foreground text-background grid gap-9 p-7 md:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.65fr)] md:p-10">
+        <article className="on-ink bg-ink text-on-ink grid gap-9 p-7 md:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.65fr)] md:p-10">
           <div>
-            <p className="text-accent-light mb-3 font-mono text-xs tracking-[0.16em] uppercase">
+            <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
               {nbaProject.eyebrow}
             </p>
             <h3 className="mb-5 text-3xl leading-tight font-bold md:text-4xl">
               {nbaProject.title}
             </h3>
-            <p className="mb-5 max-w-2xl text-lg leading-8 text-[#e5ddd5]">
-              {nbaProject.description}
-            </p>
-            <p className="mb-7 max-w-2xl leading-7 text-[#c9beb4]">{nbaProject.buildDetails}</p>
+            <p className="mb-5 max-w-2xl text-lg leading-8">{nbaProject.description}</p>
+            <p className="text-on-ink-muted mb-7 max-w-2xl leading-7">{nbaProject.buildDetails}</p>
             <div className="mb-8 flex flex-wrap gap-2 font-mono text-[0.68rem]">
               {nbaProject.tags.map((tag) => (
-                <span key={tag} className="bg-background/10 rounded-sm px-2.5 py-1.5">
+                <span key={tag} className="bg-background/70 rounded-sm px-2.5 py-1.5">
                   {tag}
                 </span>
               ))}
@@ -112,7 +114,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href={nbaProject.demo || '/projects/nba'}
-                className="bg-background text-foreground hover:bg-accent-light inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
+                className="bg-accent text-background hover:bg-foreground inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm font-bold transition-colors"
               >
                 Open the project <ArrowRight size={16} />
               </Link>
@@ -121,7 +123,7 @@ export default function Home() {
                   href={nbaProject.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-background/30 hover:border-background inline-flex items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
+                  className="border-border hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
                 >
                   <Github size={16} /> Source
                 </a>
@@ -129,14 +131,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="border-background/20 border-t pt-7 md:border-t-0 md:border-l md:pt-0 md:pl-8">
-            <p className="text-accent-light mb-5 font-mono text-xs tracking-[0.16em] uppercase">
+          <div className="border-border border-t pt-7 md:border-t-0 md:border-l md:pt-0 md:pl-8">
+            <p className="text-accent mb-5 font-mono text-xs tracking-[0.16em] uppercase">
               What is in there
             </p>
             <ul className="space-y-4">
               {nbaBuild.map((item) => (
-                <li key={item} className="flex gap-3 text-sm leading-6 text-[#e5ddd5]">
-                  <span className="text-accent-light font-mono">→</span>
+                <li key={item} className="flex gap-3 text-sm leading-6">
+                  <span className="text-accent font-mono">→</span>
                   {item}
                 </li>
               ))}
@@ -160,10 +162,7 @@ export default function Home() {
 
         <div className="grid gap-5 md:grid-cols-3">
           {coursework.map((project) => (
-            <article
-              key={project.title}
-              className="border-border/80 bg-surface/35 flex flex-col border p-6"
-            >
+            <article key={project.title} className="bg-surface flex flex-col p-6">
               <p className="text-accent mb-3 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
                 {project.eyebrow}
               </p>
@@ -172,7 +171,7 @@ export default function Home() {
               <p className="mb-5 text-sm leading-6">{project.buildDetails}</p>
               <div className="mb-5 flex flex-wrap gap-2 font-mono text-[0.65rem]">
                 {project.tags.map((tag) => (
-                  <span key={tag} className="bg-accent-light/15 text-accent rounded-sm px-2 py-1">
+                  <span key={tag} className="bg-accent-light/25 text-accent rounded-sm px-2 py-1">
                     {tag}
                   </span>
                 ))}
@@ -221,14 +220,14 @@ export default function Home() {
             All writing →
           </Link>
         </div>
-        <div className="divide-border/80 divide-y">
+        <div className="divide-border divide-y">
           {selectedPosts.map((post, index) => (
             <Link
               key={post.id}
               href={`/blog/${post.id}`}
-              className="group grid gap-2 py-5 sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-baseline sm:gap-5"
+              className="group hover:bg-surface -mx-3 grid gap-2 px-3 py-5 transition-colors sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-baseline sm:gap-5"
             >
-              <span className="text-muted font-mono text-xs">0{index + 1}</span>
+              <span className="text-accent font-mono text-xs font-bold">0{index + 1}</span>
               <span>
                 <span className="group-hover:text-accent block text-lg font-bold transition-colors">
                   {post.title}
@@ -248,15 +247,15 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-border/80 bg-surface/55 grid gap-8 border p-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
+      <section className="on-ink bg-ink text-on-ink grid gap-8 p-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
         <div>
           <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
             What I&apos;m looking for
           </p>
           <h2 className="mb-4 max-w-2xl text-3xl font-bold tracking-tight md:text-4xl">
-            If you are hiring a software engineer, I would be glad to talk.
+            I&apos;m looking for summer 2027 internships and full-time software engineering roles.
           </h2>
-          <p className="text-muted max-w-2xl text-lg leading-7">
+          <p className="text-on-ink-muted max-w-2xl text-lg leading-7">
             I care more about the project, the team, and the chance to learn than a specific job
             title, so I&apos;m open to a variety of roles.
           </p>
@@ -264,7 +263,7 @@ export default function Home() {
         <div className="flex flex-wrap gap-3 md:justify-end">
           <a
             href={siteConfig.socials.email}
-            className="bg-accent text-background hover:bg-foreground inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
+            className="bg-accent text-background hover:bg-foreground inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm font-bold transition-colors"
           >
             Send me an email <Mail size={16} />
           </a>

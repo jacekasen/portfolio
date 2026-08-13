@@ -152,7 +152,7 @@ function PageFrame({ children }: { children: React.ReactNode }) {
 
 function SetupMessage() {
   return (
-    <div className="border-border bg-accent-light/10 rounded border p-5">
+    <div className="bg-ink rounded p-5">
       <h2 className="mb-2 font-mono text-lg">Salary data is not configured</h2>
       <p className="font-mono text-sm">
         Copy <code>.env.example</code> to <code>.env.local</code>, then add the project URL and
@@ -164,7 +164,7 @@ function SetupMessage() {
 
 function UnavailableMessage() {
   return (
-    <div className="border-border rounded border p-5">
+    <div className="bg-surface rounded p-5">
       <h2 className="mb-2 font-mono text-lg">Could not load the salary data</h2>
       <p className="text-muted">
         Check that <code>player_salaries</code>, <code>salary_caps</code>, and{' '}

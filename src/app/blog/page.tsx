@@ -22,7 +22,10 @@ export default function BlogIndex() {
       <div className="space-y-8 md:space-y-10">
         {allPostsData.length > 0 ? (
           allPostsData.map(({ id, date, title, description, tags }) => (
-            <article key={id} className="group border-border/80 relative border-b pb-8">
+            <article
+              key={id}
+              className="group border-border/80 hover:bg-surface relative -mx-4 border-b px-4 pt-4 pb-8 transition-colors"
+            >
               <div className="mb-2 flex flex-col md:flex-row md:items-baseline md:justify-between">
                 <h2 className="group-hover:text-accent text-xl font-bold transition-colors">
                   <Link href={`/blog/${id}`}>
@@ -40,7 +43,7 @@ export default function BlogIndex() {
               {tags && (
                 <div className="relative z-10 flex flex-wrap gap-2 font-mono text-xs">
                   {tags.map((tag: string) => (
-                    <span key={tag} className="bg-accent-light/20 text-accent rounded px-2 py-1">
+                    <span key={tag} className="bg-accent-light/25 text-accent rounded px-2 py-1">
                       {tag}
                     </span>
                   ))}

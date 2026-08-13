@@ -2,13 +2,19 @@
 @plugin '@tailwindcss/typography';
 
 :root {
+  /* Paper */
   --background: #fbf7f2;
+  --surface: #f6efe7;
   --foreground: #37281d;
+  --muted: #6f6257;
   --accent: #7a4f28;
   --accent-light: #c99560;
-  --surface: #f6efe7;
-  --muted: #6f6257;
   --border: #e6ddd4;
+
+  /* Ink — the soft tan blocks. Fills are light, so what sits on them is dark. */
+  --ink: #f2e7d8;
+  --on-ink: #37281d;
+  --on-ink-muted: #6f6257;
 }
 
 @theme inline {
@@ -19,6 +25,9 @@
   --color-surface: var(--surface);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
+  --color-on-ink-muted: var(--on-ink-muted);
   --font-serif: var(--font-pt-serif);
   --font-mono: var(--font-jetbrains-mono);
 }
@@ -51,4 +60,9 @@ samp {
 ::selection {
   background: rgba(122, 79, 40, 0.18);
   color: var(--foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }

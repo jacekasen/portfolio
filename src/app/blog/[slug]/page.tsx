@@ -42,14 +42,14 @@ export default async function Post({ params }: Props) {
           <time>{format(parseISO(postData.date), 'yyyy-MM-dd')}</time>
           {postData.tags &&
             postData.tags.map((tag: string) => (
-              <span key={tag} className="bg-accent-light/30 text-accent rounded-md px-2 py-1">
+              <span key={tag} className="bg-accent-light/25 text-accent rounded-md px-2 py-1">
                 {tag}
               </span>
             ))}
         </div>
         <Link
           href="/blog"
-          className="text-muted hover:text-accent inline-flex items-center gap-2 font-mono text-sm transition-colors"
+          className="text-accent inline-flex items-center gap-2 font-mono text-sm font-bold transition-colors hover:underline"
         >
           <ArrowLeft size={16} />
           back to blog
