@@ -7,6 +7,8 @@ export interface Project {
   tags: string[];
   github: string | null;
   demo: string | null;
+  /** Shown beside a featured project as the short "what is in there" list. */
+  highlights?: string[];
 }
 
 export const projects: Project[] = [
@@ -21,6 +23,30 @@ export const projects: Project[] = [
     tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL'],
     github: 'https://github.com/jacekasen/nba-peak-analysis',
     demo: '/projects/nba',
+    highlights: [
+      'Player search and dynamic routes',
+      'Server-backed PostgreSQL queries',
+      'Interactive career and peak dashboards',
+      'Prediction and comparison features',
+    ],
+  },
+  {
+    title: 'Flight Tracker',
+    eyebrow: 'A mobile app I built end to end',
+    kind: 'independent',
+    description:
+      'Airlines forget you flew with them, and the apps that do remember want your whole trip history in exchange. I wanted a private flight diary instead: look up a flight by number, keep the ones I actually took, and get a recap at the end of the year that belongs to me.',
+    buildDetails:
+      'It is an Expo app on Supabase, and most of the work was in the parts nobody sees. Flight data providers are patchy and rate-limited, so a Supabase Edge Function owns the provider key, normalizes whatever comes back into a contract the app controls, caches it, and enforces per-user limits. Every saved flight is protected by row-level security, with the isolation proven by database tests rather than assumed.',
+    tags: ['Expo', 'React Native', 'TypeScript', 'Supabase', 'PostgreSQL', 'Deno'],
+    github: 'https://github.com/jacekasen/flight-tracker',
+    demo: '/projects/flight-tracker',
+    highlights: [
+      'The real app, running in the page',
+      'Edge Function proxy with caching and rate limits',
+      'Row-level security proven by database tests',
+      'UTC storage with airport-local display',
+    ],
   },
   {
     title: 'FinSight',

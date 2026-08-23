@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "test": "vitest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "embed:flight-tracker": "node scripts/build-flight-tracker-embed.mjs"
   },
   "dependencies": {
     "@fontsource/pt-serif": "^5.2.8",
