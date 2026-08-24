@@ -264,7 +264,7 @@ export function SalaryExplorer({
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
               01 · Roster
             </p>
-            <h2 id="team-chart-title" className="font-mono text-2xl md:text-3xl">
+            <h2 id="team-chart-title" className="text-2xl font-bold md:text-3xl">
               {teamName(shownTeam)} · {shownSeason}
             </h2>
             <p className="text-muted mt-2 max-w-2xl text-sm leading-6">

@@ -121,7 +121,7 @@ function PageFrame({ children }: { children: React.ReactNode }) {
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
           Basketball Reference · 1984-85 onward
         </p>
-        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">
+        <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
           NBA Salary Cap Explorer
         </h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
@@ -153,7 +153,7 @@ function PageFrame({ children }: { children: React.ReactNode }) {
 function SetupMessage() {
   return (
     <div className="bg-ink rounded p-5">
-      <h2 className="mb-2 font-mono text-lg">Salary data is not configured</h2>
+      <h2 className="mb-2 text-lg font-bold">Salary data is not configured</h2>
       <p className="font-mono text-sm">
         Copy <code>.env.example</code> to <code>.env.local</code>, then add the project URL and
         publishable key from the Supabase Connect panel.
@@ -165,7 +165,7 @@ function SetupMessage() {
 function UnavailableMessage() {
   return (
     <div className="bg-surface rounded p-5">
-      <h2 className="mb-2 font-mono text-lg">Could not load the salary data</h2>
+      <h2 className="mb-2 text-lg font-bold">Could not load the salary data</h2>
       <p className="text-muted">
         Check that <code>player_salaries</code>, <code>salary_caps</code>, and{' '}
         <code>team_season_salaries</code> exist and their public read policies are enabled.

@@ -51,7 +51,7 @@ export function PlayerPredictionCard({
           <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
             02 · Model forecast · {observedOutcome ? 'observed outcome available' : 'next season'}
           </p>
-          <h2 id="outlook-title" className="font-mono text-2xl">
+          <h2 id="outlook-title" className="text-2xl font-bold">
             Forecast for {prediction.season}
           </h2>
         </div>
@@ -131,7 +131,7 @@ export function PlayerPredictionCard({
 
         {factors.length > 0 && (
           <div className="border-border border-t px-5 py-5 md:px-7">
-            <h3 className="mb-3 font-mono text-sm">What informed this estimate</h3>
+            <h3 className="mb-3 text-sm font-bold">What informed this estimate</h3>
             <ul className="grid gap-x-8 gap-y-2 md:grid-cols-2">
               {factors.map((factor) => (
                 <li key={factor} className="text-muted flex gap-2 text-sm leading-6">
@@ -163,7 +163,7 @@ export function PlayerPredictionCard({
 export function PlayerPredictionUnavailable() {
   return (
     <section aria-labelledby="outlook-title">
-      <h2 id="outlook-title" className="mb-4 font-mono text-2xl">
+      <h2 id="outlook-title" className="mb-4 text-2xl font-bold">
         Model outlook
       </h2>
       <div className="border-border bg-surface rounded-lg border p-5">

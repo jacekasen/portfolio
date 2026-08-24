@@ -37,7 +37,7 @@ export default async function Post({ params }: Props) {
   return (
     <article>
       <header className="border-border mb-8 border-b pt-8 pb-8 md:pt-12">
-        <h1 className="mb-4 font-mono text-4xl tracking-tight md:text-5xl">{postData.title}</h1>
+        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">{postData.title}</h1>
         <div className="text-muted mb-6 flex flex-wrap items-center gap-4 font-mono text-sm">
           <time>{format(parseISO(postData.date), 'yyyy-MM-dd')}</time>
           {postData.tags &&

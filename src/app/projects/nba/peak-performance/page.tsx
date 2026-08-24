@@ -18,7 +18,7 @@ export default async function PeakPerformancePage() {
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
           NBA Analysis · {data.meta.startSeason}–{data.meta.endSeason}
         </p>
-        <h1 className="mb-4 max-w-4xl font-mono text-4xl tracking-tight md:text-5xl">
+        <h1 className="mb-4 max-w-4xl text-4xl font-bold tracking-tight md:text-5xl">
           When do NBA players reach peak performance?
         </h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
@@ -42,7 +42,7 @@ export default async function PeakPerformancePage() {
             {bpmSummary.q1}–{bpmSummary.q3}
           </p>
           <div>
-            <h2 className="font-mono text-lg font-bold">The middle half of observed peak ages</h2>
+            <h2 className="text-lg font-bold">The middle half of observed peak ages</h2>
             <p className="text-muted mt-1 max-w-2xl leading-7">
               A single age hides meaningful variation. The distribution—and its sensitivity to
               metric choice and smoothing—is more informative than declaring one definitive NBA peak
@@ -55,7 +55,7 @@ export default async function PeakPerformancePage() {
       <PeakPerformanceDashboard data={data} />
 
       <section className="border-border border-t pt-8" aria-labelledby="method-title">
-        <h2 id="method-title" className="mb-4 font-mono text-2xl">
+        <h2 id="method-title" className="mb-4 text-2xl font-bold">
           Method
         </h2>
         <div className="text-muted grid gap-5 text-sm leading-7 md:grid-cols-2">

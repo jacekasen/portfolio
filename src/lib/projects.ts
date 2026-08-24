@@ -17,17 +17,17 @@ export const projects: Project[] = [
     eyebrow: 'A project I started for fun',
     kind: 'independent',
     description:
-      'I have followed the NBA closely since 2019, and the answer to the question of when players peak has been loosey goosey to me, or whether a developing player will keep getting better or are they still two years away from being two years away comes up often. I could have looked up the usual answer, but I wanted to investigate it myself for fun.',
+      'I have followed the NBA closely since 2019 and kept wondering when players usually peak. I collected the data to investigate it myself, then expanded the project to cover individual careers, league-wide patterns, next-season forecasts and salaries across different cap eras.',
     buildDetails:
-      "I also wanted to plot one-number metrics year by year so I could see the bigger picture of a player’s career. Stats are widely available but visualizations aren't. That turned into data ingestion, PostgreSQL, server-side queries, player search, interactive charts, and a small forecasting layer.",
+      'Python pipelines clean the performance, prediction and salary data and publish it to Supabase. The Next.js site uses server-side queries, cached aggregates and API routes to power player search, interactive career and peak-age charts, forecasts, payroll breakdowns and cross-era salary comparisons.',
     tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL'],
     github: 'https://github.com/jacekasen/nba-peak-analysis',
     demo: '/projects/nba',
     highlights: [
-      'Player search and dynamic routes',
-      'Server-backed PostgreSQL queries',
-      'Interactive career and peak dashboards',
-      'Prediction and comparison features',
+      'Career charts across five advanced metrics',
+      'Next-season forecasts with observed results',
+      'League-wide peak-age analysis',
+      'Team payrolls, player salaries and cap-share rankings',
     ],
   },
   {
@@ -35,17 +35,17 @@ export const projects: Project[] = [
     eyebrow: 'A personal alternative inspired by Flighty',
     kind: 'independent',
     description:
-      'I liked how Flighty turns old trips into a visual history, but its recurring subscription prompts were more than I wanted for a personal log. So I built the focused version I wanted to use myself: look up a flight, keep a private history, see every route on a globe, and revisit the year in a recap.',
+      'I liked how Flighty showed upcoming flights and travel history on a globe, but its recurring subscription prompts got too annoying. So I built a similar app for myself, with flight lookup, a private history, a route map and a yearly recap.',
     buildDetails:
-      'It is an Expo app on Supabase, and most of the work was in the parts nobody sees. Flight data providers are patchy and rate-limited, so a Supabase Edge Function owns the provider key, normalizes whatever comes back into a contract the app controls, caches it, and enforces per-user limits. Every saved flight is protected by row-level security, with the isolation proven by database tests rather than assumed.',
+      'The app is built with Expo and Supabase. A Supabase Edge Function keeps the flight-data API key off the client, cleans up provider responses, caches results and limits requests. Row-level security keeps each user’s saved flights private, with database tests covering that access.',
     tags: ['Expo', 'React Native', 'TypeScript', 'Supabase', 'PostgreSQL', 'Deno'],
     github: 'https://github.com/jacekasen/flight-tracker',
     demo: '/projects/flight-tracker',
     highlights: [
-      'The real app, running in the page',
-      'Edge Function proxy with caching and rate limits',
-      'Row-level security proven by database tests',
-      'UTC storage with airport-local display',
+      'Flight lookup and manual entry',
+      'A globe showing saved routes',
+      'Private histories enforced by the database',
+      'Flight times shown in each airport’s time zone',
     ],
   },
   {
@@ -57,7 +57,7 @@ export const projects: Project[] = [
     buildDetails:
       'I worked on the React Native client, REST API, authentication flow, permissions, and PostgreSQL schema.',
     tags: ['React Native', 'TypeScript', 'Node.js', 'PostgreSQL'],
-    github: null,
+    github: 'https://github.com/jacekasen/cs130-finsight-public',
     demo: null,
   },
   {

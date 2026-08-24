@@ -58,7 +58,7 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
       <section aria-labelledby="metric-explorer-title">
         <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <h2 id="metric-explorer-title" className="font-mono text-2xl">
+            <h2 id="metric-explorer-title" className="text-2xl font-bold">
               Explore the evidence
             </h2>
             <p className="text-muted mt-1 text-sm">
@@ -127,7 +127,7 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
               What survives scrutiny
             </p>
-            <h2 className="mb-3 font-mono text-2xl">Your prime years are broad</h2>
+            <h2 className="mb-3 text-2xl font-bold">Your prime years are broad</h2>
             <p className="text-muted leading-7">
               Across {summary.count.toLocaleString()} qualifying modern-era careers, the median
               observed {details.shortLabel} peak is age {formatAge(summary.median)}, while the
@@ -139,7 +139,7 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
             </p>
           </div>
           <div className="border-border border-t pt-5 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-7">
-            <h3 className="mb-3 font-mono text-sm font-bold uppercase">Interpretation limits</h3>
+            <h3 className="mb-3 text-sm font-bold uppercase">Interpretation limits</h3>
             <ul className="text-muted space-y-2 text-sm leading-6">
               <li>• Curves describe observed seasons, not a causal effect of aging.</li>
               <li>• Active players may reach a higher peak in a future season.</li>
@@ -158,7 +158,7 @@ export function PeakPerformanceDashboard({ data }: { data: PeakPerformanceData }
           <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
             04 · Comparison
           </p>
-          <h2 id="metric-comparison-title" className="font-mono text-2xl">
+          <h2 id="metric-comparison-title" className="text-2xl font-bold">
             Peak estimates across metrics
           </h2>
         </div>
@@ -208,7 +208,7 @@ function ChartSection({
     <section className="min-w-0">
       <div className="mb-5">
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">{eyebrow}</p>
-        <h2 className="font-mono text-2xl">{title}</h2>
+        <h2 className="text-2xl font-bold">{title}</h2>
         <p className="text-muted mt-2 max-w-3xl text-sm leading-6">{description}</p>
       </div>
       <div className="border-border bg-background rounded-lg border p-2 md:p-4">{children}</div>

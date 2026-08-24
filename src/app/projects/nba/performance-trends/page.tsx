@@ -142,7 +142,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
           Basketball Reference · 1976–2026
         </p>
-        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">
+        <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
           NBA Performance Trends
         </h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
@@ -195,7 +195,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         <DatabaseError />
       ) : series.length === 0 ? (
         <div className="bg-surface rounded p-5">
-          <h2 className="mb-2 font-mono text-lg">Player not found</h2>
+          <h2 className="mb-2 text-lg font-bold">Player not found</h2>
           <p className="text-muted">Check the spelling and enter the player&apos;s full name.</p>
         </div>
       ) : (
@@ -205,7 +205,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
               <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
                 01 · Career arc
               </p>
-              <h2 id="chart-title" className="font-mono text-2xl md:text-3xl">
+              <h2 id="chart-title" className="text-2xl font-bold md:text-3xl">
                 {playerSeries.name} · {metricDetails.shortLabel}
               </h2>
               <p className="text-muted mt-2 text-sm">
@@ -261,7 +261,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
               03 · Season log
             </p>
-            <h2 id="data-title" className="font-mono text-2xl">
+            <h2 id="data-title" className="text-2xl font-bold">
               Season-by-season record
             </h2>
             <p className="text-muted mt-2 mb-5 text-sm">
@@ -372,7 +372,7 @@ function SupabaseSetupMessage() {
   return (
     <div className="space-y-8 pt-4 md:pt-8">
       <header>
-        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">
+        <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
           NBA Performance Trends
         </h1>
         <p className="text-muted max-w-2xl text-lg leading-7">
@@ -395,7 +395,7 @@ function SupabaseSetupMessage() {
 function DatabaseError() {
   return (
     <div className="bg-surface rounded p-5">
-      <h2 className="mb-2 font-mono text-lg">Could not load the NBA data</h2>
+      <h2 className="mb-2 text-lg font-bold">Could not load the NBA data</h2>
       <p className="text-muted">
         Check that <code>nba_player_seasons</code> exists and its public read policy is enabled.
       </p>

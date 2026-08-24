@@ -57,7 +57,7 @@ export function PlayerSalaryPanel({
           <p className="text-accent mb-1 font-mono text-xs tracking-[0.14em] uppercase">
             02 · Player history
           </p>
-          <h2 id="player-history-title" className="font-mono text-2xl">
+          <h2 id="player-history-title" className="text-2xl font-bold">
             {name}
           </h2>
           {peak ? (

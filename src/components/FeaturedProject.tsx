@@ -51,7 +51,7 @@ export function FeaturedProject({ project, headingId }: FeaturedProjectProps) {
       {project.highlights && (
         <div className="border-border border-t pt-7 md:border-t-0 md:border-l md:pt-0 md:pl-8">
           <p className="text-accent mb-5 font-mono text-xs tracking-[0.16em] uppercase">
-            What is in there
+            What it includes
           </p>
           <ul className="space-y-4">
             {project.highlights.map((item) => (

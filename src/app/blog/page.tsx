@@ -13,7 +13,7 @@ export default function BlogIndex() {
   return (
     <div className="space-y-10 md:space-y-14">
       <header className="pt-4 md:pt-8">
-        <h1 className="mb-3 font-mono text-4xl tracking-tight md:text-5xl">Writing</h1>
+        <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">Writing</h1>
         <p className="text-muted max-w-2xl text-lg leading-7">
           Mostly attempts to answer questions I could not quite leave alone.
         </p>

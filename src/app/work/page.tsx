@@ -20,10 +20,7 @@ export default function Work() {
         <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
           Things I&apos;ve built
         </h1>
-        <p className="text-muted max-w-2xl text-lg leading-8">
-          The NBA site and the flight tracker are projects I started for myself and keep coming back
-          to. The other projects were completed as coursework at UCLA.
-        </p>
+
       </header>
 
       <section aria-labelledby="featured-heading" className="space-y-8 md:space-y-10">

@@ -9,20 +9,20 @@ export const metadata = {
 
 const architecture = [
   {
-    title: 'The provider never touches the client',
-    body: 'A Supabase Edge Function holds the AeroDataBox key, validates the session, and normalizes whatever the provider returns into a contract the app owns. Coverage is uneven and the free tier is small, so it also caches normalized results for fifteen minutes and enforces per-user and per-IP limits that survive restarts. IP addresses are hashed before they are ever stored.',
+    title: 'Keeping API requests off the client',
+    body: 'A Supabase Edge Function stores the AeroDataBox key, checks the user’s session and turns the response into a consistent format for the app. Since coverage varies and the free tier is limited, results are cached for fifteen minutes and requests are limited by user and IP. IP addresses are hashed before they are stored.',
   },
   {
-    title: 'Privacy is enforced by the database',
-    body: 'Every saved flight is protected by row-level security, so isolation does not depend on the client asking the right question. A pgTAP suite proves it: cross-user reads, writes, updates, and deletes all fail, the provider cache and rate-limit machinery are unreachable from any user session, and deleting an account really does cascade.',
+    title: 'Keeping flight history private',
+    body: 'Supabase row-level security makes sure each user can only access their own saved flights. I added pgTAP tests for cross-user reads, writes, updates and deletes, as well as checks that the provider cache and rate-limit tables cannot be accessed from a user session. Deleting an account also deletes its flight history.',
   },
   {
-    title: 'Times belong to airports, not to your phone',
-    body: 'Everything is stored in UTC and displayed in each airport’s local time, which is the only way a red-eye reads correctly on both ends. Airport coordinates and countries come from the public OurAirports dataset and are filled in by a database trigger, which is also what makes distance totals and the route map work.',
+    title: 'Handling local flight times',
+    body: 'Flight times are stored in UTC and displayed in each airport’s local time, so overnight flights show the right time at both ends. Airport coordinates and countries come from the public OurAirports dataset and are added by a database trigger. That data is also used for distance totals and the route map.',
   },
   {
-    title: 'It works when the data does not',
-    body: 'Provider records arrive partial more often than not, so a missing aircraft, distance, or airport match never removes a flight from unrelated totals. When a lookup fails entirely, manual entry saves the same record without any provider request at all.',
+    title: 'Working around incomplete data',
+    body: 'Flight records are often missing an aircraft, distance or airport match, so the app calculates each stat independently instead of dropping the whole flight. If a lookup fails completely, I can enter the flight manually and save the same kind of record.',
   },
 ];
 
@@ -33,23 +33,22 @@ export default function FlightTrackerPage() {
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
           A personal alternative inspired by Flighty
         </p>
-        <h1 className="mb-4 font-mono text-4xl tracking-tight md:text-6xl">Flight Tracker</h1>
+        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-6xl">Flight Tracker</h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
-          I liked how Flighty turns old trips into a visual history, but its recurring subscription
-          prompts were more than I wanted for a personal log. So I built the focused version I
-          wanted for myself: look up a flight, keep a private history, see every route on a globe,
-          and revisit the year in a recap. Flighty was the product reference; the implementation,
-          backend, and trade-offs documented here are my own work.
+          I liked how the iOS app Flighty visualized your upcoming flights and travel history on a
+          globe, but its recurring subscription prompts got too annoying. So I built a similar app
+          for myself. I wanted to look up a flight, keep a private history and see every route on a
+          globe.
         </p>
       </header>
 
       <section aria-labelledby="build-heading" className="space-y-6">
         <div className="border-border/80 border-b pb-4">
           <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-            How it is built
+            How it works
           </p>
           <h2 id="build-heading" className="text-3xl font-bold tracking-tight md:text-4xl">
-            The interesting parts are not on screen
+            The things happening behind the scenes
           </h2>
         </div>
 
