@@ -32,7 +32,7 @@ service-role key must never be added here — every query runs through the publi
 | NBA Peak Performance Analysis | `/projects/nba/peak-performance`   | `nba_player_seasons`                                     |
 | NBA Salary Cap Explorer       | `/projects/nba/salaries`           | `player_salaries`, `salary_caps`, `team_season_salaries` |
 
-All of these tables must be publicly readable (the `anon` role needs `select`).
+The NBA tables must be publicly readable (the `anon` role needs `select`).
 
 ## NBA Salary Cap Explorer
 
@@ -69,6 +69,14 @@ team-season, and player history or leaderboard rows only when asked for. The ful
 never shipped to the browser. Records with no salary amount are shown as _not recorded_ and left out
 of every total rather than counted as zero.
 
+## Flight Tracker case study
+
+`/projects/flight-tracker` presents Flight Tracker as a portfolio case study without embedding the
+application. The Expo app remains in a
+[separate repository](https://github.com/jacekasen/flight-tracker), while the portfolio page explains
+the personal motivation, architecture, security boundaries, data handling, and implementation
+trade-offs.
+
 ## Scripts
 
 | Command                | Description                      |
@@ -96,6 +104,7 @@ src/
 │   │   ├── page.tsx            # Blog index
 │   │   └── [slug]/page.tsx     # Individual post
 │   ├── projects/nba/           # NBA analyses (trends, peak performance, salaries)
+│   ├── projects/flight-tracker/ # Flight Tracker case study
 │   └── api/nba/                # Server-side Supabase queries for the NBA pages
 ├── components/
 │   ├── Shell.tsx               # Site navigation shell

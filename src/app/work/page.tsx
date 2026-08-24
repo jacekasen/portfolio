@@ -1,24 +1,17 @@
 import Link from 'next/link';
-import { ArrowRight, ExternalLink, Github } from 'lucide-react';
+import { ExternalLink, Github } from 'lucide-react';
+import { FeaturedProject } from '@/components/FeaturedProject';
 import { projects } from '@/lib/projects';
 
 export const metadata = {
   title: 'Work',
-  description: 'The NBA site Jace keeps working on, plus a few things he made at UCLA.',
+  description:
+    'A flight diary and an NBA analysis site Jace keeps working on, plus a few things he made at UCLA.',
 };
 
-const nbaBuild = [
-  'Player search and dynamic routes',
-  'Server-backed PostgreSQL queries',
-  'Interactive career and peak dashboards',
-  'Prediction and comparison features',
-];
-
 export default function Work() {
-  const nbaProject = projects.find((project) => project.kind === 'independent');
+  const featured = projects.filter((project) => project.kind === 'independent');
   const coursework = projects.filter((project) => project.kind === 'coursework');
-
-  if (!nbaProject) return null;
 
   return (
     <div className="space-y-16 md:space-y-20">
@@ -28,63 +21,22 @@ export default function Work() {
           Things I&apos;ve built
         </h1>
         <p className="text-muted max-w-2xl text-lg leading-8">
-          The NBA site is a project I started for fun and keep coming back to. The other projects
-          were completed as coursework at UCLA.
+          The NBA site and the flight tracker are projects I started for myself and keep coming back
+          to. The other projects were completed as coursework at UCLA.
         </p>
       </header>
 
-      <section aria-labelledby="featured-project">
-        <article className="on-ink bg-ink text-on-ink grid gap-9 p-7 md:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.65fr)] md:p-10">
-          <div>
-            <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
-              {nbaProject.eyebrow}
-            </p>
-            <h2 id="featured-project" className="mb-5 text-3xl leading-tight font-bold md:text-4xl">
-              {nbaProject.title}
-            </h2>
-            <p className="mb-5 max-w-2xl text-lg leading-8">{nbaProject.description}</p>
-            <p className="text-on-ink-muted mb-7 max-w-2xl leading-7">{nbaProject.buildDetails}</p>
-            <div className="mb-8 flex flex-wrap gap-2 font-mono text-[0.68rem]">
-              {nbaProject.tags.map((tag) => (
-                <span key={tag} className="bg-background/70 rounded-sm px-2.5 py-1.5">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={nbaProject.demo || '/projects/nba'}
-                className="bg-accent text-background hover:bg-foreground inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
-              >
-                Open the project <ArrowRight size={16} />
-              </Link>
-              {nbaProject.github && (
-                <a
-                  href={nbaProject.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-border hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
-                >
-                  <Github size={16} /> Source
-                </a>
-              )}
-            </div>
-          </div>
-
-          <div className="border-border border-t pt-7 md:border-t-0 md:border-l md:pt-0 md:pl-8">
-            <p className="text-accent mb-5 font-mono text-xs tracking-[0.16em] uppercase">
-              What is in there
-            </p>
-            <ul className="space-y-4">
-              {nbaBuild.map((item) => (
-                <li key={item} className="flex gap-3 text-sm leading-6">
-                  <span className="text-accent font-mono">→</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </article>
+      <section aria-labelledby="featured-heading" className="space-y-8 md:space-y-10">
+        <h2 id="featured-heading" className="sr-only">
+          Featured projects
+        </h2>
+        {featured.map((project) => (
+          <FeaturedProject
+            key={project.title}
+            project={project}
+            headingId={`featured-${project.title.toLowerCase().replace(/\s+/g, '-')}`}
+          />
+        ))}
       </section>
 
       <section aria-labelledby="coursework-heading">
