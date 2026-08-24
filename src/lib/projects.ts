@@ -32,10 +32,10 @@ export const projects: Project[] = [
   },
   {
     title: 'Flight Tracker',
-    eyebrow: 'A mobile app I built end to end',
+    eyebrow: 'A personal alternative inspired by Flighty',
     kind: 'independent',
     description:
-      'Airlines forget you flew with them, and the apps that do remember want your whole trip history in exchange. I wanted a private flight diary instead: look up a flight by number, keep the ones I actually took, and get a recap at the end of the year that belongs to me.',
+      'I liked how Flighty turns old trips into a visual history, but its recurring subscription prompts were more than I wanted for a personal log. So I built the focused version I wanted to use myself: look up a flight, keep a private history, see every route on a globe, and revisit the year in a recap.',
     buildDetails:
       'It is an Expo app on Supabase, and most of the work was in the parts nobody sees. Flight data providers are patchy and rate-limited, so a Supabase Edge Function owns the provider key, normalizes whatever comes back into a contract the app controls, caches it, and enforces per-user limits. Every saved flight is protected by row-level security, with the isolation proven by database tests rather than assumed.',
     tags: ['Expo', 'React Native', 'TypeScript', 'Supabase', 'PostgreSQL', 'Deno'],

@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { Github, Maximize2, Plane } from 'lucide-react';
+import { Github, Plane } from 'lucide-react';
 
 export const metadata = {
   title: 'Flight Tracker | Jace Kasen',
   description:
-    'A private flight diary built with Expo and Supabase, running live in the page as a read-only sample history.',
+    'A personal Flighty-inspired flight diary built with Expo, React Native, and Supabase.',
 };
 
 const architecture = [
@@ -31,62 +31,17 @@ export default function FlightTrackerPage() {
     <div className="space-y-14 pt-4 md:pt-8">
       <header className="max-w-4xl">
         <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-          A mobile app I built end to end
+          A personal alternative inspired by Flighty
         </p>
         <h1 className="mb-4 font-mono text-4xl tracking-tight md:text-6xl">Flight Tracker</h1>
         <p className="text-muted max-w-3xl text-lg leading-8">
-          Airlines forget you flew with them, and the apps that remember want your whole trip
-          history in exchange. This is the other version: a private flight diary that looks a flight
-          up by number, keeps the ones you actually took, and turns them into a recap that belongs
-          to you.
+          I liked how Flighty turns old trips into a visual history, but its recurring subscription
+          prompts were more than I wanted for a personal log. So I built the focused version I
+          wanted for myself: look up a flight, keep a private history, see every route on a globe,
+          and revisit the year in a recap. Flighty was the product reference; the implementation,
+          backend, and trade-offs documented here are my own work.
         </p>
       </header>
-
-      <section aria-labelledby="demo-heading" className="space-y-6">
-        <div className="border-border/80 flex flex-wrap items-end justify-between gap-4 border-b pb-4">
-          <div>
-            <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-              Live demo
-            </p>
-            <h2 id="demo-heading" className="text-3xl font-bold tracking-tight md:text-4xl">
-              The actual app, running here
-            </h2>
-          </div>
-          <a
-            href="/flight-tracker"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border-border hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-sm border px-4 py-2.5 font-mono text-xs transition-colors"
-          >
-            <Maximize2 size={14} /> Open full screen
-          </a>
-        </div>
-
-        <p className="text-muted max-w-3xl leading-7">
-          This is the same Expo build that runs on a phone, exported for the web and pointed at a
-          sample account. Browse the timeline, open a flight, and look at the insights. It is
-          read-only on purpose: saving, editing, and deleting all require an account, and no
-          password is published here to get one.
-        </p>
-
-        <div className="bg-ink flex justify-center px-4 py-10 md:py-14">
-          <div className="w-full max-w-[375px]">
-            <div className="rounded-[2.5rem] bg-[#1c1c1e] p-3 shadow-2xl">
-              <div className="relative overflow-hidden rounded-[2rem] bg-black">
-                <iframe
-                  src="/flight-tracker"
-                  title="Flight Tracker demo application"
-                  loading="lazy"
-                  className="block h-[812px] w-full border-0"
-                />
-              </div>
-            </div>
-            <p className="text-on-ink-muted mt-5 text-center font-mono text-[0.68rem] tracking-[0.1em] uppercase">
-              Expo web build · read-only sample account
-            </p>
-          </div>
-        </div>
-      </section>
 
       <section aria-labelledby="build-heading" className="space-y-6">
         <div className="border-border/80 border-b pb-4">
