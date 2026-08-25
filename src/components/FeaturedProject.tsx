@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Github } from 'lucide-react';
+import { ArrowRight, ExternalLink, Github } from 'lucide-react';
 import type { Project } from '@/lib/projects';
 
 interface FeaturedProjectProps {
@@ -43,6 +43,16 @@ export function FeaturedProject({ project, headingId }: FeaturedProjectProps) {
               className="border-border hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
             >
               <Github size={16} /> Source
+            </a>
+          )}
+          {project.video && (
+            <a
+              href={project.video}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-border hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
+            >
+              Watch demo <ExternalLink size={16} />
             </a>
           )}
         </div>

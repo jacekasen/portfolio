@@ -7,6 +7,7 @@ export interface Project {
   tags: string[];
   github: string | null;
   demo: string | null;
+  video?: string | null;
   /** Shown beside a featured project as the short "what is in there" list. */
   highlights?: string[];
 }
@@ -41,6 +42,7 @@ export const projects: Project[] = [
     tags: ['Expo', 'React Native', 'TypeScript', 'Supabase', 'PostgreSQL', 'Deno'],
     github: 'https://github.com/jacekasen/flight-tracker',
     demo: '/projects/flight-tracker',
+    video: 'https://youtu.be/ZIx8ffsGgGk',
     highlights: [
       'Flight lookup and manual entry',
       'A globe showing saved routes',

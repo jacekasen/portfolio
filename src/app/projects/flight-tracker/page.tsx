@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Plane } from 'lucide-react';
+import { ExternalLink, Github, Plane } from 'lucide-react';
 
 export const metadata = {
   title: 'Flight Tracker | Jace Kasen',
@@ -81,14 +81,24 @@ export default function FlightTrackerPage() {
               </p>
             </div>
           </div>
-          <a
-            href="https://github.com/jacekasen/flight-tracker"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-accent text-background hover:bg-foreground inline-flex w-fit shrink-0 items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
-          >
-            <Github size={16} /> Read the source
-          </a>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <a
+              href="https://youtu.be/ZIx8ffsGgGk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-accent text-background hover:bg-foreground inline-flex w-fit items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
+            >
+              Watch the demo <ExternalLink size={16} />
+            </a>
+            <a
+              href="https://github.com/jacekasen/flight-tracker"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-border hover:border-accent hover:text-accent inline-flex w-fit items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
+            >
+              <Github size={16} /> Read the source
+            </a>
+          </div>
         </div>
       </section>
 

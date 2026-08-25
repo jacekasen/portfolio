@@ -75,7 +75,7 @@ of every total rather than counted as zero.
 application. The Expo app remains in a
 [separate repository](https://github.com/jacekasen/flight-tracker), while the portfolio page explains
 the personal motivation, architecture, security boundaries, data handling, and implementation
-trade-offs.
+trade-offs. A [recorded walkthrough](https://youtu.be/ZIx8ffsGgGk) demonstrates the mobile app.
 
 ## Scripts
 
