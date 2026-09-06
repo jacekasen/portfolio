@@ -1,25 +1,46 @@
 import Link from 'next/link';
 import { ArrowRight, ExternalLink, Github } from 'lucide-react';
 import type { Project } from '@/lib/projects';
+import { cn } from '@/lib/utils';
 
 interface FeaturedProjectProps {
   project: Project;
   headingId: string;
+  compact?: boolean;
 }
 
-export function FeaturedProject({ project, headingId }: FeaturedProjectProps) {
+export function FeaturedProject({ project, headingId, compact = false }: FeaturedProjectProps) {
+  const highlights = compact ? project.highlights?.slice(0, 3) : project.highlights;
+
   return (
-    <article className="on-ink bg-ink text-on-ink grid gap-9 p-7 md:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.65fr)] md:p-10">
+    <article
+      className={cn(
+        'on-ink bg-ink text-on-ink grid md:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.65fr)]',
+        compact ? 'gap-7 p-6 md:p-8' : 'gap-9 p-7 md:p-10',
+      )}
+    >
       <div>
         <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
           {project.eyebrow}
         </p>
-        <h3 id={headingId} className="mb-5 text-3xl leading-tight font-bold md:text-4xl">
+        <h3
+          id={headingId}
+          className={cn(
+            'leading-tight font-bold',
+            compact ? 'mb-4 text-2xl md:text-3xl' : 'mb-5 text-3xl md:text-4xl',
+          )}
+        >
           {project.title}
         </h3>
-        <p className="mb-5 max-w-2xl text-lg leading-8">{project.description}</p>
-        <p className="text-on-ink-muted mb-7 max-w-2xl leading-7">{project.buildDetails}</p>
-        <div className="mb-8 flex flex-wrap gap-2 font-mono text-[0.68rem]">
+        <p className={cn('max-w-2xl', compact ? 'mb-5 leading-7' : 'mb-5 text-lg leading-8')}>
+          {project.description}
+        </p>
+        {!compact && (
+          <p className="text-on-ink-muted mb-7 max-w-2xl leading-7">{project.buildDetails}</p>
+        )}
+        <div
+          className={cn('flex flex-wrap gap-2 font-mono text-[0.68rem]', compact ? 'mb-6' : 'mb-8')}
+        >
           {project.tags.map((tag) => (
             <span key={tag} className="bg-background/70 rounded-sm px-2.5 py-1.5">
               {tag}
@@ -58,13 +79,13 @@ export function FeaturedProject({ project, headingId }: FeaturedProjectProps) {
         </div>
       </div>
 
-      {project.highlights && (
+      {highlights && (
         <div className="border-border border-t pt-7 md:border-t-0 md:border-l md:pt-0 md:pl-8">
           <p className="text-accent mb-5 font-mono text-xs tracking-[0.16em] uppercase">
-            What it includes
+            {compact ? 'Highlights' : 'What it includes'}
           </p>
           <ul className="space-y-4">
-            {project.highlights.map((item) => (
+            {highlights.map((item) => (
               <li key={item} className="flex gap-3 text-sm leading-6">
                 <span className="text-accent font-mono">→</span>
                 {item}

@@ -8,6 +8,6 @@ A general education class in linguistic anthropology made me more curious about 
 
 At UCLA, I was president of the Russian-Speaking Student Association and helped found the Central Asian Student Union. Both mattered to me because they made a very large university feel smaller and gave people of shared cultured a place to find one another.
 
-I also spend a lot of time following professional Counter-Strike 2 and the NBA: podcasts, stats, roster moves, and storylines. Alongside the master's, I'm looking for summer 2027 internships and full-time software engineering roles.
+I also spend a lot of time following professional Counter-Strike 2 and the NBA: podcasts, stats, roster moves, and storylines. Alongside the master's, I'm looking for Summer 2027 software engineering Co-ops.
 
 [Email me](mailto:jace@jacekasen.com) or [find me on LinkedIn](https://linkedin.com/in/jacekasen).

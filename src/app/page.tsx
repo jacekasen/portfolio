@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Download, ExternalLink, Github, Linkedin, Mail } from 'lucide-react';
+import { ArrowRight, Download, ExternalLink, Linkedin, Mail } from 'lucide-react';
 import { FeaturedProject } from '@/components/FeaturedProject';
+import { PageHeader } from '@/components/PageHeader';
 import { getSortedPostsData } from '@/lib/posts';
 import { projects } from '@/lib/projects';
 import { siteConfig } from '@/lib/config';
@@ -10,29 +11,22 @@ export default function Home() {
   const posts = getSortedPostsData();
   const featuredProjects = projects.filter((project) => project.kind === 'independent');
   const coursework = projects.filter((project) => project.kind === 'coursework');
-  const selectedPosts = ['my-name', 'green-bazar-code-switching', '2026-03-20-emg-to-text-decoding']
+  const selectedPosts = ['my-name', '2026-03-20-emg-to-text-decoding']
     .map((id) => posts.find((post) => post.id === id))
     .filter((post): post is (typeof posts)[number] => Boolean(post));
 
   return (
-    <div className="space-y-24 pb-8 md:space-y-32">
-      <section className="pt-3 md:pt-10">
-        <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_15rem] md:gap-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
+    <div className="space-y-16 pb-8 md:space-y-24">
+      <section>
+        <div className="grid items-start gap-10 md:grid-cols-[minmax(0,1fr)_15rem] md:gap-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="max-w-3xl">
-            <p className="text-accent mb-4 font-mono text-xs tracking-[0.16em] uppercase">
-              Software engineer · Vancouver, BC
-            </p>
-            <h1 className="mb-6 text-4xl leading-[1.08] font-bold tracking-[-0.025em] text-balance md:text-6xl lg:text-7xl">
-              Hey, I&apos;m Jace.
-            </h1>
-            <p className="text-muted mb-8 max-w-2xl text-lg leading-8 md:text-xl">
-              I&apos;m from Kazakhstan, graduated from UCLA with a degree in computer science and a
-              minor in anthropology, and I&apos;m now working toward an M.S. in computer science at
-              Northeastern University in Vancouver. I&apos;m looking for summer 2027 internships and
-              full-time software engineering roles.
-            </p>
+            <PageHeader
+              eyebrow="Software engineer · Vancouver, BC"
+              title="Hey, I'm Jace."
+              description="I earned my Bachelor's in Computer Science at UCLA and am now pursuing an M.S. in Computer Science at Northeastern University in Vancouver. I'm looking for Summer 2027 Software Engineering Co-ops."
+            />
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="#work"
                 className="bg-accent text-background hover:bg-foreground inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
@@ -56,7 +50,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative mx-auto aspect-[4/5] w-56 md:w-full">
+          <div className="relative mx-auto aspect-[4/5] w-56 md:mt-8 md:w-full">
             <div className="border-accent-light/50 absolute -right-3 -bottom-3 h-full w-full border" />
             <Image
               src="/profile_pic.jpg"
@@ -79,8 +73,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Built for curiosity</h2>
           </div>
           <p className="text-muted hidden max-w-sm text-right text-sm leading-6 md:block">
-            Two independent projects I started for myself and kept developing into complete,
-            interactive products.
+            Two personal projects developed into complete, interactive products.
           </p>
         </div>
 
@@ -90,62 +83,41 @@ export default function Home() {
               key={project.title}
               project={project}
               headingId={`home-${project.title.toLowerCase().replace(/\s+/g, '-')}`}
+              compact
             />
           ))}
         </div>
       </section>
 
       <section>
-        <div className="mb-8 max-w-2xl">
-          <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-            Coursework
-          </p>
-          <h2 className="mb-3 text-3xl font-bold tracking-tight md:text-4xl">
-            Coursework projects
-          </h2>
-          <p className="text-muted leading-7">
-            These projects were completed as coursework at UCLA.
-          </p>
+        <div className="border-border/80 mb-7 flex items-end justify-between border-b pb-4">
+          <div>
+            <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
+              Coursework
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Selected coursework</h2>
+          </div>
+          <Link href="/work" className="text-accent font-mono text-sm hover:underline">
+            All work →
+          </Link>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="divide-border border-border divide-y border-y">
           {coursework.map((project) => (
-            <article key={project.title} className="bg-surface flex flex-col p-6">
-              <p className="text-accent mb-3 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
-                {project.eyebrow}
-              </p>
-              <h3 className="mb-3 text-xl font-bold">{project.title}</h3>
-              <p className="text-muted mb-4 text-sm leading-6">{project.description}</p>
-              <p className="mb-5 text-sm leading-6">{project.buildDetails}</p>
-              <div className="mb-5 flex flex-wrap gap-2 font-mono text-[0.65rem]">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="bg-accent-light/25 text-accent rounded-sm px-2 py-1">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              {(project.demo || project.github) && (
-                <div className="mt-auto flex flex-wrap gap-4 pt-2 font-mono text-xs">
-                  {project.demo && (
-                    <Link
-                      href={project.demo}
-                      className="text-accent inline-flex items-center gap-1.5 hover:underline"
-                    >
-                      More detail <ExternalLink size={13} />
-                    </Link>
-                  )}
-                  {project.github && (
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-accent inline-flex items-center gap-1.5"
-                    >
-                      <Github size={13} /> Source
-                    </a>
-                  )}
-                </div>
-              )}
+            <article
+              key={project.title}
+              className="grid gap-3 py-5 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)_auto] sm:items-center sm:gap-6"
+            >
+              <h3 className="text-lg font-bold">{project.title}</h3>
+              <p className="text-muted text-sm leading-6">{project.description}</p>
+              <a
+                href={project.demo ?? project.github ?? '/work'}
+                target={!project.demo && project.github ? '_blank' : undefined}
+                rel={!project.demo && project.github ? 'noopener noreferrer' : undefined}
+                className="text-accent inline-flex items-center gap-1.5 font-mono text-xs hover:underline"
+              >
+                Details <ExternalLink size={13} />
+              </a>
             </article>
           ))}
         </div>
@@ -181,7 +153,7 @@ export default function Home() {
                   {post.title}
                 </span>
                 {post.description && (
-                  <span className="text-muted mt-1 block max-w-2xl text-sm leading-6">
+                  <span className="text-muted mt-1 hidden max-w-2xl text-sm leading-6 sm:block">
                     {post.description}
                   </span>
                 )}
@@ -198,14 +170,14 @@ export default function Home() {
       <section className="on-ink bg-ink text-on-ink grid gap-8 p-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
         <div>
           <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
-            What I&apos;m looking for
+            Opportunities
           </p>
           <h2 className="mb-4 max-w-2xl text-3xl font-bold tracking-tight md:text-4xl">
-            I&apos;m looking for summer 2027 internships and full-time software engineering roles.
+            I&apos;m looking for what&apos;s next.
           </h2>
           <p className="text-on-ink-muted max-w-2xl text-lg leading-7">
-            I care more about the project, the team, and the chance to learn than a specific job
-            title, so I&apos;m open to a variety of roles.
+            I&apos;m looking for Summer 2027 software engineering Co-ops with a thoughtful team and
+            room to learn.
           </p>
         </div>
         <div className="flex flex-wrap gap-3 md:justify-end">

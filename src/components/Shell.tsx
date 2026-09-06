@@ -45,7 +45,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="bg-background flex min-h-screen flex-col">
       <header className="on-ink bg-ink text-on-ink fixed top-0 left-0 z-40 w-full">
-        <div className="relative flex h-16 items-center px-4 md:px-8 lg:px-12">
+        <div className="relative flex h-16 items-center px-4 md:justify-center md:px-8 lg:px-12">
           <Link
             href="/"
             className="text-accent font-mono text-xl font-bold tracking-tight md:text-2xl"
@@ -54,7 +54,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             jk
           </Link>
 
-          <nav className="absolute left-[50vw] hidden -translate-x-1/2 items-center gap-1 font-mono text-sm md:flex">
+          <nav className="ml-4 hidden items-center gap-1 font-mono text-sm md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.name}

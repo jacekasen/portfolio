@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ExternalLink, Github } from 'lucide-react';
 import { FeaturedProject } from '@/components/FeaturedProject';
+import { PageHeader } from '@/components/PageHeader';
 import { projects } from '@/lib/projects';
 
 export const metadata = {
@@ -15,13 +16,11 @@ export default function Work() {
 
   return (
     <div className="space-y-16 md:space-y-20">
-      <header className="pt-4 md:pt-8">
-        <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">Work</p>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
-          Things I&apos;ve built
-        </h1>
-
-      </header>
+      <PageHeader
+        eyebrow="Selected projects"
+        title="Things I've built"
+        description="Personal projects I kept building, plus coursework from UCLA."
+      />
 
       <section aria-labelledby="featured-heading" className="space-y-8 md:space-y-10">
         <h2 id="featured-heading" className="sr-only">

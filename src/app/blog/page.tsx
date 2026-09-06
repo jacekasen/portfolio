@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getSortedPostsData } from '@/lib/posts';
 import { format, parseISO } from 'date-fns';
+import { PageHeader } from '@/components/PageHeader';
 
 export const metadata = {
   title: 'Writing | Jace Kasen',
@@ -12,12 +13,11 @@ export default function BlogIndex() {
 
   return (
     <div className="space-y-10 md:space-y-14">
-      <header className="pt-4 md:pt-8">
-        <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">Writing</h1>
-        <p className="text-muted max-w-2xl text-lg leading-7">
-          Mostly attempts to answer questions I could not quite leave alone.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Notes and essays"
+        title="Writing"
+        description="Mostly attempts to answer questions I could not quite leave alone."
+      />
 
       <div className="space-y-8 md:space-y-10">
         {allPostsData.length > 0 ? (

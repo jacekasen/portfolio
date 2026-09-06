@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, CircleDollarSign, Github, LineChart, Mountain } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
 
 export const metadata = {
   title: 'NBA Analysis | Jace Kasen',
@@ -73,18 +74,12 @@ const buildDetails = [
 
 export default function NbaAnalysisPage() {
   return (
-    <div className="space-y-12 pt-4 md:pt-8">
-      <header className="max-w-4xl">
-        <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-          A personal basketball data project
-        </p>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-6xl">NBA Analysis</h1>
-        <p className="text-muted max-w-3xl text-lg leading-8">
-          I wanted to know when NBA players usually peak, so I collected the data and looked at it a
-          few different ways. The project now covers individual career trends, league-wide peak
-          patterns, next-season forecasts and salaries across different cap eras.
-        </p>
-      </header>
+    <div className="space-y-12">
+      <PageHeader
+        eyebrow="A personal basketball data project"
+        title="NBA Analysis"
+        description="I wanted to know when NBA players usually peak, so I collected the data and looked at it a few different ways. The project now covers individual career trends, league-wide peak patterns, next-season forecasts and salaries across different cap eras."
+      />
 
       <section className="flex flex-col gap-5" aria-label="NBA analysis projects">
         {analyses.map((analysis, index) => {
