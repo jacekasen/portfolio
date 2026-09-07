@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { PT_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import Shell from '@/components/Shell';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const ptSerif = PT_Serif({
   variable: '--font-pt-serif',
@@ -32,6 +34,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${ptSerif.variable} ${jetbrainsMono.variable} font-serif antialiased`}>
         <Shell>{children}</Shell>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
