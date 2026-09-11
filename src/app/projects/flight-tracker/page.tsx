@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, Github, Plane } from 'lucide-react';
 
@@ -6,6 +7,19 @@ export const metadata = {
   description:
     'A personal Flighty-inspired flight diary built with Expo, React Native, and Supabase.',
 };
+
+const screenshots = [
+  {
+    src: '/images/flight-tracker/flights-home.jpg',
+    alt: 'Flights tab showing a Los Angeles to Vancouver route on a globe above an upcoming flights card',
+    caption: 'Upcoming flights drawn on the globe',
+  },
+  {
+    src: '/images/flight-tracker/flight-insights.jpg',
+    alt: 'Insights screen showing seven saved flight routes across North America on a globe',
+    caption: 'Every saved route on the Insights globe',
+  },
+];
 
 const architecture = [
   {
@@ -41,6 +55,25 @@ export default function FlightTrackerPage() {
           globe.
         </p>
       </header>
+
+      <section aria-label="App screenshots" className="grid max-w-xl grid-cols-2 gap-5 md:gap-8">
+        {screenshots.map((shot) => (
+          <figure key={shot.src} className="space-y-3">
+            <div className="relative aspect-[1/2]">
+              <Image
+                src={shot.src}
+                alt={shot.alt}
+                fill
+                sizes="(min-width: 768px) 17rem, 45vw"
+                className="object-cover"
+              />
+            </div>
+            <figcaption className="text-muted font-mono text-xs leading-5">
+              {shot.caption}
+            </figcaption>
+          </figure>
+        ))}
+      </section>
 
       <section aria-labelledby="build-heading" className="space-y-6">
         <div className="border-border/80 border-b pb-4">
