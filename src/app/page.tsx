@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Download, Linkedin, Mail } from 'lucide-react';
+import { Download, ExternalLink, Github, Linkedin, Mail } from 'lucide-react';
 import { FeaturedProject } from '@/components/FeaturedProject';
 import { PageHeader } from '@/components/PageHeader';
 import { projects } from '@/lib/projects';
@@ -112,46 +112,45 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="divide-border divide-y">
-          {coursework.map((project, index) => {
-            const href = project.demo ?? project.github ?? '/work';
-            const isExternal = !project.demo && Boolean(project.github);
-            const rowClassName =
-              'group hover:bg-surface -mx-3 grid gap-2 px-3 py-5 transition-colors sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-baseline sm:gap-5';
-            const content = (
-              <>
-                <span className="text-accent font-mono text-xs font-bold">0{index + 1}</span>
-                <span>
-                  <span className="group-hover:text-accent block text-lg font-bold transition-colors">
-                    {project.title}
+        <div className="grid gap-5 md:grid-cols-3">
+          {coursework.map((project) => (
+            <article key={project.title} className="bg-surface flex flex-col p-6">
+              <p className="text-accent mb-3 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
+                {project.eyebrow}
+              </p>
+              <h3 className="mb-3 text-xl font-bold">{project.title}</h3>
+              <p className="text-muted mb-5 text-sm leading-6">{project.description}</p>
+              <div className="mb-5 flex flex-wrap gap-2 font-mono text-[0.65rem]">
+                {project.tags.map((tag) => (
+                  <span key={tag} className="bg-accent-light/25 text-accent rounded-sm px-2 py-1">
+                    {tag}
                   </span>
-                  <span className="text-muted mt-1 hidden max-w-2xl text-sm leading-6 sm:block">
-                    {project.description}
-                  </span>
-                </span>
-                <ArrowRight
-                  className="text-accent hidden transition-transform group-hover:translate-x-1 sm:block"
-                  size={17}
-                />
-              </>
-            );
-
-            return isExternal ? (
-              <a
-                key={project.title}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={rowClassName}
-              >
-                {content}
-              </a>
-            ) : (
-              <Link key={project.title} href={href} className={rowClassName}>
-                {content}
-              </Link>
-            );
-          })}
+                ))}
+              </div>
+              {(project.demo || project.github) && (
+                <div className="mt-auto flex flex-wrap gap-4 pt-2 font-mono text-xs">
+                  {project.demo && (
+                    <Link
+                      href={project.demo}
+                      className="text-accent inline-flex items-center gap-1.5 hover:underline"
+                    >
+                      More detail <ExternalLink size={13} />
+                    </Link>
+                  )}
+                  {project.github && (
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-accent inline-flex items-center gap-1.5"
+                    >
+                      <Github size={13} /> Source
+                    </a>
+                  )}
+                </div>
+              )}
+            </article>
+          ))}
         </div>
       </section>
 
