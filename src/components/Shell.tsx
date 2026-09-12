@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   BookOpen,
   BriefcaseBusiness,
+  Crosshair,
   Download,
   Github,
   Linkedin,
@@ -27,6 +28,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'About', href: '/about', icon: User },
     { name: 'Writing', href: '/blog', icon: BookOpen },
     { name: 'NBA Analysis', href: '/projects/nba', icon: TrendingUp },
+    { name: 'CS2 Analysis', href: '/projects/cs2', icon: Crosshair },
     { name: 'Résumé', href: '/jace-kasen-resume.pdf', icon: Download },
   ];
 

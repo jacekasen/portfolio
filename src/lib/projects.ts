@@ -14,6 +14,24 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: 'Counter-Strike 2 Analysis',
+    eyebrow: 'Map-to-map professional telemetry',
+    kind: 'independent',
+    description:
+      'An automated pipeline discovering, harvesting, extracting, and analyzing professional CS2 match demos and HLTV telemetry across all 65 concluded MVP tournaments since the launch of CS2. Features interactive map-to-map performance tracking with rolling window smoothing on HLTV Rating 3.0.',
+    buildDetails:
+      'Python pipelines parse Source 2 demo events and HLTV boxscores, synchronizing to a Supabase PostgreSQL backend. The Next.js dashboard uses server-side data fetching, Canvas visualization, map pool filtering, and moving average smoothing to analyze player form and variance.',
+    tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL', 'Canvas'],
+    github: 'https://github.com/jacekasen/cs2',
+    demo: '/projects/cs2',
+    highlights: [
+      'Chronological map-to-map HLTV Rating 3.0 curves',
+      'Configurable rolling window smoothing (5–20 maps)',
+      'Map-specific filters for competitive pool analysis',
+      '40,000+ map boxscores across 65 Tier-1 tournaments',
+    ],
+  },
+  {
     title: 'NBA Performance Analysis',
     eyebrow: 'A project I started for fun',
     kind: 'independent',
