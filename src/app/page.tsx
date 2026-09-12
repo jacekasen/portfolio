@@ -1,19 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Download, ExternalLink, Linkedin, Mail } from 'lucide-react';
+import { ArrowRight, Download, Linkedin, Mail } from 'lucide-react';
 import { FeaturedProject } from '@/components/FeaturedProject';
 import { PageHeader } from '@/components/PageHeader';
-import { getSortedPostsData } from '@/lib/posts';
 import { projects } from '@/lib/projects';
 import { siteConfig } from '@/lib/config';
 
 export default function Home() {
-  const posts = getSortedPostsData();
   const featuredProjects = projects.filter((project) => project.kind === 'independent');
   const coursework = projects.filter((project) => project.kind === 'coursework');
-  const selectedPosts = ['my-name', '2026-03-20-emg-to-text-decoding']
-    .map((id) => posts.find((post) => post.id === id))
-    .filter((post): post is (typeof posts)[number] => Boolean(post));
 
   return (
     <div className="pb-8">
@@ -117,68 +112,46 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="divide-border border-border divide-y border-y">
-          {coursework.map((project) => (
-            <article
-              key={project.title}
-              className="grid gap-3 py-5 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)_auto] sm:items-center sm:gap-6"
-            >
-              <h3 className="text-lg font-bold">{project.title}</h3>
-              <p className="text-muted text-sm leading-6">{project.description}</p>
-              <a
-                href={project.demo ?? project.github ?? '/work'}
-                target={!project.demo && project.github ? '_blank' : undefined}
-                rel={!project.demo && project.github ? 'noopener noreferrer' : undefined}
-                className="text-accent inline-flex items-center gap-1.5 font-mono text-xs hover:underline"
-              >
-                Details <ExternalLink size={13} />
-              </a>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-16 md:mt-24">
-        <div className="border-border/80 mb-7 flex items-end justify-between border-b pb-4">
-          <div>
-            <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-              A little more about me
-            </p>
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-              Things I&apos;ve written
-            </h2>
-          </div>
-          <Link
-            href="/blog"
-            className="text-accent hidden font-mono text-sm hover:underline sm:block"
-          >
-            All writing →
-          </Link>
-        </div>
         <div className="divide-border divide-y">
-          {selectedPosts.map((post, index) => (
-            <Link
-              key={post.id}
-              href={`/blog/${post.id}`}
-              className="group hover:bg-surface -mx-3 grid gap-2 px-3 py-5 transition-colors sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-baseline sm:gap-5"
-            >
-              <span className="text-accent font-mono text-xs font-bold">0{index + 1}</span>
-              <span>
-                <span className="group-hover:text-accent block text-lg font-bold transition-colors">
-                  {post.title}
-                </span>
-                {post.description && (
-                  <span className="text-muted mt-1 hidden max-w-2xl text-sm leading-6 sm:block">
-                    {post.description}
+          {coursework.map((project, index) => {
+            const href = project.demo ?? project.github ?? '/work';
+            const isExternal = !project.demo && Boolean(project.github);
+            const rowClassName =
+              'group hover:bg-surface -mx-3 grid gap-2 px-3 py-5 transition-colors sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-baseline sm:gap-5';
+            const content = (
+              <>
+                <span className="text-accent font-mono text-xs font-bold">0{index + 1}</span>
+                <span>
+                  <span className="group-hover:text-accent block text-lg font-bold transition-colors">
+                    {project.title}
                   </span>
-                )}
-              </span>
-              <ArrowRight
-                className="text-accent hidden transition-transform group-hover:translate-x-1 sm:block"
-                size={17}
-              />
-            </Link>
-          ))}
+                  <span className="text-muted mt-1 hidden max-w-2xl text-sm leading-6 sm:block">
+                    {project.description}
+                  </span>
+                </span>
+                <ArrowRight
+                  className="text-accent hidden transition-transform group-hover:translate-x-1 sm:block"
+                  size={17}
+                />
+              </>
+            );
+
+            return isExternal ? (
+              <a
+                key={project.title}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={rowClassName}
+              >
+                {content}
+              </a>
+            ) : (
+              <Link key={project.title} href={href} className={rowClassName}>
+                {content}
+              </Link>
+            );
+          })}
         </div>
       </section>
 
