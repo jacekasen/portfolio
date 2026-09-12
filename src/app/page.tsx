@@ -72,8 +72,8 @@ export default function Home() {
             </p>
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Built for curiosity</h2>
           </div>
-          <p className="text-muted hidden max-w-sm text-right text-sm leading-6 md:block">
-            Two personal projects developed into complete, interactive products.
+          <p className="text-muted hidden max-w-none text-right text-sm leading-6 whitespace-nowrap md:block">
+            Three personal projects developed into complete, interactive products.
           </p>
         </div>
 

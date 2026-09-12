@@ -6,13 +6,11 @@ import { usePathname } from 'next/navigation';
 import {
   BookOpen,
   BriefcaseBusiness,
-  Crosshair,
   Download,
   Github,
   Linkedin,
   Mail,
   Menu,
-  TrendingUp,
   User,
   X,
 } from 'lucide-react';
@@ -27,8 +25,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'Work', href: '/work', icon: BriefcaseBusiness },
     { name: 'About', href: '/about', icon: User },
     { name: 'Writing', href: '/blog', icon: BookOpen },
-    { name: 'NBA Analysis', href: '/projects/nba', icon: TrendingUp },
-    { name: 'CS2 Analysis', href: '/projects/cs2', icon: Crosshair },
     { name: 'Résumé', href: '/jace-kasen-resume.pdf', icon: Download },
   ];
 
@@ -112,7 +108,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </header>
 
       <main className="flex-1 pt-16">
-        <div className="mx-auto max-w-6xl px-4 pt-6 pb-8 md:px-12 md:pb-12 lg:px-16">
+        <div className="mx-auto max-w-6xl px-4 pt-10 pb-8 md:px-12 md:pt-14 md:pb-12 lg:px-16">
           {children}
         </div>
       </main>
