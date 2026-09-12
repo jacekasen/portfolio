@@ -16,7 +16,7 @@ export default function Home() {
     .filter((post): post is (typeof posts)[number] => Boolean(post));
 
   return (
-    <div className="space-y-16 pb-8 md:space-y-24">
+    <div className="pb-8">
       <section>
         <div className="grid items-start gap-10 md:grid-cols-[minmax(0,1fr)_15rem] md:gap-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="max-w-3xl">
@@ -64,7 +64,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="work" className="scroll-mt-24">
+      <section id="work" className="mt-12 scroll-mt-24 md:mt-16">
         <div className="border-border/80 mb-8 flex items-end justify-between gap-6 border-b pb-4">
           <div>
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
@@ -89,7 +89,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section>
+      <section className="mt-16 md:mt-24">
         <div className="border-border/80 mb-7 flex items-end justify-between border-b pb-4">
           <div>
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
@@ -123,7 +123,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section>
+      <section className="mt-16 md:mt-24">
         <div className="border-border/80 mb-7 flex items-end justify-between border-b pb-4">
           <div>
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
@@ -167,7 +167,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="on-ink bg-ink text-on-ink grid gap-8 p-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
+      <section className="on-ink bg-ink text-on-ink mt-16 grid gap-8 p-7 md:mt-24 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
         <div>
           <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
             Opportunities
