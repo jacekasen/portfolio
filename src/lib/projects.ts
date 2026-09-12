@@ -18,7 +18,7 @@ export const projects: Project[] = [
     eyebrow: 'Map-to-map professional telemetry',
     kind: 'independent',
     description:
-      'An automated pipeline discovering, harvesting, extracting, and analyzing professional CS2 match demos and HLTV telemetry across all 65 concluded MVP tournaments since the launch of CS2. Features interactive map-to-map performance tracking with rolling window smoothing on HLTV Rating 3.0.',
+      'An automated pipeline that harvests and analyzes professional CS2 match demos across 65 Tier-1 tournaments, with interactive map-to-map performance tracking.',
     buildDetails:
       'Python pipelines parse Source 2 demo events and HLTV boxscores, synchronizing to a Supabase PostgreSQL backend. The Next.js dashboard uses server-side data fetching, Canvas visualization, map pool filtering, and moving average smoothing to analyze player form and variance.',
     tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL', 'Canvas'],
@@ -36,7 +36,7 @@ export const projects: Project[] = [
     eyebrow: 'A project I started for fun',
     kind: 'independent',
     description:
-      'I have followed the NBA closely since 2019 and kept wondering when players usually peak. I collected the data to investigate it myself, then expanded the project to cover individual careers, league-wide patterns, next-season forecasts and salaries across different cap eras.',
+      'I kept wondering when NBA players peak, so I built this to explore career trends, league-wide patterns, next-season forecasts, and salaries across cap eras.',
     buildDetails:
       'Python pipelines clean the performance, prediction and salary data and publish it to Supabase. The Next.js site uses server-side queries, cached aggregates and API routes to power player search, interactive career and peak-age charts, forecasts, payroll breakdowns and cross-era salary comparisons.',
     tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL'],
@@ -54,7 +54,7 @@ export const projects: Project[] = [
     eyebrow: 'A personal alternative inspired by Flighty',
     kind: 'independent',
     description:
-      'I liked how Flighty showed upcoming flights and travel history on a globe, but its recurring subscription prompts got too annoying. So I built a similar app for myself, with flight lookup, a private history, a route map and a yearly recap.',
+      'A personal alternative to Flighty, without the subscription prompts — flight lookup, private trip history, a route map, and a yearly recap.',
     buildDetails:
       'The app is built with Expo and Supabase. A Supabase Edge Function keeps the flight-data API key off the client, cleans up provider responses, caches results and limits requests. Row-level security keeps each user’s saved flights private, with database tests covering that access.',
     tags: ['Expo', 'React Native', 'TypeScript', 'Supabase', 'PostgreSQL', 'Deno'],

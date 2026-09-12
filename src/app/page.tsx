@@ -83,16 +83,16 @@ export default function Home() {
         <div className="border-border/80 mb-8 flex items-end justify-between gap-6 border-b pb-4">
           <div>
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-              Selected work
+              Built for curiosity
             </p>
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Built for curiosity</h2>
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Selected work</h2>
           </div>
           <p className="text-muted hidden max-w-none text-right text-sm leading-6 whitespace-nowrap md:block">
             Three personal projects developed into complete, interactive products.
           </p>
         </div>
 
-        <div className="space-y-8 md:space-y-10">
+        <div className="space-y-5 md:space-y-6">
           {featuredProjects.map((project) => (
             <FeaturedProject
               key={project.title}
