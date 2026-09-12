@@ -108,12 +108,12 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </header>
 
       <main className="flex-1 pt-16">
-        <div className="mx-auto max-w-6xl px-4 pt-10 pb-8 md:px-12 md:pt-14 md:pb-12 lg:px-16">
+        <div className="mx-auto max-w-6xl px-4 pt-10 pb-10 md:px-12 md:pt-14 md:pb-14 lg:px-16">
           {children}
         </div>
       </main>
 
-      <footer className="on-ink bg-ink text-on-ink-muted mt-16">
+      <footer className="on-ink bg-ink text-on-ink-muted">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-6 md:flex-row md:justify-between md:px-12 lg:px-16">
           <p className="font-mono text-xs">
             © {year} {siteConfig.name}

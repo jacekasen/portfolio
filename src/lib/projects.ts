@@ -14,7 +14,7 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    title: 'Counter-Strike 2 Analysis',
+    title: 'Professional Counter-Strike 2 Analysis Pipeline',
     eyebrow: 'Map-to-map professional telemetry',
     kind: 'independent',
     description:
@@ -33,7 +33,7 @@ export const projects: Project[] = [
   },
   {
     title: 'NBA Player Analytics Toolset',
-    eyebrow: 'A project I started for fun',
+    eyebrow: 'Career trajectory forecasting and salary analytics',
     kind: 'independent',
     description:
       'An NBA player analytics toolset: a leakage-safe ML pipeline forecasting career trajectories, plus a separate salary and cap-share analysis system.',
@@ -50,7 +50,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: 'Flight Tracker',
+    title: 'Flight Tracker Mobile App',
     eyebrow: 'A personal alternative inspired by Flighty',
     kind: 'independent',
     description:

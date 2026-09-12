@@ -11,7 +11,7 @@ export default function Home() {
   const coursework = projects.filter((project) => project.kind === 'coursework');
 
   return (
-    <div className="pb-8">
+    <div>
       <section>
         <div className="grid items-start gap-10 md:grid-cols-[minmax(0,1fr)_15rem] md:gap-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="max-w-3xl">
@@ -99,7 +99,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mt-16 md:mt-24">
+      <section className="mt-12 md:mt-16">
         <div className="border-border/80 mb-7 flex items-end justify-between border-b pb-4">
           <div>
             <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
@@ -154,7 +154,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="on-ink bg-ink text-on-ink mt-16 grid gap-8 p-7 md:mt-24 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
+      <section className="on-ink bg-ink text-on-ink mt-12 grid gap-8 p-7 md:mt-16 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
         <div>
           <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
             Opportunities
@@ -163,7 +163,7 @@ export default function Home() {
             I&apos;m looking for what&apos;s next.
           </h2>
           <p className="text-on-ink-muted max-w-2xl text-lg leading-7">
-            I&apos;m looking for Summer 2027 software engineering Co-ops with a thoughtful team and
+            I&apos;m looking for Summer 2027 Software Engineering Co-ops with a thoughtful team and
             room to learn.
           </p>
         </div>
