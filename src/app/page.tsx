@@ -27,19 +27,21 @@ export default function Home() {
             />
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href="#work"
-                className="bg-accent text-background hover:bg-foreground inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
-              >
-                See selected work <ArrowRight size={16} />
-              </Link>
               <a
                 href="/jace-kasen-resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border-border hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
+                className="bg-accent text-background hover:bg-foreground inline-flex items-center gap-2 rounded-sm px-5 py-3 font-mono text-sm transition-colors"
               >
                 Résumé <Download size={16} />
+              </a>
+              <a
+                href={siteConfig.socials.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border-border hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-sm border px-5 py-3 font-mono text-sm transition-colors"
+              >
+                LinkedIn <Linkedin size={16} />
               </a>
               <a
                 href={siteConfig.socials.email}
