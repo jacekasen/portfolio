@@ -154,7 +154,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="on-ink bg-ink text-on-ink mt-12 grid gap-8 p-7 md:mt-16 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
+      <section className="on-ink bg-ink text-on-ink mt-10 grid gap-8 p-7 md:mt-14 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-10">
         <div>
           <p className="text-accent mb-3 font-mono text-xs tracking-[0.16em] uppercase">
             Opportunities
