@@ -23,7 +23,20 @@ export default function Home() {
             <PageHeader
               eyebrow="Software engineer · Vancouver, BC"
               title="Hey, I'm Jace."
-              description="I earned my Bachelor's in Computer Science at UCLA and am now pursuing an M.S. in Computer Science at Northeastern University in Vancouver. I'm looking for Summer 2027 Software Engineering Co-ops."
+              description={
+                <>
+                  <p>
+                    I am a full-stack software engineer focusing on data-driven products, built with
+                    Next.js, Python, Postgres, and Supabase.
+                  </p>
+                  <p>
+                    Got my Bachelor&apos;s degree in Computer Science at UCLA in 2026. Currently
+                    pursuing my Master&apos;s degree in Computer Science at Northeastern University
+                    in Vancouver, set to graduate in 2028.
+                  </p>
+                  <p>Looking for Summer 2027 Software Engineering Co-ops.</p>
+                </>
+              }
             />
 
             <div className="mt-8 flex flex-wrap items-center gap-3">

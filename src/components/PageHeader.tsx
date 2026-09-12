@@ -17,11 +17,11 @@ export function PageHeader({ eyebrow, title, description, compact = false }: Pag
         {title}
       </h1>
       {description && (
-        <p
-          className={`text-muted w-full max-w-none ${compact ? 'text-sm leading-5 md:text-base md:leading-6' : 'text-lg leading-8'}`}
+        <div
+          className={`text-muted w-full max-w-none space-y-3 ${compact ? 'text-sm leading-5 md:text-base md:leading-6' : 'text-lg leading-8'}`}
         >
           {description}
-        </p>
+        </div>
       )}
     </header>
   );
