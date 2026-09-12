@@ -32,21 +32,21 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: 'NBA Performance Analysis',
+    title: 'NBA Player Analytics Toolset',
     eyebrow: 'A project I started for fun',
     kind: 'independent',
     description:
-      'I kept wondering when NBA players peak, so I built this to explore career trends, league-wide patterns, next-season forecasts, and salaries across cap eras.',
+      'An NBA player analytics toolset: a leakage-safe ML pipeline forecasting career trajectories, plus a separate salary and cap-share analysis system.',
     buildDetails:
-      'Python pipelines clean the performance, prediction and salary data and publish it to Supabase. The Next.js site uses server-side queries, cached aggregates and API routes to power player search, interactive career and peak-age charts, forecasts, payroll breakdowns and cross-era salary comparisons.',
-    tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL'],
-    github: 'https://github.com/jacekasen/nba-peak-analysis',
+      'A leakage-safe ML pipeline uses chronological splits and a continuation model to correct for survivorship bias, producing exit-risk-adjusted next-season BPM forecasts. A separate pipeline scrapes and validates historical salaries into cap-share metrics across eras. Both publish to Supabase, powering a Next.js dashboard for player search, career and peak-age charts, forecasts, and salary comparisons.',
+    tags: ['Next.js', 'TypeScript', 'Python', 'Machine Learning', 'Supabase', 'PostgreSQL'],
+    github: 'https://github.com/jacekasen/nba',
     demo: '/projects/nba',
     highlights: [
-      'Career charts across five advanced metrics',
-      'Next-season forecasts with observed results',
-      'League-wide peak-age analysis',
-      'Team payrolls, player salaries and cap-share rankings',
+      'Leakage-safe, chronologically-validated career forecasts',
+      'Survivorship-bias-corrected player trajectory model',
+      'Historical salary and cap-share analysis, 1984–present',
+      'Interactive career, peak-age, and payroll dashboards',
     ],
   },
   {
