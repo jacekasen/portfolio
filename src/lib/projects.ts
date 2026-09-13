@@ -14,58 +14,58 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    title: 'Professional Counter-Strike 2 Analysis Pipeline',
-    eyebrow: 'Live, map-to-map professional telemetry',
+    title: 'Counter-Strike 2 Analytics & ETL Pipeline',
+    eyebrow: 'Automated ETL pipeline & 2D radar spatial analytics',
     kind: 'independent',
     description:
-      'A pipeline that continuously ingests new CS2 matches, with map-to-map performance tracking across 65 Tier-1 tournaments to date.',
+      'An automated ETL pipeline and interactive Next.js platform ingesting 1,787 matches across 65 tournaments, reducing >380 GB of raw match replays into a compact 472 MB partitioned Parquet datastore.',
     buildDetails:
-      'Python pipelines parse Source 2 demo events and HLTV boxscores, synchronizing to a Supabase PostgreSQL backend. A live incremental syncer polls HLTV for newly concluded tournaments and automatically triggers end-to-end parsing, so the dataset grows on its own rather than needing a manual rerun. The Next.js dashboard uses server-side data fetching, Canvas visualization, map pool filtering, and moving average smoothing to analyze player form and variance.',
-    tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL', 'Canvas'],
+      'Engineered an automated ETL pipeline ingesting 1,787 matches across 65 tournaments, reducing >380 GB of raw match replays into a compact 472 MB partitioned Parquet datastore (>99.8% storage reduction). Extracted and normalized 598,000+ combat events using Polars, computing 2D radar spatial projections and implementing 3-second sliding-window algorithms for trade-kill attribution. Built a resilient ingestion crawler with browser TLS impersonation, request jitter, circuit-breaker error handling, and SQLite WAL mode to track match processing state. Shipped an interactive Next.js dashboard featuring server-rendered tournament analytics, Canvas-based player form curves, and rating comparisons.',
+    tags: ['Python', 'Polars', 'Next.js', 'Snappy Parquet', 'SQLite', 'Supabase'],
     github: 'https://github.com/jacekasen/cs2',
     demo: '/projects/cs2',
     highlights: [
-      'Live incremental syncer ingests new tournaments automatically',
-      'Chronological map-to-map HLTV Rating 3.0 curves',
-      'Configurable rolling window smoothing (5–20 maps)',
-      '40,000+ map boxscores across 65 Tier-1 tournaments to date',
-    ],
-  },
-  {
-    title: 'NBA Player Analytics Toolset',
-    eyebrow: 'Career trajectory forecasting and salary analytics',
-    kind: 'independent',
-    description:
-      'An NBA player analytics toolset: a leakage-safe ML pipeline forecasting career trajectories, plus a separate salary and cap-share analysis system.',
-    buildDetails:
-      'A leakage-safe ML pipeline uses chronological splits and a continuation model to correct for survivorship bias, producing exit-risk-adjusted next-season BPM forecasts. A separate pipeline scrapes and validates historical salaries into cap-share metrics across eras. Both publish to Supabase, powering a Next.js dashboard for player search, career and peak-age charts, forecasts, and salary comparisons.',
-    tags: ['Next.js', 'TypeScript', 'Python', 'Machine Learning', 'Supabase', 'PostgreSQL'],
-    github: 'https://github.com/jacekasen/nba',
-    demo: '/projects/nba',
-    highlights: [
-      'Leakage-safe, chronologically-validated career forecasts',
-      'Survivorship-bias-corrected player trajectory model',
-      'Historical salary and cap-share analysis, 1984–present',
-      'Interactive career, peak-age, and payroll dashboards',
+      'Automated ETL pipeline ingesting 1,787 matches across 65 tournaments (>99.8% storage reduction)',
+      '598,000+ combat events with 2D radar projections and 3-second trade attribution',
+      'Resilient ingestion crawler with browser TLS impersonation and SQLite WAL tracking',
+      'Server-rendered tournament analytics, Canvas player form curves, and rating comparisons',
     ],
   },
   {
     title: 'Flight Tracker Mobile App',
-    eyebrow: 'Secure, cross-platform flight history tracking',
+    eyebrow: 'Cross-platform flight history & edge-secured API',
     kind: 'independent',
     description:
-      'A cross-platform flight-history app with authenticated Edge Function lookups, per-user rate limiting, and row-level security isolating each user’s data.',
+      'A cross-platform flight-history app for iOS, Android, and web with authenticated search, private travel history, and custom route maps with yearly recaps.',
     buildDetails:
-      'A Supabase Edge Function validates the user’s session before proxying AeroDataBox lookups, applying persistent per-user and HMAC-hashed-IP rate limits with fifteen-minute result caching. Postgres row-level security isolates every user’s flights, with cascading deletion on account removal. The app parses alphanumeric flight numbers, stores UTC times with airport-local display, and renders all-time routes using native maps on iOS and Android and a custom globe renderer on web. Unit tests, Edge Function HTTP tests, and pgTAP database authorization tests run in continuous integration.',
-    tags: ['Expo', 'React Native', 'TypeScript', 'Supabase', 'PostgreSQL', 'Deno'],
+      'Secured flight lookups behind a Supabase Edge Function with JWT validation, persistent HMAC-hashed IP and per-user rate limits, and 15-minute cached provider responses. Enforced Postgres Row-Level Security with cascading account deletion, normalized data against a 4,134-airport dataset, and calculated Great Circle flight distances. Automated CI/CD workflows using GitHub Actions to run 35 Vitest unit tests, Edge Function HTTP tests, and database authorization assertions with pgTAP.',
+    tags: ['Expo', 'React Native', 'TypeScript', 'PostgreSQL', 'Supabase', 'Deno'],
     github: 'https://github.com/jacekasen/flight-tracker',
     demo: '/projects/flight-tracker',
     video: 'https://youtu.be/ZIx8ffsGgGk',
     highlights: [
-      'Authenticated Edge Function with per-user and IP-hashed rate limiting',
-      'Row-level security with cascading account deletion',
-      'Native maps on iOS/Android plus a custom globe renderer on web',
-      'Unit, Edge Function, and database authorization tests in CI',
+      'Cross-platform app for iOS, Android, and web with authenticated search and yearly recaps',
+      'Supabase Edge Function with JWT validation, HMAC-hashed IP, and per-user rate limits',
+      'Postgres Row-Level Security with cascading account deletion and 4,134-airport normalization',
+      'Automated CI/CD with 35 Vitest unit tests, Edge Function HTTP tests, and pgTAP assertions',
+    ],
+  },
+  {
+    title: 'NBA Player Analytics & Salary Cap Explorer',
+    eyebrow: 'Career trajectory forecasting & historical cap share analysis',
+    kind: 'independent',
+    description:
+      'A full-stack analytics platform that processes 36,000+ player-season records across 80 seasons, serving interactive career charts, peak-age curves, and forecasts via Next.js and Supabase.',
+    buildDetails:
+      'Developed a historical salary pipeline normalizing contracts into Cap Share percentages across eras, supporting stacked payroll-against-cap and roster composition visualizations. Built a leakage-safe ML pipeline with strict chronological validation splits (1976–2018 train, 2019–2022 validation, 2023–2024 test), resetting rolling features on non-consecutive seasons. Built an automated prediction service integrating two-stage classification and regression models, correcting for survivorship bias and publishing calibrated career forecasts to Supabase.',
+    tags: ['Python', 'Next.js', 'TypeScript', 'PostgreSQL', 'Supabase', 'scikit-learn'],
+    github: 'https://github.com/jacekasen/nba',
+    demo: '/projects/nba',
+    highlights: [
+      'Processes 36,000+ player-season records across 80 seasons with interactive dashboards',
+      'Historical salary pipeline normalizing contracts into Cap Share percentages across eras',
+      'Leakage-safe ML pipeline with strict chronological validation splits (1976–2018, 2019–2022, 2023–2024)',
+      'Two-stage classification and regression models correcting for survivorship bias',
     ],
   },
   {
