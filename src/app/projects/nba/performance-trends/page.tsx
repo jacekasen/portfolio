@@ -7,6 +7,12 @@ import {
   type ObservedPredictionOutcome,
   type PlayerPrediction,
 } from '@/components/nba/PlayerPredictionCard';
+import {
+  escapeLikePattern,
+  groupCareersByPlayer,
+  selectCareer,
+  type PlayerCareer,
+} from '@/lib/nba/players';
 import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 
 export const metadata = {
@@ -70,6 +76,7 @@ const METRIC_ORDER: MetricKey[] = ['bpm', 'vorp', 'ws_per_48', 'ws', 'per'];
 
 type NbaSeasonRow = {
   player_name: string;
+  player_url: string;
   year_id: string;
   age: number;
   per: number;
@@ -81,6 +88,7 @@ type NbaSeasonRow = {
 
 type NbaPageProps = {
   searchParams: Promise<{
+    id?: string;
     metric?: string;
     player?: string;
   }>;
@@ -97,11 +105,12 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
   }
 
   const supabase = createSupabaseClient();
+  const playerPattern = escapeLikePattern(requestedPlayer);
   const [seasonResult, predictionResult] = await Promise.all([
     supabase
       .from('nba_player_seasons')
-      .select('player_name, year_id, age, per, bpm, ws, vorp, ws_per_48')
-      .ilike('player_name', requestedPlayer)
+      .select('player_name, player_url, year_id, age, per, bpm, ws, vorp, ws_per_48')
+      .ilike('player_name', playerPattern)
       .order('age', { ascending: true })
       .returns<NbaSeasonRow[]>(),
     supabase
@@ -109,20 +118,23 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
       .select(
         'player_id, player_name, season, age, current_bpm, trajectory, improving_probability, stable_probability, regressing_probability, peak_probability, predicted_bpm_delta, prediction_factors, model_version, updated_at',
       )
-      .ilike('player_name', requestedPlayer)
-      .limit(1)
+      .ilike('player_name', playerPattern)
       .returns<PlayerPrediction[]>(),
   ]);
 
   const { data, error: queryError } = seasonResult;
-  const prediction = predictionResult.data?.[0] ?? null;
-  const observedOutcome = prediction ? getObservedOutcome(data ?? [], prediction) : undefined;
+  const careers = groupCareersByPlayer(data ?? []);
+  const career = selectCareer(careers, params.id);
+  const seasons = career?.seasons ?? [];
+  const prediction =
+    predictionResult.data?.find((row) => row.player_id === career?.playerId) ?? null;
+  const observedOutcome = prediction ? getObservedOutcome(seasons, prediction) : undefined;
 
-  const series: MetricSeries[] = data?.length
+  const series: MetricSeries[] = seasons.length
     ? [
         {
-          name: data[0].player_name,
-          points: data.map((season) => ({
+          name: seasons[0].player_name,
+          points: seasons.map((season) => ({
             age: Number(season.age),
             season: season.year_id,
             value: Number(season[metric]),
@@ -157,6 +169,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         action="/projects/nba/performance-trends"
         method="get"
       >
+        {career && careers.length > 1 && <input type="hidden" name="id" value={career.playerId} />}
         <label className="grid gap-2">
           <span className="font-mono text-xs font-bold tracking-wide uppercase">Statistic</span>
           <select
@@ -211,6 +224,9 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
               <p className="text-muted mt-2 text-sm">
                 {metricDetails.label} across {playerSeries.points.length} recorded seasons.
               </p>
+              {career && careers.length > 1 && (
+                <NamesakeChooser careers={careers} selectedId={career.playerId} metric={metric} />
+              )}
             </div>
 
             <div className="mb-5 grid gap-3 sm:grid-cols-3">
@@ -341,6 +357,48 @@ function CareerStat({ label, value, detail }: { label: string; value: string; de
       <p className="mt-2 font-mono text-2xl">{value}</p>
       <p className="text-muted mt-1 text-xs">{detail}</p>
     </article>
+  );
+}
+
+function NamesakeChooser({
+  careers,
+  selectedId,
+  metric,
+}: {
+  careers: PlayerCareer<NbaSeasonRow>[];
+  selectedId: string;
+  metric: MetricKey;
+}) {
+  const name = careers[0].seasons[0].player_name;
+
+  return (
+    <nav aria-label={`Players named ${name}`} className="mt-4">
+      <p className="text-muted mb-2 text-sm">
+        {careers.length} players are named {name}. Choose a career:
+      </p>
+      <ul className="flex flex-wrap gap-2 font-mono text-xs">
+        {careers.map(({ playerId, seasons }) => {
+          const isSelected = playerId === selectedId;
+          const query = new URLSearchParams({ metric, player: name, id: playerId });
+
+          return (
+            <li key={playerId}>
+              <Link
+                href={`/projects/nba/performance-trends?${query}`}
+                aria-current={isSelected ? 'page' : undefined}
+                className={`inline-block rounded-full border px-3 py-1 transition-colors ${
+                  isSelected
+                    ? 'border-accent bg-accent text-background'
+                    : 'border-border bg-surface hover:border-accent hover:text-accent'
+                }`}
+              >
+                {seasons[0].year_id} to {seasons.at(-1)!.year_id} · {seasons.length} seasons
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }
 

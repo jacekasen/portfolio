@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { escapeLikePattern } from '@/lib/nba/players';
 import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 
 const MIN_QUERY_LENGTH = 2;
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
   const { data, error } = await supabase
     .from('nba_player_seasons')
     .select('player_name')
-    .ilike('player_name', `%${query}%`)
+    .ilike('player_name', `%${escapeLikePattern(query)}%`)
     .order('player_name')
     .limit(500);
 

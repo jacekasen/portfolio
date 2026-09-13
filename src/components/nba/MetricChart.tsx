@@ -33,6 +33,7 @@ type SelectedPoint = {
 const SERIES_COLORS = ['#7a4f28', '#2563a8', '#297a51', '#8b4a8f', '#b45309'];
 const MIN_AGE = 18;
 const MAX_AGE = 42;
+const PLOT_PADDING = { top: 24, right: 20, bottom: 50, left: 58 };
 
 export function MetricChart({
   metricLabel,
@@ -77,13 +78,7 @@ export function MetricChart({
 
       const yMin = scale.min;
       const yMax = scale.max;
-      const padding = { top: 24, right: 20, bottom: 50, left: 58 };
-      const plotWidth = width - padding.left - padding.right;
-      const plotHeight = height - padding.top - padding.bottom;
-      const xFor = (age: number) =>
-        padding.left + ((age - MIN_AGE) / (MAX_AGE - MIN_AGE)) * plotWidth;
-      const yFor = (value: number) =>
-        padding.top + ((yMax - value) / Math.max(yMax - yMin, 1)) * plotHeight;
+      const { padding, plotHeight, xFor, yFor } = plotLayout(width, height, scale);
 
       context.font = `11px ${mono}`;
       context.textBaseline = 'middle';
@@ -245,13 +240,7 @@ export function MetricChart({
     const bounds = canvas.getBoundingClientRect();
     const x = clientX - bounds.left;
     const y = clientY - bounds.top;
-    const padding = { top: 24, right: 20, bottom: 50, left: 58 };
-    const plotWidth = bounds.width - padding.left - padding.right;
-    const plotHeight = bounds.height - padding.top - padding.bottom;
-    const xFor = (age: number) =>
-      padding.left + ((age - MIN_AGE) / (MAX_AGE - MIN_AGE)) * plotWidth;
-    const yFor = (value: number) =>
-      padding.top + ((scale.max - value) / Math.max(scale.max - scale.min, 1)) * plotHeight;
+    const { xFor, yFor } = plotLayout(bounds.width, bounds.height, scale);
 
     let nearest: (SelectedPoint & { distance: number }) | null = null;
     for (const [playerIndex, player] of series.entries()) {
@@ -329,6 +318,19 @@ export function MetricChart({
       </p>
     </div>
   );
+}
+
+export function plotLayout(width: number, height: number, scale: { min: number; max: number }) {
+  const plotWidth = width - PLOT_PADDING.left - PLOT_PADDING.right;
+  const plotHeight = height - PLOT_PADDING.top - PLOT_PADDING.bottom;
+  const valueRange = scale.max - scale.min || 1;
+
+  return {
+    padding: PLOT_PADDING,
+    plotHeight,
+    xFor: (age: number) => PLOT_PADDING.left + ((age - MIN_AGE) / (MAX_AGE - MIN_AGE)) * plotWidth,
+    yFor: (value: number) => PLOT_PADDING.top + ((scale.max - value) / valueRange) * plotHeight,
+  };
 }
 
 function formatAxisValue(value: number) {
