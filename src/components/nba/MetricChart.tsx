@@ -11,6 +11,12 @@ export type MetricSeries = {
   }[];
 };
 
+export type MetricProjection = {
+  age: number;
+  season: string;
+  value: number;
+};
+
 type MetricChartProps = {
   metricLabel: string;
   valueDigits: number;
@@ -23,18 +29,26 @@ type MetricChartProps = {
     min: number;
   };
   series: MetricSeries[];
+  /** Projected next season for the first series, drawn as a dotted extension of its line. */
+  projection?: MetricProjection;
   heightClassName?: string;
 };
 
-type SelectedPoint = {
-  playerIndex: number;
-  pointIndex: number;
+type SelectedPoint =
+  | { kind: 'season'; playerIndex: number; pointIndex: number }
+  | { kind: 'projection' };
+
+type SelectablePoint = {
+  selection: SelectedPoint;
+  age: number;
+  value: number;
 };
 
 const SERIES_COLORS = ['#7a4f28', '#2563a8', '#297a51', '#8b4a8f', '#b45309'];
 const MIN_AGE = 18;
 const MAX_AGE = 42;
 const PLOT_PADDING = { top: 24, right: 20, bottom: 50, left: 58 };
+const HIT_RADIUS = 14;
 
 export function MetricChart({
   metricLabel,
@@ -42,10 +56,13 @@ export function MetricChart({
   referenceLine,
   scale,
   series,
+  projection,
   heightClassName = 'h-[320px] md:h-[400px]',
 }: MetricChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedPoint, setSelectedPoint] = useState<SelectedPoint | null>(null);
+  const shownProjection =
+    projection && projection.age <= MAX_AGE && series[0]?.points.length ? projection : undefined;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -139,6 +156,35 @@ export function MetricChart({
         context.restore();
       }
 
+      // Drawn before the series so the last season's marker sits on top of the dotted segment.
+      const lastPoint = series[0]?.points.at(-1);
+      if (shownProjection && lastPoint) {
+        const projectionX = xFor(shownProjection.age);
+        const projectionY = yFor(shownProjection.value);
+        context.save();
+        context.strokeStyle = SERIES_COLORS[0];
+        context.lineWidth = 3;
+        context.lineCap = 'round';
+        context.setLineDash([0.5, 6]);
+        context.beginPath();
+        context.moveTo(xFor(lastPoint.age), yFor(lastPoint.value));
+        context.lineTo(projectionX, projectionY);
+        context.stroke();
+        context.setLineDash([]);
+
+        context.lineWidth = 2;
+        context.beginPath();
+        context.arc(projectionX, projectionY, 5, 0, Math.PI * 2);
+        context.fillStyle = background;
+        context.fill();
+        context.stroke();
+        context.beginPath();
+        context.arc(projectionX, projectionY, 2, 0, Math.PI * 2);
+        context.fillStyle = SERIES_COLORS[0];
+        context.fill();
+        context.restore();
+      }
+
       series.forEach((player, playerIndex) => {
         const color = SERIES_COLORS[playerIndex % SERIES_COLORS.length];
         context.strokeStyle = color;
@@ -166,61 +212,58 @@ export function MetricChart({
         });
       });
 
-      if (selectedPoint) {
-        const player = series[selectedPoint.playerIndex];
-        const point = player?.points[selectedPoint.pointIndex];
-        if (point) {
-          const color = SERIES_COLORS[selectedPoint.playerIndex % SERIES_COLORS.length];
-          const pointX = xFor(point.age);
-          const pointY = yFor(point.value);
-          context.beginPath();
-          context.arc(pointX, pointY, 7, 0, Math.PI * 2);
-          context.fillStyle = background;
-          context.fill();
-          context.strokeStyle = color;
-          context.lineWidth = 3;
-          context.stroke();
+      const selection = resolveSelection(selectedPoint, series, shownProjection);
+      if (selection) {
+        const { color, point } = selection;
+        const pointX = xFor(point.age);
+        const pointY = yFor(point.value);
+        context.beginPath();
+        context.arc(pointX, pointY, 7, 0, Math.PI * 2);
+        context.fillStyle = background;
+        context.fill();
+        context.strokeStyle = color;
+        context.lineWidth = 3;
+        context.stroke();
 
-          const tooltipLines = [
-            player.name,
-            `${metricLabel}: ${point.value.toFixed(valueDigits)}`,
-            `Season: ${point.season}`,
-            `Age: ${point.age}`,
-          ];
-          context.font = `12px ${mono}`;
-          const tooltipPadding = 12;
-          const tooltipWidth =
-            Math.max(...tooltipLines.map((line) => context.measureText(line).width)) +
-            tooltipPadding * 2;
-          const tooltipHeight = 82;
-          const tooltipGap = 12;
-          let tooltipX = pointX + tooltipGap;
-          let tooltipY = pointY - tooltipHeight - tooltipGap;
+        const tooltipLines = [
+          selection.name,
+          `${metricLabel}: ${point.value.toFixed(valueDigits)}${selection.projected ? ' (projected)' : ''}`,
+          `Season: ${point.season}`,
+          `Age: ${point.age}`,
+        ];
+        context.font = `12px ${mono}`;
+        const tooltipPadding = 12;
+        const tooltipWidth =
+          Math.max(...tooltipLines.map((line) => context.measureText(line).width)) +
+          tooltipPadding * 2;
+        const tooltipHeight = 82;
+        const tooltipGap = 12;
+        let tooltipX = pointX + tooltipGap;
+        let tooltipY = pointY - tooltipHeight - tooltipGap;
 
-          if (tooltipX + tooltipWidth > width - padding.right) {
-            tooltipX = pointX - tooltipWidth - tooltipGap;
-          }
-          if (tooltipY < padding.top) {
-            tooltipY = pointY + tooltipGap;
-          }
-          tooltipY = Math.min(tooltipY, height - padding.bottom - tooltipHeight);
-
-          context.fillStyle = surface;
-          context.strokeStyle = border;
-          context.lineWidth = 1;
-          context.beginPath();
-          context.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 6);
-          context.fill();
-          context.stroke();
-
-          context.textAlign = 'left';
-          context.textBaseline = 'top';
-          tooltipLines.forEach((line, index) => {
-            context.fillStyle = index === 0 ? foreground : index === 1 ? color : muted;
-            context.font = `${index <= 1 ? '600 ' : ''}12px ${mono}`;
-            context.fillText(line, tooltipX + tooltipPadding, tooltipY + 10 + index * 17);
-          });
+        if (tooltipX + tooltipWidth > width - padding.right) {
+          tooltipX = pointX - tooltipWidth - tooltipGap;
         }
+        if (tooltipY < padding.top) {
+          tooltipY = pointY + tooltipGap;
+        }
+        tooltipY = Math.min(tooltipY, height - padding.bottom - tooltipHeight);
+
+        context.fillStyle = surface;
+        context.strokeStyle = border;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 6);
+        context.fill();
+        context.stroke();
+
+        context.textAlign = 'left';
+        context.textBaseline = 'top';
+        tooltipLines.forEach((line, index) => {
+          context.fillStyle = index === 0 ? foreground : index === 1 ? color : muted;
+          context.font = `${index <= 1 ? '600 ' : ''}12px ${mono}`;
+          context.fillText(line, tooltipX + tooltipPadding, tooltipY + 10 + index * 17);
+        });
       }
 
       context.save();
@@ -228,6 +271,7 @@ export function MetricChart({
       context.rotate(-Math.PI / 2);
       context.fillStyle = foreground;
       context.textAlign = 'center';
+      context.textBaseline = 'middle';
       context.font = `12px ${mono}`;
       context.fillText(metricLabel, 0, 0);
       context.restore();
@@ -237,7 +281,26 @@ export function MetricChart({
     const observer = new ResizeObserver(draw);
     observer.observe(canvas);
     return () => observer.disconnect();
-  }, [metricLabel, referenceLine, scale, selectedPoint, series, valueDigits]);
+  }, [metricLabel, referenceLine, scale, selectedPoint, series, shownProjection, valueDigits]);
+
+  const selectablePoints: SelectablePoint[] = [
+    ...series.flatMap((player, playerIndex) =>
+      player.points.map((point, pointIndex) => ({
+        selection: { kind: 'season' as const, playerIndex, pointIndex },
+        age: point.age,
+        value: point.value,
+      })),
+    ),
+    ...(shownProjection
+      ? [
+          {
+            selection: { kind: 'projection' as const },
+            age: shownProjection.age,
+            value: shownProjection.value,
+          },
+        ]
+      : []),
+  ];
 
   const selectPointAt = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
@@ -248,43 +311,33 @@ export function MetricChart({
     const y = clientY - bounds.top;
     const { xFor, yFor } = plotLayout(bounds.width, bounds.height, scale);
 
-    let nearest: (SelectedPoint & { distance: number }) | null = null;
-    for (const [playerIndex, player] of series.entries()) {
-      for (const [pointIndex, point] of player.points.entries()) {
-        const distance = Math.hypot(x - xFor(point.age), y - yFor(point.value));
-        if (distance <= 14 && (!nearest || distance < nearest.distance)) {
-          nearest = { playerIndex, pointIndex, distance };
-        }
+    let nearest: SelectedPoint | null = null;
+    let nearestDistance = HIT_RADIUS;
+    for (const candidate of selectablePoints) {
+      const distance = Math.hypot(x - xFor(candidate.age), y - yFor(candidate.value));
+      if (distance <= nearestDistance) {
+        nearest = candidate.selection;
+        nearestDistance = distance;
       }
     }
 
-    setSelectedPoint(
-      nearest ? { playerIndex: nearest.playerIndex, pointIndex: nearest.pointIndex } : null,
-    );
+    setSelectedPoint(nearest);
   };
 
   const selectAdjacentPoint = (direction: -1 | 1) => {
-    const points = series.flatMap((player, playerIndex) =>
-      player.points.map((_, pointIndex) => ({ playerIndex, pointIndex })),
-    );
-    if (points.length === 0) return;
+    if (selectablePoints.length === 0) return;
 
     const currentIndex = selectedPoint
-      ? points.findIndex(
-          (point) =>
-            point.playerIndex === selectedPoint.playerIndex &&
-            point.pointIndex === selectedPoint.pointIndex,
-        )
+      ? selectablePoints.findIndex(({ selection }) => isSameSelection(selection, selectedPoint))
       : direction === 1
         ? -1
         : 0;
-    const nextIndex = (currentIndex + direction + points.length) % points.length;
-    setSelectedPoint(points[nextIndex]);
+    const nextIndex =
+      (currentIndex + direction + selectablePoints.length) % selectablePoints.length;
+    setSelectedPoint(selectablePoints[nextIndex].selection);
   };
 
-  const selectedPlayer = selectedPoint ? series[selectedPoint.playerIndex] : null;
-  const selectedSeason =
-    selectedPlayer && selectedPoint ? selectedPlayer.points[selectedPoint.pointIndex] : null;
+  const announced = resolveSelection(selectedPoint, series, shownProjection);
 
   return (
     <div>
@@ -307,7 +360,7 @@ export function MetricChart({
         className={`${heightClassName} w-full cursor-crosshair`}
         role="button"
         tabIndex={0}
-        aria-label={`${metricLabel} by player age from 18 to 42 for ${series.map((player) => player.name).join(', ')}. ${referenceLine.label} is marked with a dashed line. Click a data point, or use the left and right arrow keys, to inspect its exact value and season.`}
+        aria-label={`${metricLabel} by player age from 18 to 42 for ${series.map((player) => player.name).join(', ')}. ${referenceLine.label} is marked with a dashed line.${shownProjection ? ` A dotted segment extends to the projected ${shownProjection.season} value of ${shownProjection.value.toFixed(valueDigits)}.` : ''} Click a data point, or use the left and right arrow keys, to inspect its exact value and season.`}
         onClick={(event) => selectPointAt(event.clientX, event.clientY)}
         onKeyDown={(event) => {
           if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -317,8 +370,8 @@ export function MetricChart({
         }}
       />
       <p className="sr-only" aria-live="polite">
-        {selectedPlayer && selectedSeason
-          ? `${selectedPlayer.name}, ${metricLabel}: ${selectedSeason.value.toFixed(valueDigits)}, season ${selectedSeason.season}, age ${selectedSeason.age}`
+        {announced
+          ? `${announced.name}, ${metricLabel}${announced.projected ? ' projection' : ''}: ${announced.point.value.toFixed(valueDigits)}, season ${announced.point.season}, age ${announced.point.age}`
           : ''}
       </p>
     </div>
@@ -336,6 +389,36 @@ export function plotLayout(width: number, height: number, scale: { min: number; 
     xFor: (age: number) => PLOT_PADDING.left + ((age - MIN_AGE) / (MAX_AGE - MIN_AGE)) * plotWidth,
     yFor: (value: number) => PLOT_PADDING.top + ((scale.max - value) / valueRange) * plotHeight,
   };
+}
+
+function resolveSelection(
+  selection: SelectedPoint | null,
+  series: MetricSeries[],
+  projection: MetricProjection | undefined,
+) {
+  if (!selection) return null;
+
+  if (selection.kind === 'projection') {
+    return projection && series[0]
+      ? { name: series[0].name, point: projection, color: SERIES_COLORS[0], projected: true }
+      : null;
+  }
+
+  const player = series[selection.playerIndex];
+  const point = player?.points[selection.pointIndex];
+  return point
+    ? {
+        name: player.name,
+        point,
+        color: SERIES_COLORS[selection.playerIndex % SERIES_COLORS.length],
+        projected: false,
+      }
+    : null;
+}
+
+function isSameSelection(a: SelectedPoint, b: SelectedPoint) {
+  if (a.kind === 'projection' || b.kind === 'projection') return a.kind === b.kind;
+  return a.playerIndex === b.playerIndex && a.pointIndex === b.pointIndex;
 }
 
 function formatAxisValue(value: number) {

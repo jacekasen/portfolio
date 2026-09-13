@@ -4,8 +4,8 @@ import { PlayerAutocomplete } from '@/components/nba/PlayerAutocomplete';
 import {
   PlayerPredictionCard,
   PlayerPredictionUnavailable,
-  type PlayerPrediction,
 } from '@/components/nba/PlayerPredictionCard';
+import { bpmProjection, forecastSummary, type PlayerPrediction } from '@/lib/nba/forecast';
 import { getPlayerIndex } from '@/lib/nba/player-index';
 import {
   findPlayerNames,
@@ -163,6 +163,13 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
       ]
     : [];
   const playerSeries = series[0];
+  const upcomingForecast = prediction && !forecastSeasonInData ? prediction : null;
+  const projectedBpm = upcomingForecast ? bpmProjection(upcomingForecast) : null;
+  const lastPoint = playerSeries?.points.at(-1);
+  const chartProjection =
+    metric === 'bpm' && upcomingForecast && projectedBpm && lastPoint
+      ? { age: lastPoint.age + 1, season: upcomingForecast.season, value: projectedBpm.projected }
+      : undefined;
 
   return (
     <div className="space-y-8">
@@ -240,16 +247,32 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
         <>
           <section aria-labelledby="chart-title">
             <div className="mb-4">
-              <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
-                01 · Career arc
-              </p>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                <p className="text-accent font-mono text-xs tracking-[0.14em] uppercase">
+                  01 · Career arc
+                </p>
+                <p className="text-muted text-xs">
+                  {metricDetails.label} across {playerSeries.points.length} recorded seasons.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
                 <h2 id="chart-title" className="text-2xl font-bold md:text-3xl">
                   {playerSeries.name} · {metricDetails.shortLabel}
                 </h2>
-                <p className="text-muted text-sm">
-                  {metricDetails.label} across {playerSeries.points.length} recorded seasons.
-                </p>
+                {upcomingForecast && (
+                  <a
+                    href="#outlook-title"
+                    className="border-accent/40 bg-surface hover:border-accent inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs transition-colors"
+                  >
+                    <span className="text-accent font-bold">
+                      {upcomingForecast.season} forecast
+                    </span>
+                    <span>{forecastSummary(upcomingForecast)}</span>
+                    <span aria-hidden="true" className="text-accent">
+                      ↓
+                    </span>
+                  </a>
+                )}
               </div>
               {career && careers.length > 1 && (
                 <NamesakeChooser careers={careers} selectedId={career.playerId} metric={metric} />
@@ -269,6 +292,7 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
                 }}
                 scale={{ min: metricDetails.min, max: metricDetails.max }}
                 series={series}
+                projection={chartProjection}
               />
             </div>
             <p className="text-muted mt-2 text-xs">
@@ -276,6 +300,8 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
               18–42 and {formatMetric(metricDetails.min, metricDetails.digits)}–
               {formatMetric(metricDetails.max, metricDetails.digits)} {metricDetails.shortLabel}.
               The dashed line marks {metricDetails.referenceLabel.toLocaleLowerCase()}.
+              {chartProjection &&
+                ` The dotted segment is the model’s ${chartProjection.season} projection.`}
             </p>
           </section>
 
