@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Activity, LineChart } from 'lucide-react';
+import { Activity, Crosshair, LineChart } from 'lucide-react';
 
 export function Cs2SubNav({ player }: { player?: string }) {
   const pathname = usePathname();
@@ -10,10 +10,12 @@ export function Cs2SubNav({ player }: { player?: string }) {
   const activePlayer = player || searchParams.get('player') || 'donk';
 
   const isForm = pathname.endsWith('/form');
-  const isTrends = !isForm && pathname.includes('/cs2');
+  const isRadar = pathname.endsWith('/radar');
+  const isTrends = !isForm && !isRadar && pathname.includes('/cs2');
 
   const trendsHref = `/projects/cs2?player=${encodeURIComponent(activePlayer)}`;
   const formHref = `/projects/cs2/form?player=${encodeURIComponent(activePlayer)}`;
+  const radarHref = `/projects/cs2/radar?player=${encodeURIComponent(activePlayer)}`;
 
   return (
     <div className="border-border flex items-center gap-2 border-b pb-4 font-mono text-xs">
@@ -39,6 +41,17 @@ export function Cs2SubNav({ player }: { player?: string }) {
       >
         <Activity size={14} />
         <span>Form Tracker</span>
+      </Link>
+      <Link
+        href={radarHref}
+        className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition-colors ${
+          isRadar
+            ? 'bg-accent text-background font-bold'
+            : 'text-muted hover:text-foreground hover:bg-black/5'
+        }`}
+      >
+        <Crosshair size={14} />
+        <span>Radar Duel Heatmap</span>
       </Link>
     </div>
   );

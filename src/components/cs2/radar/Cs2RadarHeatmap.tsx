@@ -1,0 +1,956 @@
+'use client';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  Crosshair,
+  Flame,
+  Layers,
+  MapPin,
+  Maximize2,
+  Search,
+  Shield,
+  Sliders,
+  Sparkles,
+  Target,
+  Zap,
+} from 'lucide-react';
+import {
+  ANGLES_KERNEL_RADIUS,
+  computeRadarMetrics,
+  filterRadarEvents,
+  findSpatialHotspots,
+  formatWeaponName,
+  HEATMAP_PALETTES,
+  MAP_DISPLAY_NAMES,
+  toCanvasCoords,
+  type CombatSide,
+  type HeatmapTheme,
+  type RadarFilterOptions,
+  type RadarKillEvent,
+  type RadarManifest,
+  type RadarPerspective,
+  type RadarPlayerDetail,
+  type SpatialHotspot,
+  type WeaponCategory,
+} from '@/lib/cs2/radar';
+
+type Props = {
+  manifest: RadarManifest;
+  initialPlayer?: string;
+  initialMap?: string;
+};
+
+export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const selectedPlayer = searchParams.get('player') || initialPlayer || 'donk';
+  const availableMaps = useMemo(
+    () => manifest.allMaps || manifest.activeMaps || [],
+    [manifest],
+  );
+  const [selectedMap, setSelectedMap] = useState<string>(
+    initialMap || availableMaps[0] || 'mirage',
+  );
+  const [perspective, setPerspective] = useState<RadarPerspective>('attacker');
+  const [combatSide, setCombatSide] = useState<CombatSide>('all');
+  const [weaponCategory, setWeaponCategory] = useState<WeaponCategory>('all');
+  const [headshotsOnly, setHeadshotsOnly] = useState(false);
+  const [firstKillOnly, setFirstKillOnly] = useState(false);
+  const [tradeKillOnly, setTradeKillOnly] = useState(false);
+  const [opponentQuery, setOpponentQuery] = useState('');
+
+  // Advanced Heatmap Customization States
+  const [heatmapTheme, setHeatmapTheme] = useState<HeatmapTheme>('thermal');
+  const [showKillPins, setShowKillPins] = useState(true);
+  const [showHotspots, setShowHotspots] = useState(true);
+  const [heatmapOpacity, setHeatmapOpacity] = useState(0.85);
+
+  const [playerDetail, setPlayerDetail] = useState<RadarPlayerDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [hoveredEvent, setHoveredEvent] = useState<RadarKillEvent | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const mapImageRef = useRef<HTMLImageElement | null>(null);
+  const cacheRef = useRef<Map<string, RadarPlayerDetail>>(new Map());
+
+  // Palette LUT cache
+  const paletteCacheRef = useRef<Map<HeatmapTheme, Uint8ClampedArray>>(new Map());
+
+  const handlePlayerChange = (newPlayer: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('player', newPlayer);
+    router.push(`/projects/cs2/radar?${params.toString()}`);
+  };
+
+  // Fetch player detail data
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadPlayerData() {
+      if (cacheRef.current.has(selectedPlayer)) {
+        setPlayerDetail(cacheRef.current.get(selectedPlayer)!);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch(`/data/cs2/radar/${encodeURIComponent(selectedPlayer)}.json`);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const data: RadarPlayerDetail = await res.json();
+        if (!isCancelled) {
+          cacheRef.current.set(selectedPlayer, data);
+          setPlayerDetail(data);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Failed to load CS2 radar data for player:', selectedPlayer, err);
+        if (!isCancelled) setLoading(false);
+      }
+    }
+
+    loadPlayerData();
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedPlayer]);
+
+  // Preload map image
+  useEffect(() => {
+    const img = new Image();
+    img.src = `/images/cs2/maps/de_${selectedMap}.png`;
+    img.onload = () => {
+      mapImageRef.current = img;
+      renderCanvas();
+    };
+    img.onerror = () => {
+      const fallbackImg = new Image();
+      fallbackImg.src = `/images/cs2/maps/${selectedMap}.png`;
+      fallbackImg.onload = () => {
+        mapImageRef.current = fallbackImg;
+        renderCanvas();
+      };
+    };
+  }, [selectedMap]);
+
+  // Compute filtered events
+  const filterOptions: RadarFilterOptions = useMemo(
+    () => ({
+      map: selectedMap,
+      perspective,
+      side: combatSide,
+      weaponCategory,
+      headshotsOnly,
+      firstKillOnly,
+      tradeKillOnly,
+      searchOpponent: opponentQuery,
+    }),
+    [
+      selectedMap,
+      perspective,
+      combatSide,
+      weaponCategory,
+      headshotsOnly,
+      firstKillOnly,
+      tradeKillOnly,
+      opponentQuery,
+    ],
+  );
+
+  const { events: activeEvents } = useMemo(() => {
+    if (!playerDetail) return { events: [], perspectiveUsed: perspective };
+    return filterRadarEvents(playerDetail, filterOptions);
+  }, [playerDetail, filterOptions, perspective]);
+
+  const metrics = useMemo(() => computeRadarMetrics(activeEvents), [activeEvents]);
+
+  // Top Spatial Hotspots
+  const spatialHotspots: SpatialHotspot[] = useMemo(() => {
+    return findSpatialHotspots(activeEvents, perspective, 3);
+  }, [activeEvents, perspective]);
+
+  // Helper: Build or retrieve color palette lookup table (256x1)
+  const getPaletteLUT = useCallback((theme: HeatmapTheme): Uint8ClampedArray => {
+    if (paletteCacheRef.current.has(theme)) {
+      return paletteCacheRef.current.get(theme)!;
+    }
+
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = 256;
+    pCanvas.height = 1;
+    const pCtx = pCanvas.getContext('2d');
+    if (!pCtx) return new Uint8ClampedArray(256 * 4);
+
+    const grad = pCtx.createLinearGradient(0, 0, 256, 0);
+    const paletteDef = HEATMAP_PALETTES[theme];
+    for (const [stop, color] of paletteDef.stops) {
+      grad.addColorStop(stop, color);
+    }
+
+    pCtx.fillStyle = grad;
+    pCtx.fillRect(0, 0, 256, 1);
+    const lut = pCtx.getImageData(0, 0, 256, 1).data;
+    paletteCacheRef.current.set(theme, lut);
+    return lut;
+  }, []);
+
+  // Main Canvas Render
+  const renderCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. Draw Map Background
+    if (mapImageRef.current && mapImageRef.current.complete) {
+      ctx.drawImage(mapImageRef.current, 0, 0, width, height);
+
+      // Contrast enhancement overlay: desaturates map textures so heat glow pops
+      ctx.fillStyle = 'rgba(10, 15, 28, 0.48)';
+      ctx.fillRect(0, 0, width, height);
+    } else {
+      ctx.fillStyle = '#0b0f19';
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = '#475569';
+      ctx.font = '14px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Loading tactical radar map...', width / 2, height / 2);
+      return;
+    }
+
+    // Tactical Range Rings (Center guides)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+    ctx.lineWidth = 1;
+    const cx = width / 2;
+    const cy = height / 2;
+    [width * 0.2, width * 0.35, width * 0.5].forEach((r) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Subtle tactical grid
+    const step = width / 8;
+    for (let i = step; i < width; i += step) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(width, i);
+      ctx.stroke();
+    }
+
+    if (activeEvents.length === 0) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = '13px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('No combat telemetry matches active filters', width / 2, height / 2);
+      return;
+    }
+
+    // 2. High-Fidelity Kernel Density Estimation (KDE) Heatmap
+    const bufferSize = 512;
+    const densityCanvas = document.createElement('canvas');
+    densityCanvas.width = bufferSize;
+    densityCanvas.height = bufferSize;
+    const densityCtx = densityCanvas.getContext('2d');
+
+    if (densityCtx) {
+      densityCtx.clearRect(0, 0, bufferSize, bufferSize);
+      densityCtx.globalCompositeOperation = 'lighter';
+
+      const baseRadius = ANGLES_KERNEL_RADIUS;
+      // Dynamic intensity scaling so low or high event counts maintain optimal contrast
+      const intensity = Math.max(0.12, Math.min(0.38, 45 / Math.sqrt(activeEvents.length + 1)));
+
+      for (const ev of activeEvents) {
+        const pointsToDraw: { rx: number; ry: number }[] = [];
+        if (perspective === 'attacker') {
+          pointsToDraw.push({ rx: ev.ax, ry: ev.ay });
+        } else if (perspective === 'victim') {
+          pointsToDraw.push({ rx: ev.vx, ry: ev.vy });
+        } else {
+          pointsToDraw.push({ rx: ev.ax, ry: ev.ay });
+          pointsToDraw.push({ rx: ev.vx, ry: ev.vy });
+        }
+
+        for (const pt of pointsToDraw) {
+          const bx = pt.rx * bufferSize;
+          const by = pt.ry * bufferSize;
+
+          const grad = densityCtx.createRadialGradient(bx, by, 0, bx, by, baseRadius);
+          grad.addColorStop(0, `rgba(0, 0, 0, ${intensity})`);
+          grad.addColorStop(0.35, `rgba(0, 0, 0, ${intensity * 0.6})`);
+          grad.addColorStop(0.7, `rgba(0, 0, 0, ${intensity * 0.2})`);
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+          densityCtx.fillStyle = grad;
+          densityCtx.beginPath();
+          densityCtx.arc(bx, by, baseRadius, 0, Math.PI * 2);
+          densityCtx.fill();
+        }
+      }
+
+      // Colorize using Palette Transfer LUT
+      const densityImageData = densityCtx.getImageData(0, 0, bufferSize, bufferSize);
+      const data = densityImageData.data;
+      const palette = getPaletteLUT(heatmapTheme);
+      const len = data.length;
+
+      for (let i = 0; i < len; i += 4) {
+        const alpha = data[i + 3];
+        if (alpha > 0) {
+          const lutIndex = alpha * 4;
+          data[i] = palette[lutIndex]; // R
+          data[i + 1] = palette[lutIndex + 1]; // G
+          data[i + 2] = palette[lutIndex + 2]; // B
+          data[i + 3] = Math.min(255, Math.round(palette[lutIndex + 3] * heatmapOpacity));
+        }
+      }
+
+      densityCtx.putImageData(densityImageData, 0, 0);
+
+      // Composite colored density onto main canvas
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(densityCanvas, 0, 0, width, height);
+      ctx.restore();
+    }
+
+    // 3. Optional Micro Kill Pins Overlay
+    if (showKillPins) {
+      for (const ev of activeEvents) {
+        const isHovered = hoveredEvent === ev;
+        const pt =
+          perspective === 'victim'
+            ? toCanvasCoords(ev.vx, ev.vy, width, height)
+            : toCanvasCoords(ev.ax, ev.ay, width, height);
+
+        // Draw pin
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, isHovered ? 5.5 : 2, 0, Math.PI * 2);
+        ctx.fillStyle = isHovered
+          ? '#ffffff'
+          : ev.s === 'T'
+            ? 'rgba(245, 158, 11, 0.85)'
+            : ev.s === 'CT'
+              ? 'rgba(59, 130, 246, 0.85)'
+              : perspective === 'victim'
+                ? 'rgba(244, 63, 94, 0.75)'
+                : 'rgba(52, 211, 153, 0.75)';
+        ctx.fill();
+
+        if (isHovered) {
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Outer pulse ring
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 10, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // 4. Tactical Hotspot Rings & Callouts
+    if (showHotspots && spatialHotspots.length > 0) {
+      spatialHotspots.forEach((spot, idx) => {
+        const hPt = toCanvasCoords(spot.x, spot.y, width, height);
+
+        // Concentric tactical targeting circle
+        ctx.save();
+        ctx.strokeStyle = idx === 0 ? '#facc15' : idx === 1 ? '#38bdf8' : '#a855f7';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.arc(hPt.x, hPt.y, 22, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Small badge pill
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.beginPath();
+        ctx.roundRect(hPt.x - 16, hPt.y - 32, 32, 16, 4);
+        ctx.fill();
+        ctx.strokeStyle = idx === 0 ? '#facc15' : idx === 1 ? '#38bdf8' : '#a855f7';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 9px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`#${idx + 1}`, hPt.x, hPt.y - 24);
+        ctx.restore();
+      });
+    }
+  }, [
+    activeEvents,
+    perspective,
+    heatmapTheme,
+    heatmapOpacity,
+    showKillPins,
+    showHotspots,
+    hoveredEvent,
+    spatialHotspots,
+    getPaletteLUT,
+  ]);
+
+  useEffect(() => {
+    renderCanvas();
+  }, [renderCanvas]);
+
+  // Handle Mouse Hover
+  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas || activeEvents.length === 0) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const mouseCanvasX = (e.clientX - rect.left) * scaleX;
+    const mouseCanvasY = (e.clientY - rect.top) * scaleY;
+
+    let closestEvent: RadarKillEvent | null = null;
+    let minDistance = 24;
+
+    for (const ev of activeEvents) {
+      const pt =
+        perspective === 'victim'
+          ? toCanvasCoords(ev.vx, ev.vy, canvas.width, canvas.height)
+          : toCanvasCoords(ev.ax, ev.ay, canvas.width, canvas.height);
+
+      const d = Math.hypot(pt.x - mouseCanvasX, pt.y - mouseCanvasY);
+      if (d < minDistance) {
+        minDistance = d;
+        closestEvent = ev;
+      }
+    }
+
+    if (closestEvent) {
+      setHoveredEvent(closestEvent);
+      setTooltipPos({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+    } else {
+      setHoveredEvent(null);
+      setTooltipPos(null);
+    }
+  };
+
+  const handleCanvasMouseLeave = () => {
+    setHoveredEvent(null);
+    setTooltipPos(null);
+  };
+
+  const activePlayerProfile = manifest.players.find((p) => p.player === selectedPlayer);
+
+  return (
+    <div className="space-y-6">
+      {/* Top Filter Bar */}
+      <div className="border-border bg-surface rounded-lg border p-4 space-y-4">
+        {/* Row 1: Player & Map Selectors */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Player Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-muted font-mono text-xs uppercase tracking-wider">Player:</span>
+            <select
+              value={selectedPlayer}
+              onChange={(e) => handlePlayerChange(e.target.value)}
+              className="border-border bg-background text-foreground rounded-md border px-3 py-1.5 font-mono text-xs font-bold focus:outline-none focus:ring-1 focus:ring-accent"
+            >
+              {manifest.players.map((p) => (
+                <option key={p.player} value={p.player}>
+                  {p.player} {p.role ? `(${p.role})` : ''}
+                </option>
+              ))}
+            </select>
+            {activePlayerProfile && (
+              <span className="border-border bg-black/5 dark:bg-white/5 text-muted hidden rounded px-2 py-0.5 font-mono text-[11px] sm:inline-block">
+                {activePlayerProfile.country ? `${activePlayerProfile.country} · ` : ''}
+                {activePlayerProfile.role}
+              </span>
+            )}
+          </div>
+
+          {/* Map Tabs (All 10 Maps) */}
+          <div className="flex flex-wrap items-center gap-1">
+            {availableMaps.map((map) => (
+              <button
+                key={map}
+                type="button"
+                onClick={() => setSelectedMap(map)}
+                className={`rounded px-2.5 py-1 font-mono text-xs transition-colors ${
+                  selectedMap === map
+                    ? 'bg-accent text-background font-bold'
+                    : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                {MAP_DISPLAY_NAMES[map] || map}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2: Perspective, Combat Side Separator & Color Palette */}
+        <div className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-t pt-3 font-mono text-xs">
+          {/* Perspective Buttons */}
+          <div className="flex items-center gap-1">
+            <span className="text-muted mr-1">Perspective:</span>
+            {(['attacker', 'victim', 'both'] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setPerspective(mode)}
+                className={`rounded px-2.5 py-1 transition-colors ${
+                  perspective === mode
+                    ? 'bg-ink text-on-ink font-bold'
+                    : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                {mode === 'attacker' ? 'Kills (Attacker)' : mode === 'victim' ? 'Deaths (Victim)' : 'All Positions'}
+              </button>
+            ))}
+          </div>
+
+          {/* Combat Side Separator: All Sides, Terrorist (T), Counter-Terrorist (CT) */}
+          <div className="flex items-center gap-1">
+            <span className="text-muted mr-1">Side:</span>
+            {(['all', 'T', 'CT'] as const).map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setCombatSide(s)}
+                className={`rounded px-2.5 py-1 transition-colors ${
+                  combatSide === s
+                    ? s === 'T'
+                      ? 'bg-amber-600 text-white font-bold'
+                      : s === 'CT'
+                        ? 'bg-blue-600 text-white font-bold'
+                        : 'bg-ink text-on-ink font-bold'
+                    : s === 'T'
+                      ? 'text-amber-500 hover:text-amber-400 hover:bg-amber-500/10'
+                      : s === 'CT'
+                        ? 'text-blue-500 hover:text-blue-400 hover:bg-blue-500/10'
+                        : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                {s === 'all' ? 'All Sides' : s === 'T' ? 'Terrorist (T)' : 'Counter-Terrorist (CT)'}
+              </button>
+            ))}
+          </div>
+
+          {/* Thermal Palette Themes */}
+          <div className="flex items-center gap-1">
+            <span className="text-muted mr-1">Palette:</span>
+            {(['thermal', 'cyber', 'crimson'] as const).map((theme) => (
+              <button
+                key={theme}
+                type="button"
+                onClick={() => setHeatmapTheme(theme)}
+                className={`rounded px-2.5 py-1 text-[11px] transition-colors ${
+                  heatmapTheme === theme
+                    ? 'bg-accent text-background font-bold'
+                    : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                {HEATMAP_PALETTES[theme].name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 3: Weapon Category Pills */}
+        <div className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-t pt-3 font-mono text-xs">
+          <div className="flex items-center gap-1">
+            <span className="text-muted mr-1">Weapon:</span>
+            {(['all', 'rifles', 'snipers', 'pistols', 'smg_heavy'] as const).map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setWeaponCategory(cat)}
+                className={`rounded px-2 py-0.5 text-[11px] transition-colors ${
+                  weaponCategory === cat
+                    ? 'bg-accent text-background font-bold'
+                    : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                {cat === 'all'
+                  ? 'All'
+                  : cat === 'rifles'
+                    ? 'Rifles'
+                    : cat === 'snipers'
+                      ? 'Snipers'
+                      : cat === 'pistols'
+                        ? 'Pistols'
+                        : 'SMG'}
+              </button>
+            ))}
+          </div>
+
+          {/* Overlays & Toggles */}
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex cursor-pointer items-center gap-1.5 select-none">
+              <input
+                type="checkbox"
+                checked={showKillPins}
+                onChange={(e) => setShowKillPins(e.target.checked)}
+                className="accent-accent h-3.5 w-3.5 rounded"
+              />
+              <span className={showKillPins ? 'text-foreground font-bold' : 'text-muted'}>
+                Kill Pins
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-center gap-1.5 select-none">
+              <input
+                type="checkbox"
+                checked={showHotspots}
+                onChange={(e) => setShowHotspots(e.target.checked)}
+                className="accent-accent h-3.5 w-3.5 rounded"
+              />
+              <span className={showHotspots ? 'text-foreground font-bold' : 'text-muted'}>
+                Hotspot Callouts
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-center gap-1.5 select-none">
+              <input
+                type="checkbox"
+                checked={headshotsOnly}
+                onChange={(e) => setHeadshotsOnly(e.target.checked)}
+                className="accent-accent h-3.5 w-3.5 rounded"
+              />
+              <span className={headshotsOnly ? 'text-foreground font-bold' : 'text-muted'}>
+                Headshots Only
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-center gap-1.5 select-none">
+              <input
+                type="checkbox"
+                checked={firstKillOnly}
+                onChange={(e) => setFirstKillOnly(e.target.checked)}
+                className="accent-accent h-3.5 w-3.5 rounded"
+              />
+              <span className={firstKillOnly ? 'text-foreground font-bold' : 'text-muted'}>
+                Opening Duels
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-center gap-1.5 select-none">
+              <input
+                type="checkbox"
+                checked={tradeKillOnly}
+                onChange={(e) => setTradeKillOnly(e.target.checked)}
+                className="accent-accent h-3.5 w-3.5 rounded"
+              />
+              <span className={tradeKillOnly ? 'text-foreground font-bold' : 'text-muted'}>
+                Trade Kills
+              </span>
+            </label>
+          </div>
+
+          {/* Opponent Filter Search */}
+          <div className="flex items-center gap-1.5">
+            <Search size={13} className="text-muted" />
+            <input
+              type="text"
+              placeholder="Search opponent pro..."
+              value={opponentQuery}
+              onChange={(e) => setOpponentQuery(e.target.value)}
+              className="border-border bg-background text-foreground w-36 rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+            {opponentQuery && (
+              <button
+                type="button"
+                onClick={() => setOpponentQuery('')}
+                className="text-muted hover:text-foreground text-[10px]"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Radar Display & Stats Split */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Left Column: Interactive Radar Canvas */}
+        <div className="lg:col-span-8 flex flex-col items-center">
+          <div className="border-border bg-slate-950 relative aspect-square w-full max-w-[720px] overflow-hidden rounded-xl border shadow-2xl">
+            <canvas
+              ref={canvasRef}
+              width={1024}
+              height={1024}
+              onMouseMove={handleCanvasMouseMove}
+              onMouseLeave={handleCanvasMouseLeave}
+              className="h-full w-full cursor-crosshair object-contain"
+            />
+
+            {/* Thermal Gradient Legend */}
+            <div className="bg-slate-950/90 pointer-events-none absolute bottom-3 left-3 rounded-md border border-white/10 p-2 font-mono text-[10px] text-white/90 backdrop-blur-md">
+              <div className="mb-1 flex items-center justify-between text-[9px] text-white/60 uppercase">
+                <span>Low Density</span>
+                <span>Peak Core</span>
+              </div>
+              <div
+                className="h-2 w-36 rounded-full"
+                style={{
+                  background:
+                    heatmapTheme === 'thermal'
+                      ? 'linear-gradient(to right, #1e3a8a, #06b6d4, #22c55e, #eab308, #ef4444, #ffffff)'
+                      : heatmapTheme === 'cyber'
+                        ? 'linear-gradient(to right, #4c1d95, #a855f7, #ec4899, #fb923c, #facc15, #ffffff)'
+                        : 'linear-gradient(to right, #7f1d1d, #dc2626, #ea580c, #facc15, #ffffff)',
+                }}
+              />
+            </div>
+
+            {/* Map Identifier & Side Badge */}
+            <div className="bg-slate-950/90 pointer-events-none absolute top-3 right-3 flex items-center gap-2 rounded-md border border-white/10 px-2.5 py-1 font-mono text-xs font-bold text-white/90 uppercase tracking-wider backdrop-blur-md">
+              <span>de_{selectedMap}</span>
+              {combatSide !== 'all' && (
+                <span
+                  className={`rounded px-1.5 py-0.5 text-[10px] ${
+                    combatSide === 'T'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                      : 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                  }`}
+                >
+                  {combatSide === 'T' ? 'T Side' : 'CT Side'}
+                </span>
+              )}
+            </div>
+
+            {/* Tactical HUD Hover Tooltip */}
+            {hoveredEvent && tooltipPos && (
+              <div
+                className="bg-slate-950/95 pointer-events-none absolute z-20 w-64 -translate-x-1/2 -translate-y-full rounded-lg border border-white/20 p-3 font-mono text-xs text-white shadow-2xl backdrop-blur-md"
+                style={{
+                  left: Math.min(Math.max(tooltipPos.x, 130), 590),
+                  top: Math.max(tooltipPos.y - 12, 80),
+                }}
+              >
+                <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-[11px]">
+                  <span className="text-emerald-400 font-bold">
+                    {perspective === 'victim' ? hoveredEvent.opp : selectedPlayer}
+                  </span>
+                  <span className="text-white/50">eliminated</span>
+                  <span className="text-rose-400 font-bold">
+                    {perspective === 'victim' ? selectedPlayer : hoveredEvent.opp}
+                  </span>
+                </div>
+
+                <div className="mt-2 space-y-1 text-[11px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/60">Weapon:</span>
+                    <span className="font-bold">{formatWeaponName(hoveredEvent.w)}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/60">Distance:</span>
+                    <span className="font-bold">
+                      {hoveredEvent.d !== null ? `${hoveredEvent.d} m` : 'Close range'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/60">Round:</span>
+                    <span className="font-bold">Round {hoveredEvent.rnd}</span>
+                  </div>
+                </div>
+
+                <div className="mt-2 flex flex-wrap gap-1 border-t border-white/10 pt-1.5">
+                  {hoveredEvent.s && (
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                        hoveredEvent.s === 'T'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                          : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                      }`}
+                    >
+                      {hoveredEvent.s === 'T' ? 'T Side' : 'CT Side'}
+                    </span>
+                  )}
+                  {hoveredEvent.hs && (
+                    <span className="rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-bold text-rose-300">
+                      Headshot
+                    </span>
+                  )}
+                  {hoveredEvent.fk && (
+                    <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+                      1st Kill (Entry)
+                    </span>
+                  )}
+                  {hoveredEvent.tk && (
+                    <span className="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-bold text-blue-300">
+                      Trade Kill
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Tactical Telemetry & Hotspots Sidebar */}
+        <div className="lg:col-span-4 space-y-4">
+          {/* Summary Metric Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="border-border bg-surface rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-muted font-mono text-[11px] uppercase">Duels Rendered</span>
+                <Crosshair size={14} className="text-accent" />
+              </div>
+              <p className="mt-1 font-mono text-2xl font-bold">{metrics.totalDuels}</p>
+              <div className="text-muted mt-0.5 flex items-center gap-1.5 font-mono text-[10px]">
+                <span>on {MAP_DISPLAY_NAMES[selectedMap]}</span>
+                {combatSide === 'all' && metrics.totalDuels > 0 && (
+                  <>
+                    <span>·</span>
+                    <span className="text-amber-500 font-semibold">{metrics.tDuelsCount} T</span>
+                    <span>·</span>
+                    <span className="text-blue-500 font-semibold">{metrics.ctDuelsCount} CT</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="border-border bg-surface rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-muted font-mono text-[11px] uppercase">Headshot %</span>
+                <Target size={14} className="text-rose-500" />
+              </div>
+              <p className="mt-1 font-mono text-2xl font-bold">{metrics.headshotPct}%</p>
+              <p className="text-muted mt-0.5 font-mono text-[10px]">precision rate</p>
+            </div>
+
+            <div className="border-border bg-surface rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-muted font-mono text-[11px] uppercase">Avg Range</span>
+                <Maximize2 size={14} className="text-blue-500" />
+              </div>
+              <p className="mt-1 font-mono text-2xl font-bold">{metrics.avgDistanceMeters}m</p>
+              <p className="text-muted mt-0.5 font-mono text-[10px]">engagement line</p>
+            </div>
+
+            <div className="border-border bg-surface rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-muted font-mono text-[11px] uppercase">Opening Duels</span>
+                <Zap size={14} className="text-amber-500" />
+              </div>
+              <p className="mt-1 font-mono text-2xl font-bold">{metrics.openingDuelPct}%</p>
+              <p className="text-muted mt-0.5 font-mono text-[10px]">
+                {metrics.openingDuelCount} of {metrics.totalDuels} duels
+              </p>
+            </div>
+          </div>
+
+          {/* Detected Tactical Hotspots Card */}
+          <div className="border-border bg-surface rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Flame size={14} className="text-accent" />
+                <span>Primary Spatial Hotspots</span>
+              </h4>
+              <span className="text-muted font-mono text-[10px]">KDE Peaks</span>
+            </div>
+
+            <div className="mt-3 space-y-2 font-mono text-xs">
+              {spatialHotspots.length === 0 ? (
+                <p className="text-muted text-[11px]">No distinct hotspots detected</p>
+              ) : (
+                spatialHotspots.map((spot, idx) => (
+                  <div
+                    key={idx}
+                    className="border-border bg-background/50 flex items-center justify-between rounded border p-2 text-[11px]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${
+                          idx === 0
+                            ? 'bg-amber-400/20 text-amber-400'
+                            : idx === 1
+                              ? 'bg-sky-400/20 text-sky-400'
+                              : 'bg-purple-400/20 text-purple-400'
+                        }`}
+                      >
+                        #{idx + 1}
+                      </span>
+                      <span className="text-foreground font-semibold">
+                        Cluster {idx + 1} · ({Math.round(spot.x * 100)}%, {Math.round(spot.y * 100)}%)
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-foreground font-bold">{spot.count} duels</span>
+                      <span className="text-muted ml-1.5 text-[10px]">({spot.pct}%)</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Top Weapons Distribution */}
+          <div className="border-border bg-surface rounded-lg border p-4">
+            <h4 className="font-mono text-xs font-bold uppercase tracking-wider">
+              Weapon Arsenal Distribution
+            </h4>
+            <div className="mt-3 space-y-2 font-mono text-xs">
+              {metrics.topWeapons.length === 0 ? (
+                <p className="text-muted text-[11px]">No weapon telemetry available</p>
+              ) : (
+                metrics.topWeapons.map((item) => (
+                  <div key={item.weapon} className="space-y-1">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-foreground font-bold">{item.weapon}</span>
+                      <span className="text-muted">
+                        {item.count} ({item.pct}%)
+                      </span>
+                    </div>
+                    <div className="bg-black/10 dark:bg-white/10 h-1.5 w-full overflow-hidden rounded-full">
+                      <div
+                        className="bg-accent h-full rounded-full transition-all duration-300"
+                        style={{ width: `${item.pct}%` }}
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Tactical Spatial Insight Note */}
+          <div className="border-border bg-surface/50 text-muted rounded-lg border p-4 font-mono text-xs leading-relaxed">
+            <div className="text-foreground mb-1 flex items-center gap-1.5 font-bold">
+              <Shield size={14} className="text-accent" />
+              <span>Continuous Density Kernel</span>
+            </div>
+            <p className="text-[11px]">
+              The thermal density engine applies a continuous 2D Gaussian radial kernel over tick-level
+              Source 2 coordinates, mapped through an offscreen 256-color transfer lookup table.
+              Concentrated red/white zones highlight dominant anchor angles and entry choke points.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
