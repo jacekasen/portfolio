@@ -272,55 +272,6 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
           ) : (
             <PlayerPredictionUnavailable />
           )}
-
-          <section aria-labelledby="data-title">
-            <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
-              03 · Season log
-            </p>
-            <h2 id="data-title" className="text-2xl font-bold">
-              Season-by-season record
-            </h2>
-            <p className="text-muted mt-2 mb-5 text-sm">
-              Open the complete table for the selected statistic.
-            </p>
-            <details className="border-border bg-surface group overflow-hidden rounded-lg border">
-              <summary className="hover:bg-accent-light/10 flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-mono text-sm transition-colors">
-                <span>View {playerSeries.points.length} seasons</span>
-                <span className="text-accent group-open:rotate-45" aria-hidden="true">
-                  +
-                </span>
-              </summary>
-              <div className="border-border overflow-x-auto border-t">
-                <table className="w-full min-w-[560px] text-left text-sm">
-                  <thead className="bg-accent-light/15 font-mono text-xs uppercase">
-                    <tr>
-                      <th className="px-3 py-2">Player</th>
-                      <th className="px-3 py-2">Age</th>
-                      <th className="px-3 py-2">Season</th>
-                      <th className="px-3 py-2">{metricDetails.shortLabel}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {series.flatMap((player) =>
-                      player.points.map((point) => (
-                        <tr
-                          key={`${player.name}-${point.season}`}
-                          className="border-border border-t"
-                        >
-                          <td className="px-3 py-2">{player.name}</td>
-                          <td className="px-3 py-2">{point.age}</td>
-                          <td className="px-3 py-2 font-mono">{point.season}</td>
-                          <td className="px-3 py-2">
-                            {formatMetric(point.value, metricDetails.digits)}
-                          </td>
-                        </tr>
-                      )),
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </details>
-          </section>
         </>
       )}
 
