@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { PeakPerformanceDashboard } from '@/components/nba/PeakPerformanceDashboard';
 import { getPeakPerformanceData } from '@/lib/nba/peak-performance';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 export const metadata = {
   title: 'NBA Peak Performance Analysis | Jace Kasen',
@@ -9,6 +10,25 @@ export const metadata = {
 };
 
 export default async function PeakPerformancePage() {
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="space-y-8 pt-4 md:pt-8">
+        <header>
+          <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
+            When do NBA players reach peak performance?
+          </h1>
+          <p className="text-muted max-w-2xl text-lg leading-7">
+            Database connection not configured. Please set NEXT_PUBLIC_SUPABASE_URL and
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
+          </p>
+        </header>
+        <Link href="/projects/nba" className="text-accent font-mono text-sm hover:underline">
+          ← all NBA analyses
+        </Link>
+      </div>
+    );
+  }
+
   const data = await getPeakPerformanceData();
   const bpmSummary = data.summaries.bpm;
 
