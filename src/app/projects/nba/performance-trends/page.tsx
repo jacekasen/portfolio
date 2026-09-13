@@ -74,6 +74,17 @@ const METRICS = {
 type MetricKey = keyof typeof METRICS;
 const METRIC_ORDER: MetricKey[] = ['bpm', 'vorp', 'ws_per_48', 'ws', 'per'];
 
+const POPULAR_PLAYERS = [
+  'LeBron James',
+  'Michael Jordan',
+  'Stephen Curry',
+  'Kobe Bryant',
+  'Nikola Jokić',
+  "Shaquille O'Neal",
+  'Luka Dončić',
+  'Victor Wembanyama',
+];
+
 type NbaSeasonRow = {
   player_name: string;
   player_url: string;
@@ -154,63 +165,69 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
   const playerSeries = series[0];
 
   return (
-    <div className="space-y-14 pt-4 md:pt-8">
-      <header className="max-w-4xl">
-        <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-          Basketball Reference · 1976–2026
-        </p>
-        <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
-          NBA Performance Trends
-        </h1>
-        <p className="text-muted max-w-3xl text-lg leading-8">
-          Follow one player from season-by-season performance to a probabilistic forecast of what
-          comes next.
-        </p>
-      </header>
+    <div className="space-y-8">
+      <div className="space-y-6">
+        <header className="max-w-4xl">
+          <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
+            Basketball Reference · 1976–2026
+          </p>
+          <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
+            NBA Performance Trends
+          </h1>
+          <p className="text-muted text-lg leading-7">
+            Follow one player from season-by-season performance to a probabilistic forecast of what
+            comes next.
+          </p>
+        </header>
 
-      <form
-        aria-label="Choose player and statistic"
-        className="border-border bg-surface grid gap-5 rounded-lg border p-5 md:grid-cols-[1fr_1.6fr_auto] md:items-start md:p-6"
-        action="/projects/nba/performance-trends"
-        method="get"
-      >
-        {career && careers.length > 1 && <input type="hidden" name="id" value={career.playerId} />}
-        <label className="grid gap-2">
-          <span className="font-mono text-xs font-bold tracking-wide uppercase">Statistic</span>
-          <select
-            name="metric"
-            defaultValue={metric}
-            className="border-border bg-background h-11 rounded border px-3"
-          >
-            {METRIC_ORDER.map((value) => (
-              <option key={value} value={value}>
-                {METRICS[value].label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="grid gap-2">
-          <label
-            htmlFor="nba-player-search"
-            className="font-mono text-xs font-bold tracking-wide uppercase"
-          >
-            Player
-          </label>
-          <PlayerAutocomplete
-            inputId="nba-player-search"
-            defaultValue={seasons[0]?.player_name ?? requestedPlayer}
-          />
-          <span className="text-muted text-xs">Enter the player name.</span>
-        </div>
-
-        <button
-          type="submit"
-          className="bg-accent text-background h-11 rounded px-5 font-mono text-sm transition-opacity hover:opacity-90 md:mt-6"
+        <form
+          aria-label="Choose player and statistic"
+          className="border-border bg-surface grid gap-4 rounded-lg border p-4 md:grid-cols-[1fr_1.6fr_auto] md:items-end md:gap-x-5 md:gap-y-3 md:p-4"
+          action="/projects/nba/performance-trends"
+          method="get"
         >
-          update view
-        </button>
-      </form>
+          {career && careers.length > 1 && (
+            <input type="hidden" name="id" value={career.playerId} />
+          )}
+          <label className="grid gap-2">
+            <span className="font-mono text-xs font-bold tracking-wide uppercase">Statistic</span>
+            <select
+              name="metric"
+              defaultValue={metric}
+              className="border-border bg-background h-11 rounded border px-3"
+            >
+              {METRIC_ORDER.map((value) => (
+                <option key={value} value={value}>
+                  {METRICS[value].label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="grid gap-2">
+            <label
+              htmlFor="nba-player-search"
+              className="font-mono text-xs font-bold tracking-wide uppercase"
+            >
+              Player
+            </label>
+            <PlayerAutocomplete
+              key={seasons[0]?.player_name ?? requestedPlayer}
+              inputId="nba-player-search"
+              defaultValue={seasons[0]?.player_name ?? requestedPlayer}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="bg-accent text-background h-11 rounded px-5 font-mono text-sm transition-opacity hover:opacity-90"
+          >
+            update view
+          </button>
+
+          <PopularPlayers metric={metric} currentPlayer={seasons[0]?.player_name} />
+        </form>
+      </div>
 
       {queryError ? (
         <DatabaseError />
@@ -222,23 +239,28 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
       ) : (
         <>
           <section aria-labelledby="chart-title">
-            <div className="mb-6">
+            <div className="mb-4">
               <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
                 01 · Career arc
               </p>
-              <h2 id="chart-title" className="text-2xl font-bold md:text-3xl">
-                {playerSeries.name} · {metricDetails.shortLabel}
-              </h2>
-              <p className="text-muted mt-2 text-sm">
-                {metricDetails.label} across {playerSeries.points.length} recorded seasons.
-              </p>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                <h2 id="chart-title" className="text-2xl font-bold md:text-3xl">
+                  {playerSeries.name} · {metricDetails.shortLabel}
+                </h2>
+                <p className="text-muted text-sm">
+                  {metricDetails.label} across {playerSeries.points.length} recorded seasons.
+                </p>
+              </div>
               {career && careers.length > 1 && (
                 <NamesakeChooser careers={careers} selectedId={career.playerId} metric={metric} />
               )}
             </div>
 
-            <div className="border-border bg-background rounded-lg border p-3 md:p-5">
+            <div className="border-border bg-background rounded-lg border p-3 md:p-4">
+              {/* From md up, size the canvas so the whole card fits a laptop viewport: 558px is
+                  everything above the canvas plus the card's bottom padding and a small margin. */}
               <MetricChart
+                heightClassName="h-[320px] md:h-[clamp(230px,calc(100svh_-_558px),420px)]"
                 metricLabel={metricDetails.shortLabel}
                 valueDigits={metricDetails.digits}
                 referenceLine={{
@@ -249,9 +271,9 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
                 series={series}
               />
             </div>
-            <p className="text-muted mt-3 text-xs">
-              Fixed comparison scale: ages 18–42 and{' '}
-              {formatMetric(metricDetails.min, metricDetails.digits)}–
+            <p className="text-muted mt-2 text-xs">
+              Click a data point to see its exact value and season. Fixed comparison scale: ages
+              18–42 and {formatMetric(metricDetails.min, metricDetails.digits)}–
               {formatMetric(metricDetails.max, metricDetails.digits)} {metricDetails.shortLabel}.
               The dashed line marks {metricDetails.referenceLabel.toLocaleLowerCase()}.
             </p>
@@ -292,6 +314,39 @@ function formatMetric(value: number, digits: number) {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value);
+}
+
+function PopularPlayers({ metric, currentPlayer }: { metric: MetricKey; currentPlayer?: string }) {
+  return (
+    <nav
+      aria-label="Popular players"
+      className="flex flex-wrap items-center gap-x-3 gap-y-2 md:col-span-3"
+    >
+      <span className="text-muted font-mono text-xs tracking-wide uppercase">Popular players</span>
+      <ul className="flex flex-wrap gap-1.5 text-xs">
+        {POPULAR_PLAYERS.map((player) => {
+          const isCurrent = player === currentPlayer;
+          const query = new URLSearchParams({ metric, player });
+
+          return (
+            <li key={player}>
+              <Link
+                href={`/projects/nba/performance-trends?${query}`}
+                aria-current={isCurrent ? 'page' : undefined}
+                className={`inline-block rounded-full border px-2.5 py-1 transition-colors ${
+                  isCurrent
+                    ? 'border-accent bg-accent text-background'
+                    : 'border-border bg-background hover:border-accent hover:text-accent'
+                }`}
+              >
+                {player}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
 }
 
 function NamesakeChooser({

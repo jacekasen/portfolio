@@ -23,6 +23,7 @@ type MetricChartProps = {
     min: number;
   };
   series: MetricSeries[];
+  heightClassName?: string;
 };
 
 type SelectedPoint = {
@@ -41,6 +42,7 @@ export function MetricChart({
   referenceLine,
   scale,
   series,
+  heightClassName = 'h-[320px] md:h-[400px]',
 }: MetricChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedPoint, setSelectedPoint] = useState<SelectedPoint | null>(null);
@@ -103,8 +105,12 @@ export function MetricChart({
         const x = xFor(age);
         context.fillStyle = muted;
         context.textAlign = 'center';
-        context.fillText(String(age), x, height - 22);
+        context.fillText(String(age), x, height - 32);
       }
+
+      context.fillStyle = foreground;
+      context.font = `12px ${mono}`;
+      context.fillText('Age', xFor((MIN_AGE + MAX_AGE) / 2), height - 12);
 
       if (referenceLine.value >= yMin && referenceLine.value <= yMax) {
         const referenceY = yFor(referenceLine.value);
@@ -282,21 +288,23 @@ export function MetricChart({
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs">
-        {series.map((player, index) => (
-          <span key={player.name} className="inline-flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ backgroundColor: SERIES_COLORS[index % SERIES_COLORS.length] }}
-            />
-            {player.name}
-          </span>
-        ))}
-      </div>
+      {series.length > 1 && (
+        <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs">
+          {series.map((player, index) => (
+            <span key={player.name} className="inline-flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: SERIES_COLORS[index % SERIES_COLORS.length] }}
+              />
+              {player.name}
+            </span>
+          ))}
+        </div>
+      )}
       <canvas
         ref={canvasRef}
-        className="h-[320px] w-full cursor-crosshair md:h-[400px]"
+        className={`${heightClassName} w-full cursor-crosshair`}
         role="button"
         tabIndex={0}
         aria-label={`${metricLabel} by player age from 18 to 42 for ${series.map((player) => player.name).join(', ')}. ${referenceLine.label} is marked with a dashed line. Click a data point, or use the left and right arrow keys, to inspect its exact value and season.`}
@@ -308,9 +316,6 @@ export function MetricChart({
           }
         }}
       />
-      <p className="text-muted mt-3 px-1 text-xs">
-        Click a data point to pin its exact value and season on the graph.
-      </p>
       <p className="sr-only" aria-live="polite">
         {selectedPlayer && selectedSeason
           ? `${selectedPlayer.name}, ${metricLabel}: ${selectedSeason.value.toFixed(valueDigits)}, season ${selectedSeason.season}, age ${selectedSeason.age}`
