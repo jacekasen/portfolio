@@ -1,22 +1,53 @@
 import { describe, expect, it } from 'vitest';
-import { escapeLikePattern, groupCareersByPlayer, playerIdFromUrl, selectCareer } from './players';
+import {
+  findPlayerNames,
+  groupCareersByPlayer,
+  playerIdFromUrl,
+  playerSearchKey,
+  selectCareer,
+  suggestPlayerNames,
+} from './players';
 
 const urlFor = (playerId: string) =>
   `https://www.basketball-reference.com/players/${playerId[0]}/${playerId}.html`;
 const season = (playerId: string, year_id: string) => ({ player_url: urlFor(playerId), year_id });
 
-describe('escapeLikePattern', () => {
-  it('makes LIKE and PostgREST wildcards literal', () => {
-    expect(escapeLikePattern('%')).toBe('\\%');
-    expect(escapeLikePattern('_ebron James')).toBe('\\_ebron James');
-    expect(escapeLikePattern('Kevin *')).toBe('Kevin \\*');
-    expect(escapeLikePattern('a\\b')).toBe('a\\\\b');
+describe('playerSearchKey', () => {
+  it('ignores case, accents and extra spaces', () => {
+    expect(playerSearchKey('Nikola Jokić')).toBe('nikola jokic');
+    expect(playerSearchKey('  nikola   JOKIC ')).toBe('nikola jokic');
+    expect(playerSearchKey('Dāvis Bertāns')).toBe('davis bertans');
   });
 
-  it('leaves real player names unchanged', () => {
-    expect(escapeLikePattern("Shaquille O'Neal")).toBe("Shaquille O'Neal");
-    expect(escapeLikePattern('J.R. Smith')).toBe('J.R. Smith');
-    expect(escapeLikePattern('Nikola Jokić')).toBe('Nikola Jokić');
+  it('folds letters that Unicode does not decompose', () => {
+    expect(playerSearchKey('Ömer Aşık')).toBe('omer asik');
+    expect(playerSearchKey('Pétur Guðmundsson')).toBe('petur gudmundsson');
+    // The stored name uses a Cyrillic ё.
+    expect(playerSearchKey('Egor Dёmin')).toBe('egor demin');
+  });
+});
+
+describe('player name search', () => {
+  const players = [
+    'Nikola Jokić',
+    'Nikola Vučević',
+    'LeBron James',
+    "Shaquille O'Neal",
+    "Jermaine O'Neal",
+  ].map((name) => ({ name, key: playerSearchKey(name) }));
+
+  it('resolves a typed name to its stored spelling', () => {
+    expect(findPlayerNames(players, 'nikola jokic')).toEqual(['Nikola Jokić']);
+    expect(findPlayerNames(players, 'LeBron James')).toEqual(['LeBron James']);
+    expect(findPlayerNames(players, 'Nikola')).toEqual([]);
+    expect(findPlayerNames(players, '%')).toEqual([]);
+  });
+
+  it('suggests accent-insensitive matches with prefix matches first', () => {
+    expect(suggestPlayerNames(players, 'jokic', 8)).toEqual(['Nikola Jokić']);
+    expect(suggestPlayerNames(players, "o'ne", 8)).toEqual(["Jermaine O'Neal", "Shaquille O'Neal"]);
+    expect(suggestPlayerNames(players, 'ni', 8)).toEqual(['Nikola Jokić', 'Nikola Vučević']);
+    expect(suggestPlayerNames(players, 'ni', 1)).toEqual(['Nikola Jokić']);
   });
 });
 

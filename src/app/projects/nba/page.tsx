@@ -19,7 +19,7 @@ const analyses = [
       'Career highs and league-average references',
       'Probabilities for improving, staying stable or regressing',
       'A projected BPM change with the factors behind it',
-      'Past forecasts compared with the next observed season',
+      'Past-season forecasts labeled apart from upcoming ones',
     ],
     icon: LineChart,
   },

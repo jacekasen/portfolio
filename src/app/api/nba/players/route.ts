@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { escapeLikePattern } from '@/lib/nba/players';
-import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
+import { getPlayerIndex } from '@/lib/nba/player-index';
+import { suggestPlayerNames } from '@/lib/nba/players';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 const MIN_QUERY_LENGTH = 2;
 const MAX_SUGGESTIONS = 8;
@@ -12,32 +13,15 @@ export async function GET(request: Request) {
     return NextResponse.json([]);
   }
 
-  const supabase = createSupabaseClient();
-  const { data, error } = await supabase
-    .from('nba_player_seasons')
-    .select('player_name')
-    .ilike('player_name', `%${escapeLikePattern(query)}%`)
-    .order('player_name')
-    .limit(500);
+  try {
+    const { players } = await getPlayerIndex();
 
-  if (error) {
+    return NextResponse.json(suggestPlayerNames(players, query, MAX_SUGGESTIONS), {
+      headers: {
+        'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+      },
+    });
+  } catch {
     return NextResponse.json({ error: 'Could not search players.' }, { status: 500 });
   }
-
-  const normalizedQuery = query.toLocaleLowerCase();
-  const uniqueNames = Array.from(new Set(data.map((row) => row.player_name)));
-  const suggestions = uniqueNames
-    .sort((a, b) => {
-      const aStartsWith = a.toLocaleLowerCase().startsWith(normalizedQuery);
-      const bStartsWith = b.toLocaleLowerCase().startsWith(normalizedQuery);
-      if (aStartsWith !== bStartsWith) return aStartsWith ? -1 : 1;
-      return a.localeCompare(b);
-    })
-    .slice(0, MAX_SUGGESTIONS);
-
-  return NextResponse.json(suggestions, {
-    headers: {
-      'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
-    },
-  });
 }

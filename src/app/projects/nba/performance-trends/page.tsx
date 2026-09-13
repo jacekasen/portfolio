@@ -4,11 +4,11 @@ import { PlayerAutocomplete } from '@/components/nba/PlayerAutocomplete';
 import {
   PlayerPredictionCard,
   PlayerPredictionUnavailable,
-  type ObservedPredictionOutcome,
   type PlayerPrediction,
 } from '@/components/nba/PlayerPredictionCard';
+import { getPlayerIndex } from '@/lib/nba/player-index';
 import {
-  escapeLikePattern,
+  findPlayerNames,
   groupCareersByPlayer,
   selectCareer,
   type PlayerCareer,
@@ -105,30 +105,39 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
   }
 
   const supabase = createSupabaseClient();
-  const playerPattern = escapeLikePattern(requestedPlayer);
-  const [seasonResult, predictionResult] = await Promise.all([
-    supabase
-      .from('nba_player_seasons')
-      .select('player_name, player_url, year_id, age, per, bpm, ws, vorp, ws_per_48')
-      .ilike('player_name', playerPattern)
-      .order('age', { ascending: true })
-      .returns<NbaSeasonRow[]>(),
-    supabase
-      .from('player_predictions')
-      .select(
-        'player_id, player_name, season, age, current_bpm, trajectory, improving_probability, stable_probability, regressing_probability, peak_probability, predicted_bpm_delta, prediction_factors, model_version, updated_at',
-      )
-      .ilike('player_name', playerPattern)
-      .returns<PlayerPrediction[]>(),
-  ]);
+  const playerIndex = await getPlayerIndex().catch(() => null);
+  const playerNames = playerIndex ? findPlayerNames(playerIndex.players, requestedPlayer) : [];
+  const [seasonResult, predictionResult] = playerNames.length
+    ? await Promise.all([
+        supabase
+          .from('nba_player_seasons')
+          .select('player_name, player_url, year_id, age, per, bpm, ws, vorp, ws_per_48')
+          .in('player_name', playerNames)
+          .order('age', { ascending: true })
+          .returns<NbaSeasonRow[]>(),
+        supabase
+          .from('player_predictions')
+          .select(
+            'player_id, player_name, season, age, current_bpm, trajectory, improving_probability, stable_probability, regressing_probability, peak_probability, predicted_bpm_delta, prediction_factors, model_version, updated_at',
+          )
+          .in('player_name', playerNames)
+          .returns<PlayerPrediction[]>(),
+      ])
+    : [
+        { data: [], error: null },
+        { data: [], error: null },
+      ];
 
-  const { data, error: queryError } = seasonResult;
+  const { data } = seasonResult;
+  const queryError = !playerIndex || seasonResult.error;
   const careers = groupCareersByPlayer(data ?? []);
   const career = selectCareer(careers, params.id);
   const seasons = career?.seasons ?? [];
   const prediction =
     predictionResult.data?.find((row) => row.player_id === career?.playerId) ?? null;
-  const observedOutcome = prediction ? getObservedOutcome(seasons, prediction) : undefined;
+  const forecastSeasonInData = Boolean(
+    prediction && playerIndex?.latestSeason && prediction.season <= playerIndex.latestSeason,
+  );
 
   const series: MetricSeries[] = seasons.length
     ? [
@@ -192,7 +201,10 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
           >
             Player
           </label>
-          <PlayerAutocomplete inputId="nba-player-search" defaultValue={requestedPlayer} />
+          <PlayerAutocomplete
+            inputId="nba-player-search"
+            defaultValue={seasons[0]?.player_name ?? requestedPlayer}
+          />
           <span className="text-muted text-xs">Enter the player name.</span>
         </div>
 
@@ -268,7 +280,10 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
           </section>
 
           {prediction && !predictionResult.error ? (
-            <PlayerPredictionCard prediction={prediction} observedOutcome={observedOutcome} />
+            <PlayerPredictionCard
+              prediction={prediction}
+              forecastSeasonInData={forecastSeasonInData}
+            />
           ) : (
             <PlayerPredictionUnavailable />
           )}
@@ -351,30 +366,6 @@ function NamesakeChooser({
       </ul>
     </nav>
   );
-}
-
-function getObservedOutcome(
-  seasons: NbaSeasonRow[],
-  prediction: PlayerPrediction,
-): ObservedPredictionOutcome | undefined {
-  if (prediction.current_bpm === null) return undefined;
-
-  const forecastSeasonStart = Number.parseInt(prediction.season.slice(0, 4), 10);
-  if (!Number.isFinite(forecastSeasonStart)) return undefined;
-
-  const nextSeason = seasons.find(
-    (season) => Number.parseInt(season.year_id.slice(0, 4), 10) === forecastSeasonStart,
-  );
-  if (!nextSeason) return undefined;
-
-  const bpmDelta = Number(nextSeason.bpm) - Number(prediction.current_bpm);
-  if (!Number.isFinite(bpmDelta)) return undefined;
-
-  return {
-    season: nextSeason.year_id,
-    bpmDelta,
-    trajectory: bpmDelta > 0.5 ? 'improving' : bpmDelta < -0.5 ? 'regressing' : 'stable',
-  };
 }
 
 function SupabaseSetupMessage() {

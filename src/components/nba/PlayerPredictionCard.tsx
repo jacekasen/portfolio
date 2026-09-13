@@ -15,12 +15,6 @@ export type PlayerPrediction = {
   updated_at: string;
 };
 
-export type ObservedPredictionOutcome = {
-  season: string;
-  bpmDelta: number;
-  trajectory: PlayerPrediction['trajectory'];
-};
-
 const TRAJECTORIES = [
   { key: 'improving_probability', label: 'Improving', color: 'bg-[#3f795c]' },
   { key: 'stable_probability', label: 'Stable', color: 'bg-accent-light' },
@@ -35,10 +29,11 @@ const TRAJECTORY_LABELS = {
 
 export function PlayerPredictionCard({
   prediction,
-  observedOutcome,
+  forecastSeasonInData,
 }: {
   prediction: PlayerPrediction;
-  observedOutcome?: ObservedPredictionOutcome;
+  /** The forecast season is already in the data, so the player had no qualified season in it. */
+  forecastSeasonInData: boolean;
 }) {
   const leadingProbability = prediction[`${prediction.trajectory}_probability`];
   const factors = Array.isArray(prediction.prediction_factors) ? prediction.prediction_factors : [];
@@ -49,7 +44,7 @@ export function PlayerPredictionCard({
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-accent mb-2 font-mono text-xs tracking-[0.14em] uppercase">
-            02 · Model forecast · {observedOutcome ? 'observed outcome available' : 'next season'}
+            02 · Model forecast · {forecastSeasonInData ? 'past season' : 'next season'}
           </p>
           <h2 id="outlook-title" className="text-2xl font-bold">
             Forecast for {prediction.season}
@@ -61,6 +56,13 @@ export function PlayerPredictionCard({
       </div>
 
       <div className="border-border bg-surface overflow-hidden rounded-lg border">
+        {forecastSeasonInData && (
+          <p className="border-border bg-background/45 border-b px-5 py-4 text-sm leading-6 md:px-7">
+            <span className="font-bold">No {prediction.season} result to check.</span>{' '}
+            {prediction.player_name} has no qualified {prediction.season} season in the data, so
+            this forecast can&apos;t be compared with an observed BPM change.
+          </p>
+        )}
         <div className="grid gap-8 p-5 md:p-7 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <p className="text-muted font-mono text-xs tracking-wide uppercase">
@@ -113,19 +115,8 @@ export function PlayerPredictionCard({
                   ? 'Not available'
                   : formatSigned(prediction.predicted_bpm_delta)
               }
-              detail={
-                observedOutcome
-                  ? `Expected change entering the ${observedOutcome.season} season.`
-                  : `Expected change from ${sourceSeason} to ${prediction.season}.`
-              }
+              detail={`Expected change from ${sourceSeason} to ${prediction.season}.`}
             />
-            {observedOutcome && (
-              <PredictionStat
-                label={`Observed change · ${observedOutcome.season}`}
-                value={formatSigned(observedOutcome.bpmDelta)}
-                detail={`${TRAJECTORY_LABELS[observedOutcome.trajectory]} was the observed trajectory.`}
-              />
-            )}
           </div>
         </div>
 
@@ -150,9 +141,6 @@ export function PlayerPredictionCard({
             The model uses only information available through {sourceSeason}. It was evaluated with
             chronological season splits to reduce look-ahead leakage. Estimates are probabilities,
             not guarantees.
-            {observedOutcome
-              ? ` Since ${observedOutcome.season} is now available, its result is shown for an honest out-of-sample comparison.`
-              : ' For completed careers, this is a hypothetical next-season projection.'}
           </p>
         </div>
       </div>

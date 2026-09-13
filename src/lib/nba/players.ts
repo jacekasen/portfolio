@@ -8,9 +8,54 @@ export type PlayerCareer<T extends SeasonWithPlayer> = {
   seasons: T[];
 };
 
-/** Makes LIKE wildcards literal. PostgREST also treats `*` as `%`. */
-export function escapeLikePattern(value: string) {
-  return value.replace(/[\\%_*]/g, '\\$&');
+export type PlayerNameEntry = {
+  name: string;
+  key: string;
+};
+
+// Letters that NFD does not split into a base letter plus an accent.
+const FOLDED_LETTERS: Record<string, string> = {
+  ı: 'i',
+  ð: 'd',
+  đ: 'd',
+  ł: 'l',
+  ø: 'o',
+  æ: 'ae',
+  ß: 'ss',
+  е: 'e', // Cyrillic е, stored in "Egor Dёmin"
+};
+const FOLDED_LETTER_PATTERN = new RegExp(`[${Object.keys(FOLDED_LETTERS).join('')}]`, 'g');
+
+/** Case- and accent-insensitive search key, so "jokic" matches "Nikola Jokić". */
+export function playerSearchKey(name: string) {
+  return name
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(FOLDED_LETTER_PATTERN, (letter) => FOLDED_LETTERS[letter])
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function findPlayerNames(players: PlayerNameEntry[], requestedName: string) {
+  const key = playerSearchKey(requestedName);
+  return players.filter((player) => player.key === key).map((player) => player.name);
+}
+
+export function suggestPlayerNames(players: PlayerNameEntry[], query: string, limit: number) {
+  const key = playerSearchKey(query);
+  if (!key) return [];
+
+  return players
+    .filter((player) => player.key.includes(key))
+    .sort((a, b) => {
+      const aStartsWith = a.key.startsWith(key);
+      const bStartsWith = b.key.startsWith(key);
+      if (aStartsWith !== bStartsWith) return aStartsWith ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    })
+    .slice(0, limit)
+    .map((player) => player.name);
 }
 
 export function playerIdFromUrl(url: string) {
