@@ -1,126 +1,104 @@
 'use client';
 
 import { useState } from 'react';
+import { RATING_TIERS, ratingTier, type RatingTierId } from '@/lib/cs2/form-display';
 import type { PlayerMapStat } from '@/lib/cs2/trends';
 
-type Cs2RecentFormStripProps = {
-  recentMaps: PlayerMapStat[];
+const TIER_STYLES: Record<RatingTierId, string> = {
+  excellent: 'border-emerald-500 bg-emerald-100 text-emerald-950',
+  strong: 'border-emerald-300 bg-emerald-50 text-emerald-900',
+  solid: 'border-sky-300 bg-sky-50 text-sky-950',
+  below: 'border-amber-300 bg-amber-50 text-amber-950',
+  poor: 'border-rose-300 bg-rose-50 text-rose-950',
 };
 
-export function Cs2RecentFormStrip({ recentMaps }: Cs2RecentFormStripProps) {
-  const [activeMap, setActiveMap] = useState<PlayerMapStat | null>(null);
-
-  const getTier = (r: number) => {
-    if (r >= 1.40) {
-      return {
-        bg: 'bg-emerald-100 border-emerald-500 text-emerald-950 font-bold ring-1 ring-emerald-500/40',
-        label: 'Godlike',
-      };
-    }
-    if (r >= 1.15) {
-      return {
-        bg: 'bg-emerald-50 border-emerald-400 text-emerald-900',
-        label: 'In Form',
-      };
-    }
-    if (r >= 1.00) {
-      return {
-        bg: 'bg-sky-50 border-sky-300 text-sky-950',
-        label: 'Solid',
-      };
-    }
-    if (r >= 0.85) {
-      return {
-        bg: 'bg-amber-50 border-amber-300 text-amber-950',
-        label: 'Sub-par',
-      };
-    }
-    return {
-      bg: 'bg-rose-50 border-rose-300 text-rose-950',
-      label: 'Cold',
-    };
-  };
+export function Cs2RecentFormStrip({ recentMaps }: { recentMaps: PlayerMapStat[] }) {
+  const [activeId, setActiveId] = useState<number | null>(null);
+  const activeMap = recentMaps.find((map) => map.id === activeId) ?? recentMaps.at(-1);
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
-            Recent Map Form Ribbon (Last {recentMaps.length} Maps)
-          </h3>
-          <p className="text-muted text-[11px]">
-            Chronological match-by-match performance strip. Green highlights surges; red highlights cold spells.
-          </p>
-        </div>
-        <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-muted">
-          <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-emerald-100 border border-emerald-500" />
-            <span>&ge; 1.40</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-emerald-50 border border-emerald-400" />
-            <span>1.15+</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-sky-50 border border-sky-300" />
-            <span>1.00+</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-rose-50 border border-rose-300" />
-            <span>&lt; 1.00</span>
-          </span>
-        </div>
-      </div>
+      <ul
+        aria-label="Rating tiers"
+        className="text-muted flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs"
+      >
+        {RATING_TIERS.map((tier) => (
+          <li key={tier.id} className="flex items-center gap-1.5">
+            <span
+              aria-hidden="true"
+              className={`h-2.5 w-2.5 rounded-sm border ${TIER_STYLES[tier.id]}`}
+            />
+            {tier.label} {tier.range}
+          </li>
+        ))}
+      </ul>
 
-      {/* Ribbon Grid */}
-      <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5">
-        {recentMaps.map((m, idx) => {
-          const tier = getTier(m.rating);
-          const isSelected = activeMap?.id === m.id;
+      <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-10">
+        {recentMaps.map((map) => {
+          const isActive = map.id === activeMap?.id;
 
           return (
             <button
-              key={m.id}
+              key={map.id}
               type="button"
-              onMouseEnter={() => setActiveMap(m)}
-              onFocus={() => setActiveMap(m)}
-              className={`rounded border p-2 text-center transition-all cursor-pointer font-mono flex flex-col justify-between h-20 ${tier.bg} ${
-                isSelected ? 'scale-105 shadow-lg brightness-125 ring-2 ring-white/40 z-10' : ''
-              }`}
+              aria-pressed={isActive}
+              aria-label={`${map.mapName}, rating ${map.rating.toFixed(2)}, ${map.kills}-${map.deaths}`}
+              onClick={() => setActiveId(map.id)}
+              onMouseEnter={() => setActiveId(map.id)}
+              onFocus={() => setActiveId(map.id)}
+              className={`flex h-20 flex-col justify-between rounded border p-2 text-center font-mono transition-shadow ${
+                TIER_STYLES[ratingTier(map.rating).id]
+              } ${isActive ? 'ring-accent ring-2 ring-offset-1' : ''}`}
             >
-              <div className="text-[10px] opacity-75 truncate">{m.mapName}</div>
-              <div className="text-sm font-bold tracking-tight my-0.5">{m.rating.toFixed(2)}</div>
-              <div className="text-[9px] opacity-70 truncate">{m.kills}-{m.deaths}</div>
+              <span className="truncate text-[11px] opacity-80">{map.mapName}</span>
+              <span className="text-sm font-bold">{map.rating.toFixed(2)}</span>
+              <span className="truncate text-[11px] opacity-70">
+                {map.kills}-{map.deaths}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {/* Details Box for Hovered Map */}
+      <div aria-hidden="true" className="text-muted flex justify-between font-mono text-xs">
+        <span>← Oldest</span>
+        <span>Most recent →</span>
+      </div>
+
       {activeMap && (
-        <div className="border-border bg-surface rounded-lg border p-3 flex flex-wrap items-center justify-between gap-3 font-mono text-xs animate-in fade-in duration-150">
-          <div className="flex items-center gap-2">
+        <div
+          aria-live="polite"
+          className="border-border bg-surface flex flex-wrap items-center justify-between gap-x-6 gap-y-2 rounded-lg border p-3 font-mono text-xs"
+        >
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="text-accent font-bold">{activeMap.mapName}</span>
             <span className="text-muted">vs {activeMap.opponent}</span>
-            <span className="text-muted">({activeMap.tournament})</span>
-          </div>
+            <span className="text-muted">· {activeMap.tournament}</span>
+            {activeMap.matchDate && (
+              <span className="text-muted">· {activeMap.matchDate.slice(0, 10)}</span>
+            )}
+          </p>
 
-          <div className="flex items-center gap-4 text-xs">
-            <span>
-              Rating: <strong className={activeMap.rating >= 1.0 ? 'text-emerald-800 font-bold' : 'text-rose-800 font-bold'}>{activeMap.rating.toFixed(2)}</strong>
-            </span>
-            <span>
-              K-D: <strong className="text-foreground font-bold">{activeMap.kills}-{activeMap.deaths}</strong> ({activeMap.plusMinus >= 0 ? `+${activeMap.plusMinus}` : activeMap.plusMinus})
-            </span>
-            <span>
-              ADR: <strong className="text-foreground font-bold">{activeMap.adr.toFixed(1)}</strong>
-            </span>
-            <span>
-              KAST: <strong className="text-foreground font-bold">{activeMap.kastPct.toFixed(0)}%</strong>
-            </span>
-          </div>
+          <dl className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <DetailStat label="Rating" value={activeMap.rating.toFixed(2)} />
+            <DetailStat
+              label="K-D"
+              value={`${activeMap.kills}-${activeMap.deaths} (${activeMap.plusMinus >= 0 ? '+' : ''}${activeMap.plusMinus})`}
+            />
+            <DetailStat label="ADR" value={activeMap.adr.toFixed(1)} />
+            <DetailStat label="KAST" value={`${activeMap.kastPct.toFixed(0)}%`} />
+          </dl>
         </div>
       )}
+    </div>
+  );
+}
+
+function DetailStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-1.5">
+      <dt className="text-muted">{label}</dt>
+      <dd className="text-foreground font-bold">{value}</dd>
     </div>
   );
 }

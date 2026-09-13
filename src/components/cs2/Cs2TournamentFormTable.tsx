@@ -1,63 +1,90 @@
-import { Trophy } from 'lucide-react';
+import { signedRating } from '@/lib/cs2/form-display';
 import type { TournamentFormSummary } from '@/lib/cs2/trends';
+
+// An event average from a handful of maps swings too much to read as form.
+const SMALL_SAMPLE_MAPS = 5;
 
 type Cs2TournamentFormTableProps = {
   tournaments: TournamentFormSummary[];
+  limit: number;
 };
 
-export function Cs2TournamentFormTable({ tournaments }: Cs2TournamentFormTableProps) {
-  const displayList = tournaments.slice(0, 10);
+export function Cs2TournamentFormTable({ tournaments, limit }: Cs2TournamentFormTableProps) {
+  const events = tournaments.slice(0, limit);
+  const hasSmallSamples = events.some((event) => event.mapsCount < SMALL_SAMPLE_MAPS);
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-          <Trophy size={15} className="text-accent" />
-          <span>Tournament Event Form (Last {displayList.length} Events)</span>
-        </h3>
-        <span className="text-muted font-mono text-[11px]">Event Rating vs Career Standard</span>
-      </div>
-
+    <div className="space-y-2">
       <div className="border-border bg-surface overflow-hidden rounded-lg border">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-mono text-xs">
-            <thead className="border-border bg-background border-b text-muted text-[11px] uppercase tracking-wider">
+          <table className="w-full min-w-[640px] text-left font-mono text-xs tabular-nums">
+            <thead className="border-border bg-background text-muted border-b tracking-wide uppercase">
               <tr>
-                <th className="px-4 py-3 font-semibold">Tournament Event</th>
-                <th className="px-4 py-3 font-semibold">Maps</th>
-                <th className="px-4 py-3 font-semibold">Event Rating</th>
-                <th className="px-4 py-3 font-semibold">Form Delta</th>
-                <th className="px-4 py-3 font-semibold">ADR</th>
-                <th className="px-4 py-3 font-semibold">K - D</th>
+                <th scope="col" className="px-4 py-3 font-semibold">
+                  Event
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                  Maps
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                  Rating
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                  vs career
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                  ADR
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                  K-D
+                </th>
               </tr>
             </thead>
             <tbody className="divide-border divide-y">
-              {displayList.map((t) => {
-                const isPos = t.deltaVsCareer >= 0;
-                const sign = isPos ? `+${t.deltaVsCareer.toFixed(2)}` : t.deltaVsCareer.toFixed(2);
+              {events.map((event) => {
+                const isAbove = event.deltaVsCareer >= 0;
 
                 return (
-                  <tr key={t.tournament} className="hover:bg-black/5 transition-colors">
-                    <td className="px-4 py-3 font-semibold text-foreground max-w-[200px] truncate">
-                      {t.tournament}
+                  <tr
+                    key={event.tournament}
+                    className={`transition-colors hover:bg-black/5 ${
+                      event.mapsCount < SMALL_SAMPLE_MAPS ? 'opacity-55' : ''
+                    }`}
+                  >
+                    <th
+                      scope="row"
+                      title={event.tournament}
+                      className="text-foreground max-w-[20rem] truncate px-4 py-3 text-left font-semibold"
+                    >
+                      {event.tournament}
+                    </th>
+                    <td className="text-muted px-4 py-3 text-right">{event.mapsCount}</td>
+                    <td
+                      className={`px-4 py-3 text-right font-bold ${
+                        event.avgRating >= 1.15
+                          ? 'text-emerald-800'
+                          : event.avgRating >= 1
+                            ? 'text-accent'
+                            : 'text-rose-800'
+                      }`}
+                    >
+                      {event.avgRating.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-muted">{t.mapsCount}</td>
-                    <td className="px-4 py-3">
-                      <span className={`font-bold ${t.avgRating >= 1.15 ? 'text-emerald-800' : t.avgRating >= 1.0 ? 'text-accent' : 'text-rose-800'}`}>
-                        {t.avgRating.toFixed(2)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-right">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${
-                          isPos ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-rose-100 text-rose-900 border-rose-300'
+                        className={`inline-block rounded border px-2 py-0.5 font-bold ${
+                          isAbove
+                            ? 'border-emerald-300 bg-emerald-100 text-emerald-900'
+                            : 'border-rose-300 bg-rose-100 text-rose-900'
                         }`}
                       >
-                        {sign}
+                        {signedRating(event.deltaVsCareer)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-muted">{t.adr.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-muted">{t.kills} - {t.deaths}</td>
+                    <td className="text-muted px-4 py-3 text-right">{event.adr.toFixed(1)}</td>
+                    <td className="text-muted px-4 py-3 text-right">
+                      {event.kills}-{event.deaths}
+                    </td>
                   </tr>
                 );
               })}
@@ -65,6 +92,12 @@ export function Cs2TournamentFormTable({ tournaments }: Cs2TournamentFormTablePr
           </table>
         </div>
       </div>
+
+      {hasSmallSamples && (
+        <p className="text-muted text-xs">
+          Faded rows are events with fewer than {SMALL_SAMPLE_MAPS} maps, too few to read much into.
+        </p>
+      )}
     </div>
   );
 }

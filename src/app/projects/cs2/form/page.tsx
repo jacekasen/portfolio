@@ -1,9 +1,9 @@
-import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Cs2FormMomentumChart } from '@/components/cs2/Cs2FormMomentumChart';
-import { Cs2FormStatusMeter } from '@/components/cs2/Cs2FormStatusMeter';
+import { Cs2FormStats, Cs2FormVerdict } from '@/components/cs2/Cs2FormStatusMeter';
 import { Cs2PlayerAutocomplete } from '@/components/cs2/Cs2PlayerAutocomplete';
 import { Cs2RecentFormStrip } from '@/components/cs2/Cs2RecentFormStrip';
 import { Cs2SubNav } from '@/components/cs2/Cs2SubNav';
@@ -12,9 +12,9 @@ import { computeFormMetrics, fetchPlayerMapHistory } from '@/lib/cs2/trends';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 export const metadata: Metadata = {
-  title: 'CS2 Form Tracker & Momentum | Jace Kasen',
+  title: 'CS2 Form Tracker | Jace Kasen',
   description:
-    'Visualizing good vs. bad form in Counter-Strike 2 using career baseline relative deltas, 20-map match ribbons, and diverging momentum charts.',
+    "Compare a Counter-Strike 2 player's rolling 10-map rating with their own career average, map by map and event by event.",
 };
 
 type PageProps = {
@@ -24,20 +24,36 @@ type PageProps = {
 };
 
 const DEFAULT_PLAYER = 'donk';
-const STAR_PRESETS = ['donk', 'ZywOo', 'm0NESY', 'NiKo', 'ropz', 'b1t'];
+const POPULAR_PLAYERS = [
+  'donk',
+  'ZywOo',
+  'm0NESY',
+  'NiKo',
+  'ropz',
+  'sh1ro',
+  'molodoy',
+  'frozen',
+  'XANTARES',
+  'Twistzz',
+];
+const FORM_WINDOW = 10;
+const EVENT_LIMIT = 10;
+
+const HEADER = {
+  eyebrow: 'Counter-Strike 2 analysis · Form tracker',
+  title: 'CS2 Form Tracker',
+  description:
+    'Is a player above or below their usual level? A rolling 10-map rating compared with their own career average.',
+};
 
 export default async function Cs2FormPage({ searchParams }: PageProps) {
-  const resolvedParams = await searchParams;
-  const player = resolvedParams.player?.trim() || DEFAULT_PLAYER;
+  const { player: requestedPlayer } = await searchParams;
+  const player = requestedPlayer?.trim() || DEFAULT_PLAYER;
 
   if (!isSupabaseConfigured()) {
     return (
       <div className="space-y-8">
-        <PageHeader
-          eyebrow="Counter-Strike 2 Analysis"
-          title="CS2 Form Tracker"
-          description="Visualizing good vs. bad form using career relative deltas and momentum charts."
-        />
+        <PageHeader {...HEADER} />
         <div className="border-border bg-surface rounded-lg border p-6 text-center">
           <p className="text-muted font-mono text-sm">Database connection not configured.</p>
         </div>
@@ -45,116 +61,149 @@ export default async function Cs2FormPage({ searchParams }: PageProps) {
     );
   }
 
-  const rawMaps = await fetchPlayerMapHistory(player);
-  const formAnalysis = computeFormMetrics(rawMaps, 10);
+  const maps = await fetchPlayerMapHistory(player);
+  const form = computeFormMetrics(maps, FORM_WINDOW);
+  const playerName = form?.playerNick ?? player;
 
   return (
     <div className="space-y-10">
-      <PageHeader
-        eyebrow="Counter-Strike 2 Telemetry · Form Intelligence"
-        title="CS2 Form Tracker"
-        description="Instantly identify whether a player is in peak form, performing at their career standard, or in a slump. Compares rolling 10-map rating momentum against individual career baselines."
-      />
+      <div className="space-y-6">
+        <PageHeader {...HEADER} />
 
-      <Cs2SubNav player={player} />
+        <Cs2SubNav player={playerName} />
 
-      {/* Player Search and Preset Pills */}
-      <section aria-label="Select player" className="space-y-4">
-        <div className="border-border bg-surface grid gap-4 rounded-lg border p-5 sm:grid-cols-[1fr_auto] md:p-6">
-          <div>
-            <label htmlFor="cs2-form-search" className="mb-2 block font-mono text-xs font-bold tracking-wide uppercase">
-              Select Professional Player
-            </label>
-            <form
-              method="GET"
-              action="/projects/cs2/form"
-              className="flex max-w-md items-center gap-2"
+        <section
+          aria-label="Choose a player"
+          className="border-border bg-surface flex flex-col gap-3 rounded-lg border p-3 lg:flex-row lg:items-center lg:justify-between"
+        >
+          <form
+            method="GET"
+            action="/projects/cs2/form"
+            className="flex shrink-0 items-center gap-2"
+          >
+            <label
+              htmlFor="cs2-form-search"
+              className="font-mono text-xs font-bold tracking-wide uppercase"
             >
-              <div className="flex-1">
-                <Cs2PlayerAutocomplete
-                  inputId="cs2-form-search"
-                  defaultValue={player}
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-accent text-background hover:bg-accent/90 h-11 rounded px-5 font-mono text-sm font-bold transition-colors"
-              >
-                Inspect
-              </button>
-            </form>
-          </div>
+              Player
+            </label>
+            <div className="min-w-0 flex-1 sm:w-64 sm:flex-none">
+              <Cs2PlayerAutocomplete
+                key={playerName}
+                inputId="cs2-form-search"
+                defaultValue={playerName}
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-accent text-background h-11 shrink-0 rounded px-4 font-mono text-sm transition-opacity hover:opacity-90"
+            >
+              Inspect
+            </button>
+          </form>
 
-          <div className="flex flex-col justify-end">
-            <span className="text-muted mb-2 font-mono text-xs font-medium">Quick Presets:</span>
-            <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs">
-              {STAR_PRESETS.map((star) => {
-                const isCurrent = star.toLowerCase() === player.toLowerCase();
+          <nav aria-label="Popular players" className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="text-muted font-mono text-xs tracking-wide uppercase">Popular</span>
+            <ul className="flex flex-wrap gap-1.5 font-mono text-xs">
+              {POPULAR_PLAYERS.map((name) => {
+                const isCurrent =
+                  name.toLowerCase() === playerName.toLowerCase() ||
+                  name.toLowerCase().replace(/0/g, 'o') ===
+                    playerName.toLowerCase().replace(/0/g, 'o');
+
                 return (
-                  <Link
-                    key={star}
-                    href={`/projects/cs2/form?player=${encodeURIComponent(star)}`}
-                    className={`rounded px-2.5 py-1.5 transition-colors ${
-                      isCurrent
-                        ? 'bg-accent text-background font-bold'
-                        : 'border-border hover:bg-ink hover:text-on-ink border bg-background'
-                    }`}
-                  >
-                    {star}
-                  </Link>
+                  <li key={name}>
+                    <Link
+                      href={`/projects/cs2/form?player=${encodeURIComponent(name)}`}
+                      aria-current={isCurrent ? 'page' : undefined}
+                      className={`inline-block rounded-full border px-3 py-1 transition-colors ${
+                        isCurrent
+                          ? 'border-accent bg-accent text-background font-bold'
+                          : 'border-border bg-background hover:border-accent hover:text-accent'
+                      }`}
+                    >
+                      {name}
+                    </Link>
+                  </li>
                 );
               })}
-            </div>
-          </div>
-        </div>
-      </section>
+            </ul>
+          </nav>
+        </section>
+      </div>
 
-      {!formAnalysis ? (
+      {!form ? (
         <div className="border-border bg-surface rounded-lg border p-8 text-center">
-          <p className="text-foreground font-mono text-base font-bold">
-            No match records found for &quot;{player}&quot;
+          <p className="font-mono text-base font-bold">No maps found for &ldquo;{player}&rdquo;</p>
+          <p className="text-muted mt-2 text-sm">
+            Check the spelling of the player&apos;s HLTV nickname, or pick a popular player above.
           </p>
-          <div className="mt-4 flex justify-center">
-            <Link
-              href="/projects/cs2/form?player=donk"
-              className="bg-accent text-background rounded px-4 py-2 font-mono text-xs font-bold"
-            >
-              Reset to donk
-            </Link>
-          </div>
         </div>
       ) : (
-        <Suspense fallback={<div className="text-muted font-mono text-sm">Analyzing form...</div>}>
-          <div className="space-y-10">
-            {/* 1. The Form Status Verdict & KPI Cards */}
-            <Cs2FormStatusMeter form={formAnalysis} />
+        <>
+          <section aria-labelledby="form-title">
+            <SectionHeading id="form-title" eyebrow="01 · Form over time" title={playerName}>
+              <Cs2FormVerdict form={form} />
+            </SectionHeading>
+            {/* From md up, size the chart so the whole card fits a laptop viewport: 556px is
+                everything above the chart card plus a small margin. */}
+            <Cs2FormMomentumChart
+              points={form.momentumPoints}
+              careerAvg={form.careerAvgRating}
+              windowSize={FORM_WINDOW}
+              heightClassName="h-[320px] md:h-[clamp(230px,calc(100svh_-_556px),460px)]"
+            />
+            <div className="mt-6">
+              <Cs2FormStats form={form} totalMaps={maps.length} />
+            </div>
+          </section>
 
-            {/* 2. Recent Map Match Ribbon (Heatstrip) */}
-            <Cs2RecentFormStrip recentMaps={formAnalysis.recentMaps} />
+          <section aria-labelledby="recent-maps-title">
+            <SectionHeading
+              id="recent-maps-title"
+              eyebrow={`02 · Last ${form.recentMaps.length} maps`}
+              title="Map by map"
+              description="Oldest on the left, most recent on the right. Select a map to see its full line."
+            />
+            <Cs2RecentFormStrip recentMaps={form.recentMaps} />
+          </section>
 
-            {/* 3. Diverging Form Momentum Area Chart */}
-            <section aria-label="Career momentum swings" className="space-y-3">
-              <div>
-                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
-                  Career Form Swings &amp; Momentum Wave
-                </h3>
-                <p className="text-muted text-xs">
-                  Zero-centered baseline chart displaying moving 10-map rating delta against {player}&apos;s career baseline ({formAnalysis.careerAvgRating.toFixed(2)}). Green waves indicate peak form; red valleys indicate slumps.
-                </p>
-              </div>
-
-              <Cs2FormMomentumChart
-                points={formAnalysis.momentumPoints}
-                careerAvg={formAnalysis.careerAvgRating}
-                windowSize={10}
-              />
-            </section>
-
-            {/* 4. Tournament by Tournament Form Impact */}
-            <Cs2TournamentFormTable tournaments={formAnalysis.tournamentBreakdown} />
-          </div>
-        </Suspense>
+          <section aria-labelledby="events-title">
+            <SectionHeading
+              id="events-title"
+              eyebrow="03 · By event"
+              title="Form by event"
+              description={`Average rating at each of the last ${Math.min(EVENT_LIMIT, form.tournamentBreakdown.length)} events, compared with the career average.`}
+            />
+            <Cs2TournamentFormTable tournaments={form.tournamentBreakdown} limit={EVENT_LIMIT} />
+          </section>
+        </>
       )}
+    </div>
+  );
+}
+
+function SectionHeading({
+  id,
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="mb-4">
+      <p className="text-accent mb-1.5 font-mono text-xs tracking-[0.14em] uppercase">{eyebrow}</p>
+      <h2 id={id} className="text-xl font-bold md:text-2xl">
+        {title}
+      </h2>
+      {description && <p className="text-muted mt-1 max-w-3xl text-sm leading-6">{description}</p>}
+      {children}
     </div>
   );
 }

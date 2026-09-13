@@ -1,125 +1,135 @@
-'use client';
+import {
+  Activity,
+  Flame,
+  ShieldAlert,
+  TrendingDown,
+  TrendingUp,
+  type LucideIcon,
+} from 'lucide-react';
+import { FORM_THRESHOLDS, formVerdict, signedRating } from '@/lib/cs2/form-display';
+import type { FormCategory, PlayerFormAnalysis } from '@/lib/cs2/trends';
 
-import { Activity, Flame, ShieldAlert, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
-import type { PlayerFormAnalysis } from '@/lib/cs2/trends';
+const CATEGORY_STYLES: Record<
+  FormCategory,
+  { icon: LucideIcon; badge: string; iconClassName: string }
+> = {
+  surging: {
+    icon: Flame,
+    badge: 'border-emerald-400 bg-emerald-100 text-emerald-900',
+    iconClassName: 'text-emerald-700',
+  },
+  in_form: {
+    icon: TrendingUp,
+    badge: 'border-emerald-300 bg-emerald-50 text-emerald-900',
+    iconClassName: 'text-emerald-700',
+  },
+  stable: {
+    icon: Activity,
+    badge: 'border-border bg-surface text-foreground',
+    iconClassName: 'text-muted',
+  },
+  cooling: {
+    icon: TrendingDown,
+    badge: 'border-amber-300 bg-amber-50 text-amber-900',
+    iconClassName: 'text-amber-700',
+  },
+  slump: {
+    icon: ShieldAlert,
+    badge: 'border-rose-300 bg-rose-50 text-rose-900',
+    iconClassName: 'text-rose-700',
+  },
+};
 
-export function Cs2FormStatusMeter({ form }: { form: PlayerFormAnalysis }) {
-  const isPositiveDelta = form.formDelta > 0;
-  const deltaSign = isPositiveDelta ? `+${form.formDelta.toFixed(2)}` : form.formDelta.toFixed(2);
-
-  const getBadgeStyle = () => {
-    switch (form.formCategory) {
-      case 'surging':
-        return {
-          container: 'bg-amber-100/70 border-amber-300 text-amber-950',
-          icon: Flame,
-          iconColor: 'text-amber-700',
-          tag: 'SURGING / PEAK FORM',
-          desc: 'Playing significantly above personal career baseline. Top-tier fragging and high impact.',
-        };
-      case 'in_form':
-        return {
-          container: 'bg-emerald-100/70 border-emerald-300 text-emerald-950',
-          icon: TrendingUp,
-          iconColor: 'text-emerald-700',
-          tag: 'IN FORM',
-          desc: 'Consistent positive rating momentum across recent series.',
-        };
-      case 'cooling':
-        return {
-          container: 'bg-orange-100/70 border-orange-300 text-orange-950',
-          icon: TrendingDown,
-          iconColor: 'text-orange-700',
-          tag: 'COOLING OFF',
-          desc: 'Recent output is running slightly behind normal career averages.',
-        };
-      case 'slump':
-        return {
-          container: 'bg-rose-100/70 border-rose-300 text-rose-950',
-          icon: ShieldAlert,
-          iconColor: 'text-rose-700',
-          tag: 'SLUMPING',
-          desc: 'Significant dip below career standards over the past 10 maps.',
-        };
-      default:
-        return {
-          container: 'bg-surface border-border text-foreground',
-          icon: Activity,
-          iconColor: 'text-muted',
-          tag: 'AT BASELINE',
-          desc: 'Performing right at established career average.',
-        };
-    }
-  };
-
-  const badge = getBadgeStyle();
-  const BadgeIcon = badge.icon;
+/** One-line verdict shown above the form chart. */
+export function Cs2FormVerdict({ form }: { form: PlayerFormAnalysis }) {
+  const style = CATEGORY_STYLES[form.formCategory];
+  const Icon = style.icon;
+  const verdict = formVerdict(form);
 
   return (
+    <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+      <span
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-mono text-xs font-bold tracking-wide uppercase ${style.badge}`}
+      >
+        <Icon aria-hidden="true" size={14} className={style.iconClassName} />
+        {verdict.title} {signedRating(form.formDelta)}
+      </span>
+      <span className="text-muted">{verdict.summary}</span>
+    </p>
+  );
+}
+
+export function Cs2FormStats({ form, totalMaps }: { form: PlayerFormAnalysis; totalMaps: number }) {
+  const recentCount = form.recentMaps.length;
+  const bestMap = form.recentMaps.reduce<PlayerFormAnalysis['recentMaps'][number] | null>(
+    (best, map) => (!best || map.rating > best.rating ? map : best),
+    null,
+  );
+
+  return (
+    <div className="space-y-3">
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat
+          label="Career average"
+          value={form.careerAvgRating.toFixed(2)}
+          detail={`Across ${totalMaps} maps`}
+        />
+        <Stat
+          label="Impact maps"
+          value={`${form.impactRate}%`}
+          detail={`Of the last ${recentCount} rated 1.15 or higher`}
+        />
+        <Stat
+          label="Current streak"
+          value={`${form.currentStreak.count} ${form.currentStreak.count === 1 ? 'map' : 'maps'}`}
+          detail={
+            form.currentStreak.isPositive
+              ? 'In a row rated 1.00 or higher'
+              : 'In a row rated below 1.00'
+          }
+        />
+        {bestMap && (
+          <Stat
+            label={`Best of last ${recentCount}`}
+            value={bestMap.rating.toFixed(2)}
+            detail={`${bestMap.mapName} vs ${bestMap.opponent}`}
+          />
+        )}
+      </dl>
+
+      <p className="text-muted text-xs leading-5">
+        The verdict comes from the gap between the last 10 maps and the career average: within{' '}
+        {FORM_THRESHOLDS.inForm.toFixed(2)} is at career level, {FORM_THRESHOLDS.inForm.toFixed(2)}{' '}
+        or more is in form or cooling off, and {FORM_THRESHOLDS.surging.toFixed(2)} or more is
+        surging or slumping.
+      </p>
+    </div>
+  );
+}
+
+function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <div className="border-border bg-surface min-w-0 rounded-lg border p-4">
+      <dt className="text-muted font-mono text-xs tracking-wide uppercase">{label}</dt>
+      <dd className="text-foreground mt-1 font-mono text-2xl font-bold">{value}</dd>
+      <dd className="text-muted mt-0.5 truncate text-xs" title={detail}>
+        {detail}
+      </dd>
+    </div>
+  );
+}
+
+export function Cs2FormStatusMeter({
+  form,
+  totalMaps,
+}: {
+  form: PlayerFormAnalysis;
+  totalMaps: number;
+}) {
+  return (
     <div className="space-y-4">
-      {/* Top Banner Verdict */}
-      <div className={`border rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${badge.container}`}>
-        <div className="flex items-center gap-3.5">
-          <div className="p-2.5 rounded-md bg-white/60 shadow-xs shrink-0">
-            <BadgeIcon size={24} className={badge.iconColor} />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-sm font-bold tracking-wider">{badge.tag}</span>
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-white/80 border border-black/10 font-bold text-foreground">
-                {deltaSign} vs Career
-              </span>
-            </div>
-            <p className="text-xs text-foreground/80 mt-1">{badge.desc}</p>
-          </div>
-        </div>
-
-        <div className="font-mono text-xs flex sm:flex-col items-baseline sm:items-end justify-between border-t sm:border-t-0 border-black/10 pt-3 sm:pt-0">
-          <span className="text-foreground/75 font-semibold">Current 10-Map Rating:</span>
-          <span className="text-2xl font-bold text-foreground">{form.currentFormRating.toFixed(2)}</span>
-        </div>
-      </div>
-
-      {/* 4 Supporting Metrics Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="border-border bg-surface rounded-lg border p-3.5">
-          <span className="text-muted block font-mono text-[11px] uppercase">Career Baseline</span>
-          <span className="font-mono text-2xl font-bold text-foreground mt-1 block">
-            {form.careerAvgRating.toFixed(2)}
-          </span>
-          <span className="text-muted text-[10px] block mt-0.5">All-time MVP CS2 events</span>
-        </div>
-
-        <div className="border-border bg-surface rounded-lg border p-3.5">
-          <span className="text-muted block font-mono text-[11px] uppercase">Form Momentum</span>
-          <span
-            className={`font-mono text-2xl font-bold mt-1 block ${
-              isPositiveDelta ? 'text-emerald-800' : 'text-rose-800'
-            }`}
-          >
-            {deltaSign}
-          </span>
-          <span className="text-muted text-[10px] block mt-0.5">Net delta per map</span>
-        </div>
-
-        <div className="border-border bg-surface rounded-lg border p-3.5">
-          <span className="text-muted block font-mono text-[11px] uppercase">Impact Map Rate</span>
-          <span className="font-mono text-2xl font-bold text-sky-900 mt-1 block">
-            {form.impactRate}%
-          </span>
-          <span className="text-muted text-[10px] block mt-0.5">Last 20 with Rating &ge; 1.15</span>
-        </div>
-
-        <div className="border-border bg-surface rounded-lg border p-3.5">
-          <span className="text-muted block font-mono text-[11px] uppercase">Active Streak</span>
-          <span className="font-mono text-2xl font-bold text-amber-900 mt-1 truncate block">
-            {form.currentStreak.count} Maps
-          </span>
-          <span className="text-muted text-[10px] block mt-0.5 truncate" title={form.currentStreak.description}>
-            {form.currentStreak.description}
-          </span>
-        </div>
-      </div>
+      <Cs2FormVerdict form={form} />
+      <Cs2FormStats form={form} totalMaps={totalMaps} />
     </div>
   );
 }
