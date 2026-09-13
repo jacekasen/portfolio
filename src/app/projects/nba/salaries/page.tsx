@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PageHeader } from '@/components/PageHeader';
 import {
   SalaryExplorer,
   type SalaryExplorerInitialState,
@@ -117,18 +118,11 @@ async function loadPlayerHistory(playerId: string): Promise<PlayerSalaryRow[] | 
 function PageFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="space-y-12 pt-4 md:pt-8">
-      <header className="max-w-4xl">
-        <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-          Basketball Reference · 1984-85 onward
-        </p>
-        <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
-          NBA Salary Cap Explorer
-        </h1>
-        <p className="text-muted max-w-3xl text-lg leading-8">
-          A $3M contract in 1985 and a $50M contract today can be the same contract. Cap share —
-          salary divided by that season&apos;s salary cap — is what makes them comparable.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Basketball Reference · 1984-85 onward"
+        title="NBA Salary Cap Explorer"
+        description="A $3M contract in 1985 and a $50M contract today can be the same contract. Cap share — salary divided by that season's salary cap — is what makes them comparable."
+      />
 
       {children}
 

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, Github, Plane } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
 
 export const metadata = {
   title: 'Flight Tracker | Jace Kasen',
@@ -43,18 +44,11 @@ const architecture = [
 export default function FlightTrackerPage() {
   return (
     <div className="space-y-14 pt-4 md:pt-8">
-      <header className="max-w-4xl">
-        <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-          A personal alternative inspired by Flighty
-        </p>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-6xl">Flight Tracker</h1>
-        <p className="text-muted max-w-3xl text-lg leading-8">
-          I liked how the iOS app Flighty visualized your upcoming flights and travel history on a
-          globe, but its recurring subscription prompts got too annoying. So I built a similar app
-          for myself. I wanted to look up a flight, keep a private history and see every route on a
-          globe.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="A personal alternative inspired by Flighty"
+        title="Flight Tracker"
+        description="I liked how the iOS app Flighty visualized your upcoming flights and travel history on a globe, but its recurring subscription prompts got too annoying. So I built a similar app for myself. I wanted to look up a flight, keep a private history and see every route on a globe."
+      />
 
       <section aria-label="App screenshots" className="grid max-w-xl grid-cols-2 gap-5 md:gap-8">
         {screenshots.map((shot) => (

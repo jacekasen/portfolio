@@ -28,7 +28,6 @@ export default async function Cs2AnalysisPage({ searchParams }: PageProps) {
     return (
       <div className="space-y-8">
         <PageHeader
-          compact
           eyebrow="Professional CS2 Telemetry"
           title="Counter-Strike 2 Analysis"
           description="Interactive map-to-map performance trends using rolling window smoothing on HLTV Rating 3.0."
@@ -46,15 +45,16 @@ export default async function Cs2AnalysisPage({ searchParams }: PageProps) {
   const rawMaps = await fetchPlayerMapHistory(player);
 
   return (
-    <div className="space-y-3">
-      <PageHeader
-        compact
-        eyebrow="Professional CS2 Telemetry · 2023–2026"
-        title="Counter-Strike 2 Analysis"
-        description="Tracking map-to-map variance, peak form, and career trajectory across professional CS2 tournaments. Uses rolling window moving averages on HLTV Rating 3.0 to filter single-map noise and surface true performance momentum."
-      />
+    <div className="space-y-8">
+      <div className="space-y-6">
+        <PageHeader
+          eyebrow="Professional CS2 Telemetry · 2023–2026"
+          title="Counter-Strike 2 Analysis"
+          description="Tracking map-to-map variance, peak form, and career trajectory across professional CS2 tournaments. Uses rolling window moving averages on HLTV Rating 3.0 to filter single-map noise and surface true performance momentum."
+        />
 
-      <Cs2SubNav player={player} />
+        <Cs2SubNav player={player} />
+      </div>
 
       {rawMaps.length === 0 ? (
         <div className="border-border bg-surface rounded-lg border p-8 text-center">

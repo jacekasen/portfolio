@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PageHeader } from '@/components/PageHeader';
 import { MetricChart, type MetricSeries } from '@/components/nba/MetricChart';
 import { PlayerAutocomplete } from '@/components/nba/PlayerAutocomplete';
 import {
@@ -174,18 +175,11 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
   return (
     <div className="space-y-8">
       <div className="space-y-6">
-        <header className="max-w-4xl">
-          <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-            Basketball Reference · 1976–2026
-          </p>
-          <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
-            NBA Performance Trends
-          </h1>
-          <p className="text-muted text-lg leading-7">
-            Follow one player from season-by-season performance to a probabilistic forecast of what
-            comes next.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Basketball Reference · 1976–2026"
+          title="NBA Performance Trends"
+          description="Follow one player from season-by-season performance to a probabilistic forecast of what comes next."
+        />
 
         <form
           aria-label="Choose player and statistic"

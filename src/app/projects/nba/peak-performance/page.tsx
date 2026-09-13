@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PageHeader } from '@/components/PageHeader';
 import { PeakPerformanceDashboard } from '@/components/nba/PeakPerformanceDashboard';
 import { getPeakPerformanceData } from '@/lib/nba/peak-performance';
 
@@ -14,27 +15,27 @@ export default async function PeakPerformancePage() {
 
   return (
     <div className="space-y-14 pt-4 md:space-y-18 md:pt-8">
-      <header>
-        <p className="text-accent mb-2 font-mono text-xs tracking-[0.16em] uppercase">
-          NBA Analysis · {data.meta.startSeason}–{data.meta.endSeason}
-        </p>
-        <h1 className="mb-4 max-w-4xl text-4xl font-bold tracking-tight md:text-5xl">
-          When do NBA players reach peak performance?
-        </h1>
-        <p className="text-muted max-w-3xl text-lg leading-8">
-          An interactive look at {data.meta.eligiblePlayers.toLocaleString()} qualifying careers
-          suggests a broad prime rather than one universal peak age. Across five advanced metrics,
-          the typical player’s strongest observed three-season stretch arrives around age 25–26.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-5 font-mono text-sm">
-          <Link href="/projects/nba/performance-trends" className="text-accent hover:underline">
-            explore individual careers →
-          </Link>
-          <Link href="/projects/nba" className="text-accent hover:underline">
-            all NBA analyses →
-          </Link>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow={`NBA Analysis · ${data.meta.startSeason}–${data.meta.endSeason}`}
+        title="When do NBA players reach peak performance?"
+        description={
+          <>
+            <p>
+              An interactive look at {data.meta.eligiblePlayers.toLocaleString()} qualifying careers
+              suggests a broad prime rather than one universal peak age. Across five advanced metrics,
+              the typical player’s strongest observed three-season stretch arrives around age 25–26.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-5 font-mono text-sm">
+              <Link href="/projects/nba/performance-trends" className="text-accent hover:underline">
+                explore individual careers →
+              </Link>
+              <Link href="/projects/nba" className="text-accent hover:underline">
+                all NBA analyses →
+              </Link>
+            </div>
+          </>
+        }
+      />
 
       <section className="bg-ink rounded-lg p-5 md:p-7">
         <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
