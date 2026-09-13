@@ -32,7 +32,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ptSerif.variable} ${jetbrainsMono.variable} font-serif antialiased`}>
+      {/* Browser extensions can add classes/attributes to <body> before hydration. This only
+          silences mismatches on <body>'s own attributes, not on anything rendered inside it. */}
+      <body
+        className={`${ptSerif.variable} ${jetbrainsMono.variable} font-serif antialiased`}
+        suppressHydrationWarning
+      >
         <Shell>{children}</Shell>
         <Analytics />
         <SpeedInsights />
