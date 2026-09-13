@@ -482,6 +482,28 @@
       ]
     },
     {
+      "player": "molodoy",
+      "team": "FURIA",
+      "role": "AWPer (Sniper)",
+      "country": "KZ",
+      "totalKills": 2476,
+      "totalDeaths": 1548,
+      "headshotPct": 30.1,
+      "avgDistanceMeters": 21.7,
+      "openingDuelWinPct": 68.4,
+      "maps": [
+        "mirage",
+        "inferno",
+        "nuke",
+        "ancient",
+        "anubis",
+        "dust2",
+        "overpass",
+        "train",
+        "cache"
+      ]
+    },
+    {
       "player": "ropz",
       "team": "FaZe Clan",
       "role": "Lurker / Anchor",
@@ -491,6 +513,29 @@
       "headshotPct": 52.7,
       "avgDistanceMeters": 17.0,
       "openingDuelWinPct": 64.3,
+      "maps": [
+        "mirage",
+        "inferno",
+        "nuke",
+        "ancient",
+        "anubis",
+        "dust2",
+        "vertigo",
+        "overpass",
+        "train",
+        "cache"
+      ]
+    },
+    {
+      "player": "sh1ro",
+      "team": "Team Spirit",
+      "role": "AWPer (Sniper)",
+      "country": "RU",
+      "totalKills": 2203,
+      "totalDeaths": 1354,
+      "headshotPct": 32.3,
+      "avgDistanceMeters": 20.0,
+      "openingDuelWinPct": 68.0,
       "maps": [
         "mirage",
         "inferno",

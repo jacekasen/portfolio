@@ -2,19 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  Crosshair,
-  Flame,
-  Layers,
-  MapPin,
-  Maximize2,
-  Search,
-  Shield,
-  Sliders,
-  Sparkles,
-  Target,
-  Zap,
-} from 'lucide-react';
+import { Crosshair, Flame, Maximize2, Shield, Target, Zap } from 'lucide-react';
+import { Cs2RadarPlayerSearch } from './Cs2RadarPlayerSearch';
 import {
   ANGLES_KERNEL_RADIUS,
   computeRadarMetrics,
@@ -41,34 +30,33 @@ type Props = {
   initialMap?: string;
 };
 
+const HEATMAP_THEME: HeatmapTheme = 'cyber';
+const HEATMAP_OPACITY = 0.85;
+const MIN_POINT_INTENSITY = 0.07;
+const MAX_POINT_INTENSITY = 0.16;
+
 export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const selectedPlayer = searchParams.get('player') || initialPlayer || 'donk';
-  const availableMaps = useMemo(
-    () => manifest.allMaps || manifest.activeMaps || [],
-    [manifest],
+  const activePlayerSummary = useMemo(
+    () => manifest.players.find((p) => p.player.toLowerCase() === selectedPlayer.toLowerCase()),
+    [manifest.players, selectedPlayer],
   );
+  const availableMaps = useMemo(() => manifest.allMaps || manifest.activeMaps || [], [manifest]);
   const [selectedMap, setSelectedMap] = useState<string>(
     initialMap || availableMaps[0] || 'mirage',
   );
   const [perspective, setPerspective] = useState<RadarPerspective>('attacker');
   const [combatSide, setCombatSide] = useState<CombatSide>('all');
   const [weaponCategory, setWeaponCategory] = useState<WeaponCategory>('all');
-  const [headshotsOnly, setHeadshotsOnly] = useState(false);
   const [firstKillOnly, setFirstKillOnly] = useState(false);
   const [tradeKillOnly, setTradeKillOnly] = useState(false);
-  const [opponentQuery, setOpponentQuery] = useState('');
 
-  // Advanced Heatmap Customization States
-  const [heatmapTheme, setHeatmapTheme] = useState<HeatmapTheme>('thermal');
-  const [showKillPins, setShowKillPins] = useState(true);
-  const [showHotspots, setShowHotspots] = useState(true);
-  const [heatmapOpacity, setHeatmapOpacity] = useState(0.85);
+  const [showKillPins, setShowKillPins] = useState(false);
 
   const [playerDetail, setPlayerDetail] = useState<RadarPlayerDetail | null>(null);
-  const [loading, setLoading] = useState(true);
   const [hoveredEvent, setHoveredEvent] = useState<RadarKillEvent | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
@@ -92,11 +80,9 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
     async function loadPlayerData() {
       if (cacheRef.current.has(selectedPlayer)) {
         setPlayerDetail(cacheRef.current.get(selectedPlayer)!);
-        setLoading(false);
         return;
       }
 
-      setLoading(true);
       try {
         const res = await fetch(`/data/cs2/radar/${encodeURIComponent(selectedPlayer)}.json`);
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -104,11 +90,9 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
         if (!isCancelled) {
           cacheRef.current.set(selectedPlayer, data);
           setPlayerDetail(data);
-          setLoading(false);
         }
       } catch (err) {
         console.error('Failed to load CS2 radar data for player:', selectedPlayer, err);
-        if (!isCancelled) setLoading(false);
       }
     }
 
@@ -143,21 +127,11 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
       perspective,
       side: combatSide,
       weaponCategory,
-      headshotsOnly,
+      headshotsOnly: false,
       firstKillOnly,
       tradeKillOnly,
-      searchOpponent: opponentQuery,
     }),
-    [
-      selectedMap,
-      perspective,
-      combatSide,
-      weaponCategory,
-      headshotsOnly,
-      firstKillOnly,
-      tradeKillOnly,
-      opponentQuery,
-    ],
+    [selectedMap, perspective, combatSide, weaponCategory, firstKillOnly, tradeKillOnly],
   );
 
   const { events: activeEvents } = useMemo(() => {
@@ -270,8 +244,12 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
       densityCtx.globalCompositeOperation = 'lighter';
 
       const baseRadius = ANGLES_KERNEL_RADIUS;
-      // Dynamic intensity scaling so low or high event counts maintain optimal contrast
-      const intensity = Math.max(0.12, Math.min(0.38, 45 / Math.sqrt(activeEvents.length + 1)));
+      const renderedPointCount = activeEvents.length * (perspective === 'both' ? 2 : 1);
+      // Normalize exposure by rendered point count so overlapping events retain color detail.
+      const intensity = Math.max(
+        MIN_POINT_INTENSITY,
+        Math.min(MAX_POINT_INTENSITY, 1.8 / Math.sqrt(renderedPointCount + 1)),
+      );
 
       for (const ev of activeEvents) {
         const pointsToDraw: { rx: number; ry: number }[] = [];
@@ -304,7 +282,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
       // Colorize using Palette Transfer LUT
       const densityImageData = densityCtx.getImageData(0, 0, bufferSize, bufferSize);
       const data = densityImageData.data;
-      const palette = getPaletteLUT(heatmapTheme);
+      const palette = getPaletteLUT(HEATMAP_THEME);
       const len = data.length;
 
       for (let i = 0; i < len; i += 4) {
@@ -314,7 +292,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
           data[i] = palette[lutIndex]; // R
           data[i + 1] = palette[lutIndex + 1]; // G
           data[i + 2] = palette[lutIndex + 2]; // B
-          data[i + 3] = Math.min(255, Math.round(palette[lutIndex + 3] * heatmapOpacity));
+          data[i + 3] = Math.min(255, Math.round(palette[lutIndex + 3] * HEATMAP_OPACITY));
         }
       }
 
@@ -365,50 +343,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
         }
       }
     }
-
-    // 4. Tactical Hotspot Rings & Callouts
-    if (showHotspots && spatialHotspots.length > 0) {
-      spatialHotspots.forEach((spot, idx) => {
-        const hPt = toCanvasCoords(spot.x, spot.y, width, height);
-
-        // Concentric tactical targeting circle
-        ctx.save();
-        ctx.strokeStyle = idx === 0 ? '#facc15' : idx === 1 ? '#38bdf8' : '#a855f7';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([3, 3]);
-        ctx.beginPath();
-        ctx.arc(hPt.x, hPt.y, 22, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Small badge pill
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-        ctx.beginPath();
-        ctx.roundRect(hPt.x - 16, hPt.y - 32, 32, 16, 4);
-        ctx.fill();
-        ctx.strokeStyle = idx === 0 ? '#facc15' : idx === 1 ? '#38bdf8' : '#a855f7';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 9px monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(`#${idx + 1}`, hPt.x, hPt.y - 24);
-        ctx.restore();
-      });
-    }
-  }, [
-    activeEvents,
-    perspective,
-    heatmapTheme,
-    heatmapOpacity,
-    showKillPins,
-    showHotspots,
-    hoveredEvent,
-    spatialHotspots,
-    getPaletteLUT,
-  ]);
+  }, [activeEvents, perspective, showKillPins, hoveredEvent, getPaletteLUT]);
 
   useEffect(() => {
     renderCanvas();
@@ -459,33 +394,35 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
     setTooltipPos(null);
   };
 
-  const activePlayerProfile = manifest.players.find((p) => p.player === selectedPlayer);
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Pro Player Search & Popular Players */}
+      <Cs2RadarPlayerSearch
+        manifest={manifest}
+        selectedPlayer={selectedPlayer}
+        onSelectPlayer={handlePlayerChange}
+      />
+
       {/* Top Filter Bar */}
-      <div className="border-border bg-surface rounded-lg border p-4 space-y-4">
-        {/* Row 1: Player & Map Selectors */}
+      <div className="border-border bg-surface space-y-3 rounded-lg border p-3">
+        {/* Row 1: Active Player Profile Badge & Map Tabs */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* Player Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-muted font-mono text-xs uppercase tracking-wider">Player:</span>
-            <select
-              value={selectedPlayer}
-              onChange={(e) => handlePlayerChange(e.target.value)}
-              className="border-border bg-background text-foreground rounded-md border px-3 py-1.5 font-mono text-xs font-bold focus:outline-none focus:ring-1 focus:ring-accent"
-            >
-              {manifest.players.map((p) => (
-                <option key={p.player} value={p.player}>
-                  {p.player} {p.role ? `(${p.role})` : ''}
-                </option>
-              ))}
-            </select>
-            {activePlayerProfile && (
-              <span className="border-border bg-black/5 dark:bg-white/5 text-muted hidden rounded px-2 py-0.5 font-mono text-[11px] sm:inline-block">
-                {activePlayerProfile.country ? `${activePlayerProfile.country} · ` : ''}
-                {activePlayerProfile.role}
+          {/* Active Player Profile Badge */}
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <span className="text-muted tracking-wider uppercase">Active:</span>
+            <span className="text-foreground font-bold">
+              {activePlayerSummary?.player || selectedPlayer}
+            </span>
+            {activePlayerSummary?.team && (
+              <span className="text-muted">· {activePlayerSummary.team}</span>
+            )}
+            {activePlayerSummary?.role && (
+              <span className="border-border bg-background text-muted rounded border px-1.5 py-0.5 text-[10px]">
+                {activePlayerSummary.role}
               </span>
+            )}
+            {activePlayerSummary?.country && (
+              <span className="text-muted text-[11px]">({activePlayerSummary.country})</span>
             )}
           </div>
 
@@ -496,7 +433,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                 key={map}
                 type="button"
                 onClick={() => setSelectedMap(map)}
-                className={`rounded px-2.5 py-1 font-mono text-xs transition-colors ${
+                className={`rounded px-2 py-1 font-mono text-xs transition-colors ${
                   selectedMap === map
                     ? 'bg-accent text-background font-bold'
                     : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
@@ -508,8 +445,8 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
           </div>
         </div>
 
-        {/* Row 2: Perspective, Combat Side Separator & Color Palette */}
-        <div className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-t pt-3 font-mono text-xs">
+        {/* Row 2: Perspective & Combat Side */}
+        <div className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-t pt-2 font-mono text-xs">
           {/* Perspective Buttons */}
           <div className="flex items-center gap-1">
             <span className="text-muted mr-1">Perspective:</span>
@@ -524,7 +461,11 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                     : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
-                {mode === 'attacker' ? 'Kills (Attacker)' : mode === 'victim' ? 'Deaths (Victim)' : 'All Positions'}
+                {mode === 'attacker'
+                  ? 'Kills (Attacker)'
+                  : mode === 'victim'
+                    ? 'Deaths (Victim)'
+                    : 'All Positions'}
               </button>
             ))}
           </div>
@@ -540,14 +481,14 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                 className={`rounded px-2.5 py-1 transition-colors ${
                   combatSide === s
                     ? s === 'T'
-                      ? 'bg-amber-600 text-white font-bold'
+                      ? 'bg-amber-600 font-bold text-white'
                       : s === 'CT'
-                        ? 'bg-blue-600 text-white font-bold'
+                        ? 'bg-blue-600 font-bold text-white'
                         : 'bg-ink text-on-ink font-bold'
                     : s === 'T'
-                      ? 'text-amber-500 hover:text-amber-400 hover:bg-amber-500/10'
+                      ? 'text-amber-500 hover:bg-amber-500/10 hover:text-amber-400'
                       : s === 'CT'
-                        ? 'text-blue-500 hover:text-blue-400 hover:bg-blue-500/10'
+                        ? 'text-blue-500 hover:bg-blue-500/10 hover:text-blue-400'
                         : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
@@ -555,29 +496,10 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
               </button>
             ))}
           </div>
-
-          {/* Thermal Palette Themes */}
-          <div className="flex items-center gap-1">
-            <span className="text-muted mr-1">Palette:</span>
-            {(['thermal', 'cyber', 'crimson'] as const).map((theme) => (
-              <button
-                key={theme}
-                type="button"
-                onClick={() => setHeatmapTheme(theme)}
-                className={`rounded px-2.5 py-1 text-[11px] transition-colors ${
-                  heatmapTheme === theme
-                    ? 'bg-accent text-background font-bold'
-                    : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
-                }`}
-              >
-                {HEATMAP_PALETTES[theme].name}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Row 3: Weapon Category Pills */}
-        <div className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-t pt-3 font-mono text-xs">
+        <div className="border-border/60 flex flex-wrap items-center justify-between gap-2 border-t pt-2 font-mono text-xs">
           <div className="flex items-center gap-1">
             <span className="text-muted mr-1">Weapon:</span>
             {(['all', 'rifles', 'snipers', 'pistols', 'smg_heavy'] as const).map((cat) => (
@@ -585,7 +507,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                 key={cat}
                 type="button"
                 onClick={() => setWeaponCategory(cat)}
-                className={`rounded px-2 py-0.5 text-[11px] transition-colors ${
+                className={`rounded px-1.5 py-0.5 text-[11px] transition-colors ${
                   weaponCategory === cat
                     ? 'bg-accent text-background font-bold'
                     : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
@@ -604,8 +526,8 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
             ))}
           </div>
 
-          {/* Overlays & Toggles */}
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Display & Filter Toggles */}
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
             <label className="flex cursor-pointer items-center gap-1.5 select-none">
               <input
                 type="checkbox"
@@ -615,30 +537,6 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
               />
               <span className={showKillPins ? 'text-foreground font-bold' : 'text-muted'}>
                 Kill Pins
-              </span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-1.5 select-none">
-              <input
-                type="checkbox"
-                checked={showHotspots}
-                onChange={(e) => setShowHotspots(e.target.checked)}
-                className="accent-accent h-3.5 w-3.5 rounded"
-              />
-              <span className={showHotspots ? 'text-foreground font-bold' : 'text-muted'}>
-                Hotspot Callouts
-              </span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-1.5 select-none">
-              <input
-                type="checkbox"
-                checked={headshotsOnly}
-                onChange={(e) => setHeadshotsOnly(e.target.checked)}
-                className="accent-accent h-3.5 w-3.5 rounded"
-              />
-              <span className={headshotsOnly ? 'text-foreground font-bold' : 'text-muted'}>
-                Headshots Only
               </span>
             </label>
 
@@ -666,35 +564,14 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
               </span>
             </label>
           </div>
-
-          {/* Opponent Filter Search */}
-          <div className="flex items-center gap-1.5">
-            <Search size={13} className="text-muted" />
-            <input
-              type="text"
-              placeholder="Search opponent pro..."
-              value={opponentQuery}
-              onChange={(e) => setOpponentQuery(e.target.value)}
-              className="border-border bg-background text-foreground w-36 rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-            {opponentQuery && (
-              <button
-                type="button"
-                onClick={() => setOpponentQuery('')}
-                className="text-muted hover:text-foreground text-[10px]"
-              >
-                Clear
-              </button>
-            )}
-          </div>
         </div>
       </div>
 
       {/* Main Radar Display & Stats Split */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         {/* Left Column: Interactive Radar Canvas */}
-        <div className="lg:col-span-8 flex flex-col items-center">
-          <div className="border-border bg-slate-950 relative aspect-square w-full max-w-[720px] overflow-hidden rounded-xl border shadow-2xl">
+        <div className="flex flex-col items-center lg:col-span-8">
+          <div className="border-border relative aspect-square w-full max-w-[720px] overflow-hidden rounded-xl border bg-slate-950 shadow-2xl">
             <canvas
               ref={canvasRef}
               width={1024}
@@ -704,8 +581,8 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
               className="h-full w-full cursor-crosshair object-contain"
             />
 
-            {/* Thermal Gradient Legend */}
-            <div className="bg-slate-950/90 pointer-events-none absolute bottom-3 left-3 rounded-md border border-white/10 p-2 font-mono text-[10px] text-white/90 backdrop-blur-md">
+            {/* Cyber Neon Density Legend */}
+            <div className="pointer-events-none absolute bottom-3 left-3 rounded-md border border-white/10 bg-slate-950/90 p-2 font-mono text-[10px] text-white/90 backdrop-blur-md">
               <div className="mb-1 flex items-center justify-between text-[9px] text-white/60 uppercase">
                 <span>Low Density</span>
                 <span>Peak Core</span>
@@ -714,24 +591,20 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                 className="h-2 w-36 rounded-full"
                 style={{
                   background:
-                    heatmapTheme === 'thermal'
-                      ? 'linear-gradient(to right, #1e3a8a, #06b6d4, #22c55e, #eab308, #ef4444, #ffffff)'
-                      : heatmapTheme === 'cyber'
-                        ? 'linear-gradient(to right, #4c1d95, #a855f7, #ec4899, #fb923c, #facc15, #ffffff)'
-                        : 'linear-gradient(to right, #7f1d1d, #dc2626, #ea580c, #facc15, #ffffff)',
+                    'linear-gradient(to right, transparent 0%, #4c1d95 8%, #a855f7 28%, #ec4899 52%, #fb923c 74%, #facc15 90%, #fef08a 98.5%, #ffffff 100%)',
                 }}
               />
             </div>
 
             {/* Map Identifier & Side Badge */}
-            <div className="bg-slate-950/90 pointer-events-none absolute top-3 right-3 flex items-center gap-2 rounded-md border border-white/10 px-2.5 py-1 font-mono text-xs font-bold text-white/90 uppercase tracking-wider backdrop-blur-md">
+            <div className="pointer-events-none absolute top-3 right-3 flex items-center gap-2 rounded-md border border-white/10 bg-slate-950/90 px-2.5 py-1 font-mono text-xs font-bold tracking-wider text-white/90 uppercase backdrop-blur-md">
               <span>de_{selectedMap}</span>
               {combatSide !== 'all' && (
                 <span
                   className={`rounded px-1.5 py-0.5 text-[10px] ${
                     combatSide === 'T'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                      : 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                      ? 'border border-amber-500/40 bg-amber-500/20 text-amber-300'
+                      : 'border border-blue-500/40 bg-blue-500/20 text-blue-300'
                   }`}
                 >
                   {combatSide === 'T' ? 'T Side' : 'CT Side'}
@@ -742,18 +615,18 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
             {/* Tactical HUD Hover Tooltip */}
             {hoveredEvent && tooltipPos && (
               <div
-                className="bg-slate-950/95 pointer-events-none absolute z-20 w-64 -translate-x-1/2 -translate-y-full rounded-lg border border-white/20 p-3 font-mono text-xs text-white shadow-2xl backdrop-blur-md"
+                className="pointer-events-none absolute z-20 w-64 -translate-x-1/2 -translate-y-full rounded-lg border border-white/20 bg-slate-950/95 p-3 font-mono text-xs text-white shadow-2xl backdrop-blur-md"
                 style={{
                   left: Math.min(Math.max(tooltipPos.x, 130), 590),
                   top: Math.max(tooltipPos.y - 12, 80),
                 }}
               >
                 <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-[11px]">
-                  <span className="text-emerald-400 font-bold">
+                  <span className="font-bold text-emerald-400">
                     {perspective === 'victim' ? hoveredEvent.opp : selectedPlayer}
                   </span>
                   <span className="text-white/50">eliminated</span>
-                  <span className="text-rose-400 font-bold">
+                  <span className="font-bold text-rose-400">
                     {perspective === 'victim' ? selectedPlayer : hoveredEvent.opp}
                   </span>
                 </div>
@@ -782,8 +655,8 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                     <span
                       className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
                         hoveredEvent.s === 'T'
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                          : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                          ? 'border border-amber-500/30 bg-amber-500/20 text-amber-300'
+                          : 'border border-blue-500/30 bg-blue-500/20 text-blue-300'
                       }`}
                     >
                       {hoveredEvent.s === 'T' ? 'T Side' : 'CT Side'}
@@ -811,7 +684,21 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
         </div>
 
         {/* Right Column: Tactical Telemetry & Hotspots Sidebar */}
-        <div className="lg:col-span-4 space-y-4">
+        <div className="space-y-4 lg:col-span-4">
+          {/* Tactical Spatial Insight Note */}
+          <div className="border-border bg-surface/50 text-muted rounded-lg border p-3 font-mono text-xs leading-4">
+            <div className="text-foreground mb-1 flex items-center gap-1.5 font-bold">
+              <Shield size={14} className="text-accent" />
+              <span>Continuous Density Kernel</span>
+            </div>
+            <p className="text-[11px]">
+              The Cyber Neon density engine applies a continuous 2D Gaussian radial kernel over
+              tick-level Source 2 coordinates, mapped through an offscreen 256-color transfer lookup
+              table. Violet, pink, and amber peaks highlight dominant anchor angles and entry choke
+              points, with white reserved for the most concentrated cores.
+            </p>
+          </div>
+
           {/* Summary Metric Cards */}
           <div className="grid grid-cols-2 gap-3">
             <div className="border-border bg-surface rounded-lg border p-3">
@@ -825,9 +712,9 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                 {combatSide === 'all' && metrics.totalDuels > 0 && (
                   <>
                     <span>·</span>
-                    <span className="text-amber-500 font-semibold">{metrics.tDuelsCount} T</span>
+                    <span className="font-semibold text-amber-500">{metrics.tDuelsCount} T</span>
                     <span>·</span>
-                    <span className="text-blue-500 font-semibold">{metrics.ctDuelsCount} CT</span>
+                    <span className="font-semibold text-blue-500">{metrics.ctDuelsCount} CT</span>
                   </>
                 )}
               </div>
@@ -866,7 +753,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
           {/* Detected Tactical Hotspots Card */}
           <div className="border-border bg-surface rounded-lg border p-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <h4 className="flex items-center gap-1.5 font-mono text-xs font-bold tracking-wider uppercase">
                 <Flame size={14} className="text-accent" />
                 <span>Primary Spatial Hotspots</span>
               </h4>
@@ -895,7 +782,8 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                         #{idx + 1}
                       </span>
                       <span className="text-foreground font-semibold">
-                        Cluster {idx + 1} · ({Math.round(spot.x * 100)}%, {Math.round(spot.y * 100)}%)
+                        Cluster {idx + 1} · ({Math.round(spot.x * 100)}%, {Math.round(spot.y * 100)}
+                        %)
                       </span>
                     </div>
                     <div className="text-right">
@@ -906,48 +794,6 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
                 ))
               )}
             </div>
-          </div>
-
-          {/* Top Weapons Distribution */}
-          <div className="border-border bg-surface rounded-lg border p-4">
-            <h4 className="font-mono text-xs font-bold uppercase tracking-wider">
-              Weapon Arsenal Distribution
-            </h4>
-            <div className="mt-3 space-y-2 font-mono text-xs">
-              {metrics.topWeapons.length === 0 ? (
-                <p className="text-muted text-[11px]">No weapon telemetry available</p>
-              ) : (
-                metrics.topWeapons.map((item) => (
-                  <div key={item.weapon} className="space-y-1">
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-foreground font-bold">{item.weapon}</span>
-                      <span className="text-muted">
-                        {item.count} ({item.pct}%)
-                      </span>
-                    </div>
-                    <div className="bg-black/10 dark:bg-white/10 h-1.5 w-full overflow-hidden rounded-full">
-                      <div
-                        className="bg-accent h-full rounded-full transition-all duration-300"
-                        style={{ width: `${item.pct}%` }}
-                      />
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Tactical Spatial Insight Note */}
-          <div className="border-border bg-surface/50 text-muted rounded-lg border p-4 font-mono text-xs leading-relaxed">
-            <div className="text-foreground mb-1 flex items-center gap-1.5 font-bold">
-              <Shield size={14} className="text-accent" />
-              <span>Continuous Density Kernel</span>
-            </div>
-            <p className="text-[11px]">
-              The thermal density engine applies a continuous 2D Gaussian radial kernel over tick-level
-              Source 2 coordinates, mapped through an offscreen 256-color transfer lookup table.
-              Concentrated red/white zones highlight dominant anchor angles and entry choke points.
-            </p>
           </div>
         </div>
       </div>

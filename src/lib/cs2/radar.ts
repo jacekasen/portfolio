@@ -10,7 +10,7 @@ export type RadarPerspective = 'attacker' | 'victim' | 'both';
 
 export type CombatSide = 'all' | 'T' | 'CT';
 
-export type HeatmapTheme = 'thermal' | 'cyber' | 'crimson';
+export type HeatmapTheme = 'cyber';
 
 export type SpatialHotspot = {
   x: number; // Normalized X [0, 1]
@@ -19,42 +19,17 @@ export type SpatialHotspot = {
   pct: number;
 };
 
-export const HEATMAP_PALETTES: Record<
-  HeatmapTheme,
-  { name: string; stops: [number, string][] }
-> = {
-  thermal: {
-    name: 'Thermal Classic',
-    stops: [
-      [0.0, 'rgba(0, 0, 0, 0)'],
-      [0.15, 'rgba(30, 64, 175, 0.45)'],
-      [0.35, 'rgba(6, 182, 212, 0.65)'],
-      [0.55, 'rgba(34, 197, 94, 0.8)'],
-      [0.72, 'rgba(234, 179, 8, 0.9)'],
-      [0.88, 'rgba(239, 68, 68, 0.95)'],
-      [1.0, 'rgba(255, 255, 255, 1.0)'],
-    ],
-  },
+export const HEATMAP_PALETTES: Record<HeatmapTheme, { name: string; stops: [number, string][] }> = {
   cyber: {
     name: 'Cyber Neon',
     stops: [
       [0.0, 'rgba(0, 0, 0, 0)'],
-      [0.15, 'rgba(76, 29, 149, 0.45)'],
-      [0.35, 'rgba(168, 85, 247, 0.65)'],
-      [0.55, 'rgba(236, 72, 153, 0.8)'],
-      [0.75, 'rgba(251, 146, 60, 0.9)'],
+      [0.08, 'rgba(76, 29, 149, 0.42)'],
+      [0.28, 'rgba(168, 85, 247, 0.64)'],
+      [0.52, 'rgba(236, 72, 153, 0.8)'],
+      [0.74, 'rgba(251, 146, 60, 0.9)'],
       [0.9, 'rgba(250, 204, 21, 0.95)'],
-      [1.0, 'rgba(255, 255, 255, 1.0)'],
-    ],
-  },
-  crimson: {
-    name: 'Crimson Plasma',
-    stops: [
-      [0.0, 'rgba(0, 0, 0, 0)'],
-      [0.15, 'rgba(127, 29, 29, 0.45)'],
-      [0.4, 'rgba(220, 38, 38, 0.7)'],
-      [0.65, 'rgba(234, 88, 12, 0.85)'],
-      [0.85, 'rgba(250, 204, 21, 0.95)'],
+      [0.985, 'rgba(254, 240, 138, 0.98)'],
       [1.0, 'rgba(255, 255, 255, 1.0)'],
     ],
   },
