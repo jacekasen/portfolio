@@ -1,4 +1,5 @@
 import { createSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
+import { escapeLikePattern } from './players';
 
 export type PlayerMapStat = {
   id: number;
@@ -124,7 +125,7 @@ export async function fetchPlayerMapHistory(playerNick: string): Promise<PlayerM
         )
       )
     `)
-    .ilike('player_nick', playerNick.trim())
+    .ilike('player_nick', escapeLikePattern(playerNick.trim()))
     .order('id', { ascending: true })
     .returns<SupabaseStatRow[]>();
 
