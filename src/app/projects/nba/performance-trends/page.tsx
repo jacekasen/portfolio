@@ -152,10 +152,6 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
       ]
     : [];
   const playerSeries = series[0];
-  const latestPoint = playerSeries?.points.at(-1);
-  const peakPoint = playerSeries?.points.reduce((best, point) =>
-    point.value > best.value ? point : best,
-  );
 
   return (
     <div className="space-y-14 pt-4 md:pt-8">
@@ -241,24 +237,6 @@ export default async function NbaPage({ searchParams }: NbaPageProps) {
               )}
             </div>
 
-            <div className="mb-5 grid gap-3 sm:grid-cols-3">
-              <CareerStat
-                label="Latest"
-                value={formatMetric(latestPoint!.value, metricDetails.digits)}
-                detail={`${metricDetails.shortLabel} · ${latestPoint!.season}`}
-              />
-              <CareerStat
-                label="Career high"
-                value={formatMetric(peakPoint.value, metricDetails.digits)}
-                detail={`Age ${peakPoint.age} · ${peakPoint.season}`}
-              />
-              <CareerStat
-                label="Career span"
-                value={`${playerSeries.points.length} seasons`}
-                detail={`Ages ${playerSeries.points[0].age}–${latestPoint!.age}`}
-              />
-            </div>
-
             <div className="border-border bg-background rounded-lg border p-3 md:p-5">
               <MetricChart
                 metricLabel={metricDetails.shortLabel}
@@ -314,16 +292,6 @@ function formatMetric(value: number, digits: number) {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value);
-}
-
-function CareerStat({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <article className="border-border bg-surface rounded border p-4">
-      <p className="text-muted font-mono text-xs tracking-wide uppercase">{label}</p>
-      <p className="mt-2 font-mono text-2xl">{value}</p>
-      <p className="text-muted mt-1 text-xs">{detail}</p>
-    </article>
-  );
 }
 
 function NamesakeChooser({

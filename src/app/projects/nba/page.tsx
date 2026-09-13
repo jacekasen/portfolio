@@ -16,7 +16,7 @@ const analyses = [
     description:
       'Search for a player and follow BPM, VORP, win shares, win shares per 48 minutes or PER across their career.',
     highlights: [
-      'Career highs and league-average references',
+      'League-average reference lines for each statistic',
       'Probabilities for improving, staying stable or regressing',
       'A projected BPM change with the factors behind it',
       'Past-season forecasts labeled apart from upcoming ones',
