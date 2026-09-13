@@ -51,21 +51,21 @@ export const projects: Project[] = [
   },
   {
     title: 'Flight Tracker Mobile App',
-    eyebrow: 'A personal alternative inspired by Flighty',
+    eyebrow: 'Secure, cross-platform flight history tracking',
     kind: 'independent',
     description:
-      'A personal alternative to Flighty, without the subscription prompts — flight lookup, private trip history, a route map, and a yearly recap.',
+      'A cross-platform flight-history app with authenticated Edge Function lookups, per-user rate limiting, and row-level security isolating each user’s data.',
     buildDetails:
-      'The app is built with Expo and Supabase. A Supabase Edge Function keeps the flight-data API key off the client, cleans up provider responses, caches results and limits requests. Row-level security keeps each user’s saved flights private, with database tests covering that access.',
+      'A Supabase Edge Function validates the user’s session before proxying AeroDataBox lookups, applying persistent per-user and HMAC-hashed-IP rate limits with fifteen-minute result caching. Postgres row-level security isolates every user’s flights, with cascading deletion on account removal. The app parses alphanumeric flight numbers, stores UTC times with airport-local display, and renders all-time routes using native maps on iOS and Android and a custom globe renderer on web. Unit tests, Edge Function HTTP tests, and pgTAP database authorization tests run in continuous integration.',
     tags: ['Expo', 'React Native', 'TypeScript', 'Supabase', 'PostgreSQL', 'Deno'],
     github: 'https://github.com/jacekasen/flight-tracker',
     demo: '/projects/flight-tracker',
     video: 'https://youtu.be/ZIx8ffsGgGk',
     highlights: [
-      'Flight lookup and manual entry',
-      'A globe showing saved routes',
-      'Private histories enforced by the database',
-      'Flight times shown in each airport’s time zone',
+      'Authenticated Edge Function with per-user and IP-hashed rate limiting',
+      'Row-level security with cascading account deletion',
+      'Native maps on iOS/Android plus a custom globe renderer on web',
+      'Unit, Edge Function, and database authorization tests in CI',
     ],
   },
   {
