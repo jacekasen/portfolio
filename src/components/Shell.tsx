@@ -25,7 +25,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     { name: 'Work', href: '/work', icon: BriefcaseBusiness },
     { name: 'About', href: '/about', icon: User },
     { name: 'Writing', href: '/blog', icon: BookOpen },
-    { name: 'Résumé', href: '/jace-kasen-resume.pdf', icon: Download },
+    { name: 'Résumé', href: '/jace-kasen-resume.pdf', icon: Download, newTab: true },
   ];
 
   const activeHref = navItems
@@ -57,6 +57,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.name}
                 href={item.href}
+                target={item.newTab ? '_blank' : undefined}
+                rel={item.newTab ? 'noopener noreferrer' : undefined}
                 className={cn(
                   'rounded-md px-3 py-2 transition-colors',
                   isActiveHref(item.href)
@@ -89,6 +91,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.name}
                     href={item.href}
+                    target={item.newTab ? '_blank' : undefined}
+                    rel={item.newTab ? 'noopener noreferrer' : undefined}
                     onClick={() => setMenuOpen(false)}
                     className={cn(
                       'flex items-center gap-3 rounded-md p-3 transition-colors',
