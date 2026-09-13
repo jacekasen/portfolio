@@ -1,11 +1,10 @@
-import fs from 'fs/promises';
-import path from 'path';
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/PageHeader';
+import { Cs2RadarPlayerSearch } from '@/components/cs2/radar/Cs2RadarPlayerSearch';
 import { Cs2SubNav } from '@/components/cs2/Cs2SubNav';
 import { Cs2RadarHeatmap } from '@/components/cs2/radar/Cs2RadarHeatmap';
-import type { RadarManifest } from '@/lib/cs2/radar';
+import { getRadarManifest } from '@/lib/cs2/manifest';
 
 export const metadata: Metadata = {
   title: 'CS2 2D Radar Heatmap & Duel Analytics | Jace Kasen',
@@ -20,43 +19,12 @@ type PageProps = {
   }>;
 };
 
-async function getManifest(): Promise<RadarManifest | null> {
-  try {
-    const filePath = path.join(process.cwd(), 'public/data/cs2/radar/manifest.json');
-    const content = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(content) as RadarManifest;
-  } catch (err) {
-    console.error('Failed to load radar manifest:', err);
-    return null;
-  }
-}
-
 export default async function Cs2RadarPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const player = resolvedParams.player?.trim() || 'donk';
   const map = resolvedParams.map?.trim() || 'mirage';
 
-  const manifest = await getManifest();
-
-  if (!manifest) {
-    return (
-      <div className="space-y-8">
-        <div className="space-y-6">
-          <PageHeader
-            eyebrow="Counter-Strike 2 Spatial Telemetry"
-            title="2D Radar Kill & Duel Analytics"
-            description="Interactive engagement vectors and spatial kill distributions across active-duty competitive maps."
-          />
-          <Cs2SubNav player={player} />
-        </div>
-        <div className="border-border bg-surface rounded-lg border p-6 text-center">
-          <p className="text-muted font-mono text-sm">
-            Radar manifest not found. Please ensure public radar datasets are built.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const manifest = await getRadarManifest();
 
   return (
     <div className="space-y-8">
@@ -68,13 +36,27 @@ export default async function Cs2RadarPage({ searchParams }: PageProps) {
         />
 
         <Cs2SubNav player={player} />
+
+        <Cs2RadarPlayerSearch
+          manifest={manifest}
+          selectedPlayer={player}
+          basePath="/projects/cs2/radar"
+        />
       </div>
 
-      <Suspense
-        fallback={<div className="text-muted font-mono text-sm">Loading tactical radar...</div>}
-      >
-        <Cs2RadarHeatmap manifest={manifest} initialPlayer={player} initialMap={map} />
-      </Suspense>
+      {!manifest ? (
+        <div className="border-border bg-surface rounded-lg border p-6 text-center">
+          <p className="text-muted font-mono text-sm">
+            Radar manifest not found. Please ensure public radar datasets are built.
+          </p>
+        </div>
+      ) : (
+        <Suspense
+          fallback={<div className="text-muted font-mono text-sm">Loading tactical radar...</div>}
+        >
+          <Cs2RadarHeatmap manifest={manifest} initialPlayer={player} initialMap={map} />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import type { RadarManifest } from '@/lib/cs2/radar';
 
 export const POPULAR_PLAYERS = [
@@ -21,16 +22,47 @@ function normalizePlayerKey(name: string): string {
 }
 
 type Props = {
-  manifest: RadarManifest;
+  manifest?: RadarManifest | null;
   selectedPlayer: string;
-  onSelectPlayer: (player: string) => void;
+  onSelectPlayer?: (player: string) => void;
+  basePath?: string;
 };
 
-export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer }: Props) {
+export function Cs2RadarPlayerSearch({
+  manifest: propManifest,
+  selectedPlayer,
+  onSelectPlayer,
+  basePath,
+}: Props) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const listboxId = useId();
   const [query, setQuery] = useState(selectedPlayer);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+
+  const [fetchedManifest, setFetchedManifest] = useState<RadarManifest | null>(null);
+
+  useEffect(() => {
+    if (propManifest) return;
+
+    let isCancelled = false;
+    fetch('/data/cs2/radar/manifest.json')
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error(`Failed to load manifest: ${res.status}`);
+      })
+      .then((data: RadarManifest) => {
+        if (!isCancelled) setFetchedManifest(data);
+      })
+      .catch((err) => console.error('Error fetching radar manifest:', err));
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [propManifest]);
+
+  const manifest = propManifest ?? fetchedManifest;
 
   const [prevSelectedPlayer, setPrevSelectedPlayer] = useState(selectedPlayer);
 
@@ -44,12 +76,13 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
 
   // Candidates filtered from pre-loaded manifest players
   const filteredPlayers = useMemo(() => {
+    const players = manifest?.players ?? [];
     const q = query.trim().toLowerCase();
-    if (!q) return manifest.players;
+    if (!q) return players;
 
     const normQ = normalizePlayerKey(q);
 
-    const matches = manifest.players.filter((p) => {
+    const matches = players.filter((p) => {
       const pLower = p.player.toLowerCase();
       const pNorm = normalizePlayerKey(p.player);
       return (
@@ -78,7 +111,7 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
 
       return a.player.localeCompare(b.player);
     });
-  }, [manifest.players, query]);
+  }, [manifest?.players, query]);
 
   // Inline ghost text suggestion (exact prefix match)
   const inlineSuggestion = useMemo(() => {
@@ -108,7 +141,7 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
 
   const choosePlayer = (playerName: string) => {
     const norm = normalizePlayerKey(playerName);
-    const matched = manifest.players.find(
+    const matched = manifest?.players?.find(
       (p) =>
         p.player.toLowerCase() === playerName.toLowerCase() ||
         normalizePlayerKey(p.player) === norm,
@@ -117,7 +150,15 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
     setQuery(resolvedName);
     setIsOpen(false);
     setActiveIndex(-1);
-    onSelectPlayer(resolvedName);
+
+    if (onSelectPlayer) {
+      onSelectPlayer(resolvedName);
+    } else {
+      const params = new URLSearchParams(searchParams ? searchParams.toString() : '');
+      params.set('player', resolvedName);
+      const target = basePath ?? (typeof window !== 'undefined' ? window.location.pathname : '');
+      router.push(`${target}?${params.toString()}`);
+    }
   };
 
   const acceptInlineSuggestion = () => {
@@ -150,7 +191,12 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
       aria-label="Search and select CS2 pro players"
       className="border-border bg-surface space-y-3 rounded-lg border p-4"
     >
-      <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+      <form
+        action={basePath}
+        method="GET"
+        onSubmit={handleSubmit}
+        className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
+      >
         <div className="grid gap-1.5">
           <label
             htmlFor="cs2-radar-player-search"

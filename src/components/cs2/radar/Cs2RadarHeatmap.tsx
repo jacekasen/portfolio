@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Crosshair, Flame, Maximize2, Shield, Target, Zap } from 'lucide-react';
-import { Cs2RadarPlayerSearch } from './Cs2RadarPlayerSearch';
 import {
   ANGLES_KERNEL_RADIUS,
   computeRadarMetrics,
@@ -36,7 +35,6 @@ const MIN_POINT_INTENSITY = 0.07;
 const MAX_POINT_INTENSITY = 0.16;
 
 export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const selectedPlayer = searchParams.get('player') || initialPlayer || 'donk';
@@ -66,12 +64,6 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
 
   // Palette LUT cache
   const paletteCacheRef = useRef<Map<HeatmapTheme, Uint8ClampedArray>>(new Map());
-
-  const handlePlayerChange = (newPlayer: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('player', newPlayer);
-    router.push(`/projects/cs2/radar?${params.toString()}`);
-  };
 
   // Fetch player detail data
   useEffect(() => {
@@ -398,13 +390,6 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
 
   return (
     <div className="space-y-4">
-      {/* Pro Player Search & Popular Players */}
-      <Cs2RadarPlayerSearch
-        manifest={manifest}
-        selectedPlayer={selectedPlayer}
-        onSelectPlayer={handlePlayerChange}
-      />
-
       {/* Top Filter Bar */}
       <div className="border-border bg-surface space-y-3 rounded-lg border p-3">
         {/* Row 1: Active Player Profile Badge & Map Tabs */}

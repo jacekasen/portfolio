@@ -3,6 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { Cs2RadarPlayerSearch, POPULAR_PLAYERS } from './Cs2RadarPlayerSearch';
 import type { RadarManifest } from '@/lib/cs2/radar';
 
+const pushMock = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: pushMock }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 const mockManifest: RadarManifest = {
   version: '1.0',
   generatedAt: '2026-09-13',
@@ -267,5 +273,20 @@ describe('Cs2RadarPlayerSearch Component', () => {
     fireEvent.click(molodoyBtn);
     expect(handleSelect).toHaveBeenCalledWith('molodoy');
   });
-});
 
+  it('navigates via router.push when onSelectPlayer is omitted', () => {
+    pushMock.mockClear();
+    render(
+      <Cs2RadarPlayerSearch
+        manifest={mockManifest}
+        selectedPlayer="donk"
+        basePath="/projects/cs2/form"
+      />,
+    );
+
+    const m0nesyBtn = screen.getByRole('button', { name: /^m0NESY$/i });
+    fireEvent.click(m0nesyBtn);
+
+    expect(pushMock).toHaveBeenCalledWith('/projects/cs2/form?player=m0NESY');
+  });
+});

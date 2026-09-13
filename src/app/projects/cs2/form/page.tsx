@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Cs2FormMomentumChart } from '@/components/cs2/Cs2FormMomentumChart';
 import { Cs2FormStats, Cs2FormVerdict } from '@/components/cs2/Cs2FormStatusMeter';
-import { Cs2PlayerAutocomplete } from '@/components/cs2/Cs2PlayerAutocomplete';
+import { Cs2RadarPlayerSearch } from '@/components/cs2/radar/Cs2RadarPlayerSearch';
 import { Cs2RecentFormStrip } from '@/components/cs2/Cs2RecentFormStrip';
 import { Cs2SubNav } from '@/components/cs2/Cs2SubNav';
 import { Cs2TournamentFormTable } from '@/components/cs2/Cs2TournamentFormTable';
+import { getRadarManifest } from '@/lib/cs2/manifest';
 import { computeFormMetrics, fetchPlayerMapHistory } from '@/lib/cs2/trends';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
@@ -24,18 +24,6 @@ type PageProps = {
 };
 
 const DEFAULT_PLAYER = 'donk';
-const POPULAR_PLAYERS = [
-  'donk',
-  'ZywOo',
-  'm0NESY',
-  'NiKo',
-  'ropz',
-  'sh1ro',
-  'molodoy',
-  'frozen',
-  'XANTARES',
-  'Twistzz',
-];
 const FORM_WINDOW = 10;
 const EVENT_LIMIT = 10;
 
@@ -61,75 +49,22 @@ export default async function Cs2FormPage({ searchParams }: PageProps) {
     );
   }
 
-  const maps = await fetchPlayerMapHistory(player);
+  const [manifest, maps] = await Promise.all([getRadarManifest(), fetchPlayerMapHistory(player)]);
   const form = computeFormMetrics(maps, FORM_WINDOW);
   const playerName = form?.playerNick ?? player;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div className="space-y-6">
         <PageHeader {...HEADER} />
 
         <Cs2SubNav player={playerName} />
 
-        <section
-          aria-label="Choose a player"
-          className="border-border bg-surface flex flex-col gap-3 rounded-lg border p-3 lg:flex-row lg:items-center lg:justify-between"
-        >
-          <form
-            method="GET"
-            action="/projects/cs2/form"
-            className="flex shrink-0 items-center gap-2"
-          >
-            <label
-              htmlFor="cs2-form-search"
-              className="font-mono text-xs font-bold tracking-wide uppercase"
-            >
-              Player
-            </label>
-            <div className="min-w-0 flex-1 sm:w-64 sm:flex-none">
-              <Cs2PlayerAutocomplete
-                key={playerName}
-                inputId="cs2-form-search"
-                defaultValue={playerName}
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-accent text-background h-11 shrink-0 rounded px-4 font-mono text-sm transition-opacity hover:opacity-90"
-            >
-              Inspect
-            </button>
-          </form>
-
-          <nav aria-label="Popular players" className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="text-muted font-mono text-xs tracking-wide uppercase">Popular</span>
-            <ul className="flex flex-wrap gap-1.5 font-mono text-xs">
-              {POPULAR_PLAYERS.map((name) => {
-                const isCurrent =
-                  name.toLowerCase() === playerName.toLowerCase() ||
-                  name.toLowerCase().replace(/0/g, 'o') ===
-                    playerName.toLowerCase().replace(/0/g, 'o');
-
-                return (
-                  <li key={name}>
-                    <Link
-                      href={`/projects/cs2/form?player=${encodeURIComponent(name)}`}
-                      aria-current={isCurrent ? 'page' : undefined}
-                      className={`inline-block rounded-full border px-3 py-1 transition-colors ${
-                        isCurrent
-                          ? 'border-accent bg-accent text-background font-bold'
-                          : 'border-border bg-background hover:border-accent hover:text-accent'
-                      }`}
-                    >
-                      {name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-        </section>
+        <Cs2RadarPlayerSearch
+          manifest={manifest}
+          selectedPlayer={playerName}
+          basePath="/projects/cs2/form"
+        />
       </div>
 
       {!form ? (

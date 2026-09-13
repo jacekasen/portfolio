@@ -1,8 +1,10 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/PageHeader';
+import { Cs2RadarPlayerSearch } from '@/components/cs2/radar/Cs2RadarPlayerSearch';
 import { Cs2SubNav } from '@/components/cs2/Cs2SubNav';
 import { Cs2TrendDashboard } from '@/components/cs2/Cs2TrendDashboard';
+import { getRadarManifest } from '@/lib/cs2/manifest';
 import { fetchPlayerMapHistory } from '@/lib/cs2/trends';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
@@ -42,7 +44,10 @@ export default async function Cs2AnalysisPage({ searchParams }: PageProps) {
     );
   }
 
-  const rawMaps = await fetchPlayerMapHistory(player);
+  const [manifest, rawMaps] = await Promise.all([
+    getRadarManifest(),
+    fetchPlayerMapHistory(player),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -50,10 +55,16 @@ export default async function Cs2AnalysisPage({ searchParams }: PageProps) {
         <PageHeader
           eyebrow="Professional CS2 Telemetry · 2023–2026"
           title="Counter-Strike 2 Analysis"
-          description="Tracking map-to-map variance, peak form, and career trajectory across professional CS2 tournaments. Uses rolling window moving averages on HLTV Rating 3.0 to filter single-map noise and surface true performance momentum."
+          description="Tracking map-to-map variance of HLTV Rating 3.0, peak form, and career trajectory across professional CS2 tournaments."
         />
 
         <Cs2SubNav player={player} />
+
+        <Cs2RadarPlayerSearch
+          manifest={manifest}
+          selectedPlayer={player}
+          basePath="/projects/cs2"
+        />
       </div>
 
       {rawMaps.length === 0 ? (
