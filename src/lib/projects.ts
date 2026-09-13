@@ -18,7 +18,7 @@ export const projects: Project[] = [
     eyebrow: 'Live, map-to-map professional telemetry',
     kind: 'independent',
     description:
-      'An automated pipeline that continuously ingests and analyzes new professional CS2 matches, with interactive map-to-map performance tracking across all 65 Tier-1 tournaments to date.',
+      'A pipeline that continuously ingests new CS2 matches, with map-to-map performance tracking across 65 Tier-1 tournaments to date.',
     buildDetails:
       'Python pipelines parse Source 2 demo events and HLTV boxscores, synchronizing to a Supabase PostgreSQL backend. A live incremental syncer polls HLTV for newly concluded tournaments and automatically triggers end-to-end parsing, so the dataset grows on its own rather than needing a manual rerun. The Next.js dashboard uses server-side data fetching, Canvas visualization, map pool filtering, and moving average smoothing to analyze player form and variance.',
     tags: ['Next.js', 'TypeScript', 'Python', 'Supabase', 'PostgreSQL', 'Canvas'],

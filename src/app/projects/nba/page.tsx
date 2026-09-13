@@ -78,7 +78,7 @@ export default function NbaAnalysisPage() {
       <PageHeader
         eyebrow="A personal basketball data project"
         title="NBA Analysis"
-        description="I wanted to know when NBA players usually peak, so I collected the data and looked at it a few different ways. The project now covers individual career trends, league-wide peak patterns, next-season forecasts and salaries across different cap eras."
+        description="I wanted to know when NBA players usually peak, so I built a leakage-safe forecasting pipeline to find out. It now covers individual career trends, league-wide peak patterns, next-season forecasts corrected for survivorship bias, and salary analysis across different cap eras."
       />
 
       <section className="flex flex-col gap-5" aria-label="NBA analysis projects">
