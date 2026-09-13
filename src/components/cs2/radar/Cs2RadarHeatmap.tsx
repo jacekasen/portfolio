@@ -61,7 +61,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const mapImageRef = useRef<HTMLImageElement | null>(null);
+  const [mapImage, setMapImage] = useState<HTMLImageElement | null>(null);
   const cacheRef = useRef<Map<string, RadarPlayerDetail>>(new Map());
 
   // Palette LUT cache
@@ -104,19 +104,21 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
 
   // Preload map image
   useEffect(() => {
+    let isCancelled = false;
     const img = new Image();
     img.src = `/images/cs2/maps/de_${selectedMap}.png`;
     img.onload = () => {
-      mapImageRef.current = img;
-      renderCanvas();
+      if (!isCancelled) setMapImage(img);
     };
     img.onerror = () => {
       const fallbackImg = new Image();
       fallbackImg.src = `/images/cs2/maps/${selectedMap}.png`;
       fallbackImg.onload = () => {
-        mapImageRef.current = fallbackImg;
-        renderCanvas();
+        if (!isCancelled) setMapImage(fallbackImg);
       };
+    };
+    return () => {
+      isCancelled = true;
     };
   }, [selectedMap]);
 
@@ -184,8 +186,8 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
     ctx.clearRect(0, 0, width, height);
 
     // 1. Draw Map Background
-    if (mapImageRef.current && mapImageRef.current.complete) {
-      ctx.drawImage(mapImageRef.current, 0, 0, width, height);
+    if (mapImage && mapImage.complete) {
+      ctx.drawImage(mapImage, 0, 0, width, height);
 
       // Contrast enhancement overlay: desaturates map textures so heat glow pops
       ctx.fillStyle = 'rgba(10, 15, 28, 0.48)';
@@ -343,7 +345,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
         }
       }
     }
-  }, [activeEvents, perspective, showKillPins, hoveredEvent, getPaletteLUT]);
+  }, [activeEvents, perspective, showKillPins, hoveredEvent, getPaletteLUT, mapImage]);
 
   useEffect(() => {
     renderCanvas();

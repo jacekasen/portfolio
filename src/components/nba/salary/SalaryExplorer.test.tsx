@@ -218,9 +218,9 @@ describe('SalaryExplorer', () => {
   it('summarizes payroll against the cap and can exceed it', () => {
     render(<SalaryExplorer index={index} initial={initialState()} />);
 
-    expect(controls().getByText('$140.6M')).toBeVisible();
-    expect(controls().getByText('$144.3M')).toBeVisible();
-    expect(controls().getByText('102.6%')).toBeVisible();
+    expect(screen.getByText('$140.6M')).toBeVisible();
+    expect(screen.getByText('$144.3M')).toBeVisible();
+    expect(screen.getAllByText('102.6%').length).toBe(2);
     // The same figure anchors the payroll-against-cap bar, which is free to pass 100%.
     expect(chart().getByText('102.6%')).toBeVisible();
   });

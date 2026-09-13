@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import type { RadarManifest } from '@/lib/cs2/radar';
 
 export const POPULAR_PLAYERS = [
@@ -32,12 +32,15 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
+  const [prevSelectedPlayer, setPrevSelectedPlayer] = useState(selectedPlayer);
+
   // Synchronize input query when selectedPlayer prop changes externally
-  useEffect(() => {
+  if (prevSelectedPlayer !== selectedPlayer) {
+    setPrevSelectedPlayer(selectedPlayer);
     setQuery(selectedPlayer);
     setIsOpen(false);
     setActiveIndex(-1);
-  }, [selectedPlayer]);
+  }
 
   // Candidates filtered from pre-loaded manifest players
   const filteredPlayers = useMemo(() => {
@@ -89,10 +92,7 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
       activeCandidate ??
       filteredPlayers.find((p) => {
         const pLower = p.player.toLowerCase();
-        return (
-          pLower.startsWith(q.toLowerCase()) ||
-          normalizePlayerKey(p.player).startsWith(normQ)
-        );
+        return pLower.startsWith(q.toLowerCase()) || normalizePlayerKey(p.player).startsWith(normQ);
       })?.player;
 
     if (!candidate) return null;
@@ -150,10 +150,7 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
       aria-label="Search and select CS2 pro players"
       className="border-border bg-surface space-y-3 rounded-lg border p-4"
     >
-      <form
-        onSubmit={handleSubmit}
-        className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
-      >
+      <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
         <div className="grid gap-1.5">
           <label
             htmlFor="cs2-radar-player-search"
@@ -239,9 +236,7 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
                     return;
                   }
                   if (filteredPlayers.length > 0) {
-                    setActiveIndex((prev) =>
-                      prev <= 0 ? filteredPlayers.length - 1 : prev - 1,
-                    );
+                    setActiveIndex((prev) => (prev <= 0 ? filteredPlayers.length - 1 : prev - 1));
                   }
                 } else if (e.key === 'Escape') {
                   setIsOpen(false);
@@ -313,7 +308,10 @@ export function Cs2RadarPlayerSearch({ manifest, selectedPlayer, onSelectPlayer 
       </form>
 
       {/* Popular Players Pill Navigation */}
-      <nav aria-label="Popular players" className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1">
+      <nav
+        aria-label="Popular players"
+        className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1"
+      >
         <span className="text-muted font-mono text-xs tracking-wide uppercase">
           Popular players:
         </span>
@@ -358,7 +356,7 @@ function HighlightedText({ text, query }: { text: string; query: string }) {
   return (
     <>
       {text.slice(0, startIdx)}
-      <mark className="bg-accent-light/25 rounded-xs text-inherit font-bold">
+      <mark className="bg-accent-light/25 rounded-xs font-bold text-inherit">
         {text.slice(startIdx, endIdx)}
       </mark>
       {text.slice(endIdx)}
