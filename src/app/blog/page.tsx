@@ -16,7 +16,7 @@ export default function BlogIndex() {
       <PageHeader
         eyebrow="Notes and essays"
         title="Writing"
-        description="Mostly attempts to answer questions I could not quite leave alone."
+        description="Some academic writing and stories about me."
       />
 
       <div className="space-y-8 md:space-y-10">

@@ -19,10 +19,10 @@ export default function Work() {
       <PageHeader
         eyebrow="Selected projects"
         title="Things I've built"
-        description="Personal projects I kept building, plus coursework from UCLA."
+        description="Some of my personal projects."
       />
 
-      <section aria-labelledby="featured-heading" className="space-y-8 md:space-y-10">
+      <section aria-labelledby="featured-heading" className="space-y-6 md:space-y-8">
         <h2 id="featured-heading" className="sr-only">
           Featured projects
         </h2>
