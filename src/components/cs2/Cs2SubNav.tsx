@@ -11,15 +11,15 @@ export function Cs2SubNav({ player }: { player?: string }) {
 
   const isForm = pathname.endsWith('/form');
   const isRadar = pathname.endsWith('/radar');
-  const isTrends = !isForm && !isRadar && pathname.includes('/cs2');
+  const isTrends = pathname.endsWith('/trends') || pathname.endsWith('/map-to-map');
 
-  const trendsHref = `/projects/cs2?player=${encodeURIComponent(activePlayer)}`;
+  const trendsHref = `/projects/cs2/trends?player=${encodeURIComponent(activePlayer)}`;
   const formHref = `/projects/cs2/form?player=${encodeURIComponent(activePlayer)}`;
   const radarHref = `/projects/cs2/radar?player=${encodeURIComponent(activePlayer)}`;
 
   return (
     <div className="border-border flex items-center gap-2 border-b pb-4 font-mono text-xs">
-      <span className="text-muted mr-1 uppercase tracking-wider text-[11px]">Analysis:</span>
+      <span className="text-muted mr-1 text-[11px] tracking-wider uppercase">Analysis:</span>
       <Link
         href={trendsHref}
         className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition-colors ${
