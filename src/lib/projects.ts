@@ -90,7 +90,7 @@ export const projects: Project[] = [
       'Built a shared preprocessing and evaluation pipeline, compared several architectures, and analyzed where each approach struggled.',
     tags: ['Python', 'PyTorch', 'Sequence Models', 'CTC', 'Deep Learning'],
     github: 'https://github.com/jacekasen/ece-c147a-project-submission',
-    demo: '/blog/2026-03-20-emg-to-text-decoding',
+    demo: '/writing/2026-03-20-emg-to-text-decoding',
   },
   {
     title: 'Heavy-Duty Vehicle Site Selection',
@@ -102,6 +102,6 @@ export const projects: Project[] = [
       'Built image tiling, annotation conversion, model training, inference, and mapping steps into one working pipeline.',
     tags: ['Python', 'PyTorch', 'Computer Vision', 'Geospatial', 'Object Detection'],
     github: null,
-    demo: '/blog/2025-12-13-team41-truckdetection',
+    demo: '/writing/2025-12-13-team41-truckdetection',
   },
 ];

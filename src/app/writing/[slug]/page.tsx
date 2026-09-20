@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const postData = await getPostData(slug);
     return {
       title: `${postData.title} | Jace Kasen`,
-      description: postData.description || 'Blog post',
+      description: postData.description || 'Writing',
     };
   } catch {
     return {
@@ -54,11 +54,11 @@ export default async function Post({ params }: Props) {
               )}
               <div>
                 <Link
-                  href="/blog"
+                  href="/writing"
                   className="text-accent inline-flex items-center gap-2 font-mono text-sm font-bold transition-colors hover:underline"
                 >
                   <ArrowLeft size={16} />
-                  back to blog
+                  back to writing
                 </Link>
               </div>
             </>

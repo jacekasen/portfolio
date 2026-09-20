@@ -1,6 +1,6 @@
 # Portfolio — Jace Kasen
 
-A personal portfolio and blog built with Next.js, featuring markdown-powered content, a responsive top navigation layout, and a warm earthy design system with dark mode support.
+A personal portfolio and writing site built with Next.js, featuring markdown-powered content, a responsive top navigation layout, and a warm earthy design system.
 
 ## Tech Stack
 
@@ -100,8 +100,8 @@ src/
 │   ├── layout.tsx              # Root layout (fonts, Shell wrapper)
 │   ├── page.tsx                # Home page (hero + recent posts)
 │   ├── about/page.tsx          # About page
-│   ├── blog/
-│   │   ├── page.tsx            # Blog index
+│   ├── writing/
+│   │   ├── page.tsx            # Writing index
 │   │   └── [slug]/page.tsx     # Individual post
 │   ├── projects/nba/           # NBA analyses (trends, peak performance, salaries)
 │   ├── projects/flight-tracker/ # Flight Tracker case study
@@ -116,7 +116,7 @@ src/
 │       └── salary/             # Salary cap explorer (bars, donut, history, leaderboard)
 └── lib/
     ├── config.ts               # Site-wide constants (social links, etc.)
-    ├── posts.ts                # Markdown/blog post utilities
+    ├── posts.ts                # Markdown/writing utilities
     ├── projects.ts             # Project showcase content
     ├── supabase.ts             # Supabase database client
     ├── utils.ts                # Shared helpers (cn, etc.)
@@ -141,7 +141,7 @@ Conventions:
 
 ## Adding Content
 
-### Blog posts
+### Writing
 
 Create a new `.md` file in `content/posts/`:
 
@@ -156,7 +156,7 @@ tags: [tag1, tag2]
 Post content in markdown...
 ```
 
-The post will automatically appear on the blog index and home page.
+The post will automatically appear on the writing index and home page.
 
 ### About page
 

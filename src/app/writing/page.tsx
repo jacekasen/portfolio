@@ -8,7 +8,7 @@ export const metadata = {
   description: 'Notes on software, basketball, language, identity, and whatever else sticks.',
 };
 
-export default function BlogIndex() {
+export default function WritingIndex() {
   const allPostsData = getSortedPostsData();
 
   return (
@@ -28,7 +28,7 @@ export default function BlogIndex() {
             >
               <div className="mb-2 flex flex-col md:flex-row md:items-baseline md:justify-between">
                 <h2 className="group-hover:text-accent text-xl font-bold transition-colors">
-                  <Link href={`/blog/${id}`}>
+                  <Link href={`/writing/${id}`}>
                     <span className="absolute inset-0" />
                     {title}
                   </Link>

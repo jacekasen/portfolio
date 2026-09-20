@@ -24,7 +24,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const navItems = [
     { name: 'Work', href: '/work', icon: BriefcaseBusiness },
     { name: 'About', href: '/about', icon: User },
-    { name: 'Writing', href: '/blog', icon: BookOpen },
+    { name: 'Writing', href: '/writing', icon: BookOpen },
     { name: 'Résumé', href: '/jace-kasen-resume.pdf', icon: Download, newTab: true },
   ];
 
