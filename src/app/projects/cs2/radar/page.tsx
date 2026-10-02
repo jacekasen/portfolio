@@ -30,9 +30,13 @@ export default async function Cs2RadarPage({ searchParams }: PageProps) {
     <div className="space-y-8">
       <div className="space-y-6">
         <PageHeader
-          eyebrow="Counter-Strike 2 Spatial Telemetry · Active Duty"
+          eyebrow="Counter-Strike 2 Spatial Telemetry"
           title="2D Radar Kill & Duel Heatmap"
-          description="Explore 598,000+ tier-1 combat events through engagement vectors, spatial kill clusters, opening duels, and weapon usage."
+          description={
+            manifest?.eventCount && manifest?.matchCount
+              ? `Explore ${manifest.eventCount.toLocaleString()} positioned kills across ${manifest.matchCount.toLocaleString()} parsed matches and ${manifest.players.length} players. Select a match to inspect its combat positions.`
+              : 'Explore professional Counter-Strike 2 combat positions, opening duels, and weapon usage.'
+          }
         />
 
         <Cs2SubNav player={player} />

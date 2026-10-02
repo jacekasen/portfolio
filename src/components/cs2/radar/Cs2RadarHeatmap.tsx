@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Crosshair, Flame, Maximize2, Shield, Target, Zap } from 'lucide-react';
 import {
   ANGLES_KERNEL_RADIUS,
@@ -35,16 +35,23 @@ const MIN_POINT_INTENSITY = 0.07;
 const MAX_POINT_INTENSITY = 0.16;
 
 export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const selectedPlayer = searchParams.get('player') || initialPlayer || 'donk';
+  const selectedPlayerId = searchParams.get('playerId');
+  const matchParam = searchParams.get('match');
+  const selectedMatchId = matchParam && /^\d+$/.test(matchParam) ? Number(matchParam) : null;
   const activePlayerSummary = useMemo(
-    () => manifest.players.find((p) => p.player.toLowerCase() === selectedPlayer.toLowerCase()),
-    [manifest.players, selectedPlayer],
+    () =>
+      manifest.players.find((p) => selectedPlayerId && p.id === selectedPlayerId) ||
+      manifest.players.find((p) => p.player.toLowerCase() === selectedPlayer.toLowerCase()),
+    [manifest.players, selectedPlayer, selectedPlayerId],
   );
-  const availableMaps = useMemo(() => manifest.allMaps || manifest.activeMaps || [], [manifest]);
+  const playerKey = activePlayerSummary?.id || activePlayerSummary?.player || selectedPlayer;
+  const [playerError, setPlayerError] = useState(false);
   const [selectedMap, setSelectedMap] = useState<string>(
-    initialMap || availableMaps[0] || 'mirage',
+    initialMap || activePlayerSummary?.maps[0] || manifest.allMaps?.[0] || 'mirage',
   );
   const [perspective, setPerspective] = useState<RadarPerspective>('attacker');
   const [combatSide, setCombatSide] = useState<CombatSide>('all');
@@ -55,6 +62,19 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
   const [showKillPins, setShowKillPins] = useState(false);
 
   const [playerDetail, setPlayerDetail] = useState<RadarPlayerDetail | null>(null);
+  const selectedMatch = useMemo(
+    () => playerDetail?.matches?.find((match) => match.id === selectedMatchId),
+    [playerDetail, selectedMatchId],
+  );
+  const availableMaps = useMemo(
+    () =>
+      selectedMatch?.maps ||
+      activePlayerSummary?.maps ||
+      manifest.allMaps ||
+      manifest.activeMaps ||
+      [],
+    [selectedMatch, activePlayerSummary, manifest],
+  );
   const [hoveredEvent, setHoveredEvent] = useState<RadarKillEvent | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
@@ -70,21 +90,34 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
     let isCancelled = false;
 
     async function loadPlayerData() {
-      if (cacheRef.current.has(selectedPlayer)) {
-        setPlayerDetail(cacheRef.current.get(selectedPlayer)!);
+      setPlayerError(false);
+      if (cacheRef.current.has(playerKey)) {
+        setPlayerDetail(cacheRef.current.get(playerKey)!);
         return;
       }
+      setPlayerDetail(null);
 
       try {
-        const res = await fetch(`/data/cs2/radar/${encodeURIComponent(selectedPlayer)}.json`);
+        const res = await fetch(`/data/cs2/radar/v2/${encodeURIComponent(playerKey)}.json.gz`);
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        const data: RadarPlayerDetail = await res.json();
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        // Some hosts may decompress .gz assets before they reach the browser.
+        const gzipped = bytes[0] === 0x1f && bytes[1] === 0x8b;
+        const json = gzipped
+          ? await new Response(
+              new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')),
+            ).text()
+          : new TextDecoder().decode(bytes);
+        const data = JSON.parse(json) as RadarPlayerDetail;
         if (!isCancelled) {
-          cacheRef.current.set(selectedPlayer, data);
+          if (cacheRef.current.size >= 3)
+            cacheRef.current.delete(cacheRef.current.keys().next().value!);
+          cacheRef.current.set(playerKey, data);
           setPlayerDetail(data);
         }
       } catch (err) {
-        console.error('Failed to load CS2 radar data for player:', selectedPlayer, err);
+        console.error('Failed to load CS2 radar data for player:', playerKey, err);
+        if (!isCancelled) setPlayerError(true);
       }
     }
 
@@ -92,7 +125,20 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
     return () => {
       isCancelled = true;
     };
-  }, [selectedPlayer]);
+  }, [playerKey, manifest.version]);
+
+  useEffect(() => {
+    if (availableMaps.length && !availableMaps.includes(selectedMap)) {
+      setSelectedMap(availableMaps[0]);
+    }
+  }, [availableMaps, selectedMap]);
+
+  const selectMatch = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set('match', value);
+    else params.delete('match');
+    router.replace(`/projects/cs2/radar?${params.toString()}`, { scroll: false });
+  };
 
   // Preload map image
   useEffect(() => {
@@ -118,6 +164,7 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
   const filterOptions: RadarFilterOptions = useMemo(
     () => ({
       map: selectedMap,
+      matchId: selectedMatchId,
       perspective,
       side: combatSide,
       weaponCategory,
@@ -125,7 +172,15 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
       firstKillOnly,
       tradeKillOnly,
     }),
-    [selectedMap, perspective, combatSide, weaponCategory, firstKillOnly, tradeKillOnly],
+    [
+      selectedMap,
+      selectedMatchId,
+      perspective,
+      combatSide,
+      weaponCategory,
+      firstKillOnly,
+      tradeKillOnly,
+    ],
   );
 
   const { events: activeEvents } = useMemo(() => {
@@ -390,8 +445,42 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
 
   return (
     <div className="space-y-4">
+      {playerError && (
+        <p
+          role="alert"
+          className="border-border bg-surface text-muted rounded border p-3 font-mono text-xs"
+        >
+          Radar data could not be loaded for this player. Try another player or reload the page.
+        </p>
+      )}
       {/* Top Filter Bar */}
       <div className="border-border bg-surface space-y-3 rounded-lg border p-3">
+        {playerDetail?.matches && (
+          <div className="flex flex-wrap items-center gap-3 pb-2 font-mono text-xs">
+            <label htmlFor="radar-match" className="text-muted font-bold uppercase">
+              Match
+            </label>
+            <select
+              id="radar-match"
+              value={selectedMatchId ?? ''}
+              onChange={(event) => selectMatch(event.target.value)}
+              className="border-border bg-background text-foreground max-w-full min-w-0 flex-1 rounded border px-2 py-2 sm:max-w-xl"
+            >
+              <option value="">All matches ({playerDetail.matches.length})</option>
+              {playerDetail.matches.map((match) => (
+                <option key={match.id} value={match.id}>
+                  {match.date?.slice(0, 10)} · {match.team1} vs {match.team2}
+                  {match.event ? ` · ${match.event}` : ''} · #{match.id}
+                </option>
+              ))}
+            </select>
+            {selectedMatch && (
+              <span className="text-muted text-[11px]">
+                {selectedMatch.score1}–{selectedMatch.score2} · {selectedMatch.maps.join(', ')}
+              </span>
+            )}
+          </div>
+        )}
         {/* Row 1: Active Player Profile Badge & Map Tabs */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Active Player Profile Badge */}
@@ -610,11 +699,15 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
               >
                 <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-[11px]">
                   <span className="font-bold text-emerald-400">
-                    {perspective === 'victim' ? hoveredEvent.opp : selectedPlayer}
+                    {perspective === 'victim'
+                      ? hoveredEvent.opp
+                      : activePlayerSummary?.player || selectedPlayer}
                   </span>
                   <span className="text-white/50">eliminated</span>
                   <span className="font-bold text-rose-400">
-                    {perspective === 'victim' ? selectedPlayer : hoveredEvent.opp}
+                    {perspective === 'victim'
+                      ? activePlayerSummary?.player || selectedPlayer
+                      : hoveredEvent.opp}
                   </span>
                 </div>
 
@@ -684,6 +777,12 @@ export function Cs2RadarHeatmap({ manifest, initialPlayer, initialMap }: Props) 
               table. Violet, pink, and amber peaks highlight dominant anchor angles and entry choke
               points, with white reserved for the most concentrated cores.
             </p>
+            {selectedMatch && metrics.totalDuels < 30 && (
+              <p className="mt-2 text-[11px]">
+                This map has only {metrics.totalDuels} matching duels. Individual points carry more
+                meaning than the density peaks; try Kill Pins or All matches for broader patterns.
+              </p>
+            )}
           </div>
 
           {/* Summary Metric Cards */}

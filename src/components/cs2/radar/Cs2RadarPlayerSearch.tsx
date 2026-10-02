@@ -139,13 +139,15 @@ export function Cs2RadarPlayerSearch({
     return candidate;
   }, [activeIndex, filteredPlayers, query]);
 
-  const choosePlayer = (playerName: string) => {
+  const choosePlayer = (playerName: string, playerId?: string) => {
     const norm = normalizePlayerKey(playerName);
-    const matched = manifest?.players?.find(
-      (p) =>
-        p.player.toLowerCase() === playerName.toLowerCase() ||
-        normalizePlayerKey(p.player) === norm,
-    );
+    const matched =
+      (playerId ? manifest?.players?.find((p) => p.id === playerId) : undefined) ??
+      manifest?.players?.find(
+        (p) =>
+          p.player.toLowerCase() === playerName.toLowerCase() ||
+          normalizePlayerKey(p.player) === norm,
+      );
     const resolvedName = matched ? matched.player : playerName;
     setQuery(resolvedName);
     setIsOpen(false);
@@ -157,6 +159,11 @@ export function Cs2RadarPlayerSearch({
       const params = new URLSearchParams(searchParams ? searchParams.toString() : '');
       params.set('player', resolvedName);
       const target = basePath ?? (typeof window !== 'undefined' ? window.location.pathname : '');
+      if (target.endsWith('/radar')) {
+        if (matched?.id) params.set('playerId', matched.id);
+        else params.delete('playerId');
+        params.delete('match');
+      }
       router.push(`${target}?${params.toString()}`);
     }
   };
@@ -170,7 +177,7 @@ export function Cs2RadarPlayerSearch({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (activeIndex >= 0 && filteredPlayers[activeIndex]) {
-      choosePlayer(filteredPlayers[activeIndex].player);
+      choosePlayer(filteredPlayers[activeIndex].player, filteredPlayers[activeIndex].id);
       return;
     }
     if (inlineSuggestion) {
@@ -178,7 +185,7 @@ export function Cs2RadarPlayerSearch({
       return;
     }
     if (filteredPlayers.length > 0) {
-      choosePlayer(filteredPlayers[0].player);
+      choosePlayer(filteredPlayers[0].player, filteredPlayers[0].id);
       return;
     }
     if (query.trim()) {
@@ -255,11 +262,14 @@ export function Cs2RadarPlayerSearch({
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   if (activeIndex >= 0 && filteredPlayers[activeIndex]) {
-                    choosePlayer(filteredPlayers[activeIndex].player);
+                    choosePlayer(
+                      filteredPlayers[activeIndex].player,
+                      filteredPlayers[activeIndex].id,
+                    );
                   } else if (inlineSuggestion) {
                     choosePlayer(inlineSuggestion);
                   } else if (filteredPlayers.length > 0) {
-                    choosePlayer(filteredPlayers[0].player);
+                    choosePlayer(filteredPlayers[0].player, filteredPlayers[0].id);
                   } else if (query.trim()) {
                     choosePlayer(query.trim());
                   }
@@ -310,7 +320,7 @@ export function Cs2RadarPlayerSearch({
                   const isSelected = idx === activeIndex;
                   return (
                     <li
-                      key={item.player}
+                      key={item.id || item.player}
                       id={`${listboxId}-option-${idx}`}
                       role="option"
                       aria-selected={isSelected}
@@ -318,7 +328,7 @@ export function Cs2RadarPlayerSearch({
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => choosePlayer(item.player)}
+                        onClick={() => choosePlayer(item.player, item.id)}
                         className={`flex w-full items-center justify-between px-3 py-2 text-left font-mono text-xs transition-colors ${
                           isSelected ? 'bg-accent/20 text-accent font-bold' : 'hover:bg-muted/10'
                         }`}

@@ -38,6 +38,7 @@ export const HEATMAP_PALETTES: Record<HeatmapTheme, { name: string; stops: [numb
 export const ANGLES_KERNEL_RADIUS = 18;
 
 export type RadarKillEvent = {
+  mid?: number; // HLTV match ID (available in the complete radar export)
   m: string; // Map name (e.g. 'mirage', 'dust2')
   ax: number; // Attacker normalized radar X [0.0, 1.0]
   ay: number; // Attacker normalized radar Y [0.0, 1.0]
@@ -54,6 +55,7 @@ export type RadarKillEvent = {
 };
 
 export type RadarPlayerSummary = {
+  id?: string; // Steam ID, to distinguish players with the same nickname
   player: string;
   team: string;
   role: string;
@@ -72,10 +74,24 @@ export type RadarManifest = {
   allMaps?: string[];
   activeMaps?: string[];
   players: RadarPlayerSummary[];
-  weaponCategories: Record<string, string[]>;
+  weaponCategories?: Record<string, string[]>;
+  matchCount?: number;
+  eventCount?: number;
+};
+
+export type RadarMatch = {
+  id: number;
+  date: string;
+  event: string | null;
+  team1: string;
+  team2: string;
+  score1: number | null;
+  score2: number | null;
+  maps: string[];
 };
 
 export type RadarPlayerDetail = {
+  id?: string;
   player: string;
   team: string;
   role: string;
@@ -90,10 +106,12 @@ export type RadarPlayerDetail = {
   };
   kills: RadarKillEvent[];
   deaths: RadarKillEvent[];
+  matches?: RadarMatch[];
 };
 
 export type RadarFilterOptions = {
   map: string;
+  matchId?: number | null;
   perspective: RadarPerspective;
   side?: CombatSide;
   weaponCategory: WeaponCategory;
@@ -221,6 +239,7 @@ export function filterRadarEvents(
   }
 
   const filtered = rawList.filter((event) => {
+    if (options.matchId != null && event.mid !== options.matchId) return false;
     // Combat side filter (T vs CT)
     if (options.side && options.side !== 'all') {
       if (event.s && event.s !== options.side) {

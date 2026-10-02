@@ -76,6 +76,7 @@ describe('CS2 Radar Utilities', () => {
       },
       kills: [
         {
+          mid: 1001,
           m: 'mirage',
           ax: 0.45,
           ay: 0.6,
@@ -91,6 +92,7 @@ describe('CS2 Radar Utilities', () => {
           opp: 'm0NESY',
         },
         {
+          mid: 1002,
           m: 'mirage',
           ax: 0.46,
           ay: 0.61,
@@ -186,6 +188,20 @@ describe('CS2 Radar Utilities', () => {
         tradeKillOnly: false,
       });
       expect(bothRes.events).toHaveLength(4);
+    });
+
+    it('limits events to the selected match while retaining the all-matches view', () => {
+      const options = {
+        map: 'mirage',
+        perspective: 'attacker' as const,
+        weaponCategory: 'all' as const,
+        headshotsOnly: false,
+        firstKillOnly: false,
+        tradeKillOnly: false,
+      };
+      expect(filterRadarEvents(mockDetail, options).events).toHaveLength(3);
+      expect(filterRadarEvents(mockDetail, { ...options, matchId: 1002 }).events).toHaveLength(1);
+      expect(filterRadarEvents(mockDetail, { ...options, matchId: 9999 }).events).toHaveLength(0);
     });
 
     it('filters by weapon category and headshots', () => {
@@ -383,11 +399,71 @@ describe('CS2 Radar Utilities', () => {
       expect(findSpatialHotspots([], 'attacker')).toEqual([]);
 
       const events: RadarKillEvent[] = [
-        { m: 'mirage', ax: 0.5, ay: 0.5, vx: 0.8, vy: 0.8, w: 'ak47', hs: true, fk: false, tk: false, d: 15, rnd: 1 },
-        { m: 'mirage', ax: 0.51, ay: 0.49, vx: 0.8, vy: 0.8, w: 'ak47', hs: false, fk: false, tk: false, d: 15, rnd: 2 },
-        { m: 'mirage', ax: 0.52, ay: 0.51, vx: 0.8, vy: 0.8, w: 'ak47', hs: true, fk: false, tk: false, d: 15, rnd: 3 },
-        { m: 'mirage', ax: 0.1, ay: 0.1, vx: 0.8, vy: 0.8, w: 'ak47', hs: false, fk: false, tk: false, d: 15, rnd: 4 },
-        { m: 'mirage', ax: 0.11, ay: 0.12, vx: 0.8, vy: 0.8, w: 'ak47', hs: false, fk: false, tk: false, d: 15, rnd: 5 },
+        {
+          m: 'mirage',
+          ax: 0.5,
+          ay: 0.5,
+          vx: 0.8,
+          vy: 0.8,
+          w: 'ak47',
+          hs: true,
+          fk: false,
+          tk: false,
+          d: 15,
+          rnd: 1,
+        },
+        {
+          m: 'mirage',
+          ax: 0.51,
+          ay: 0.49,
+          vx: 0.8,
+          vy: 0.8,
+          w: 'ak47',
+          hs: false,
+          fk: false,
+          tk: false,
+          d: 15,
+          rnd: 2,
+        },
+        {
+          m: 'mirage',
+          ax: 0.52,
+          ay: 0.51,
+          vx: 0.8,
+          vy: 0.8,
+          w: 'ak47',
+          hs: true,
+          fk: false,
+          tk: false,
+          d: 15,
+          rnd: 3,
+        },
+        {
+          m: 'mirage',
+          ax: 0.1,
+          ay: 0.1,
+          vx: 0.8,
+          vy: 0.8,
+          w: 'ak47',
+          hs: false,
+          fk: false,
+          tk: false,
+          d: 15,
+          rnd: 4,
+        },
+        {
+          m: 'mirage',
+          ax: 0.11,
+          ay: 0.12,
+          vx: 0.8,
+          vy: 0.8,
+          w: 'ak47',
+          hs: false,
+          fk: false,
+          tk: false,
+          d: 15,
+          rnd: 5,
+        },
       ];
 
       const hotspots = findSpatialHotspots(events, 'attacker', 2);
