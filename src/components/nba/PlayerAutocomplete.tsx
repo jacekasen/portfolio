@@ -5,9 +5,16 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 type PlayerAutocompleteProps = {
   defaultValue: string;
   inputId: string;
+  name?: string;
+  placeholder?: string;
 };
 
-export function PlayerAutocomplete({ defaultValue, inputId }: PlayerAutocompleteProps) {
+export function PlayerAutocomplete({
+  defaultValue,
+  inputId,
+  name = 'player',
+  placeholder = 'LeBron James',
+}: PlayerAutocompleteProps) {
   const listboxId = useId();
   const requestId = useRef(0);
   const [query, setQuery] = useState(defaultValue);
@@ -89,7 +96,7 @@ export function PlayerAutocomplete({ defaultValue, inputId }: PlayerAutocomplete
 
       <input
         id={inputId}
-        name="player"
+        name={name}
         value={query}
         onChange={(event) => {
           setQuery(event.target.value);
@@ -141,7 +148,7 @@ export function PlayerAutocomplete({ defaultValue, inputId }: PlayerAutocomplete
             setActiveIndex(-1);
           }
         }}
-        placeholder="LeBron James"
+        placeholder={placeholder}
         autoComplete="off"
         role="combobox"
         aria-autocomplete="both"

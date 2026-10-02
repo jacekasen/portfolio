@@ -1,11 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, CircleDollarSign, Github, LineChart, Mountain } from 'lucide-react';
+import { Activity, ArrowRight, CircleDollarSign, Github, LineChart, Mountain } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 
 export const metadata = {
   title: 'NBA Analysis | Jace Kasen',
-  description:
-    'Three interactive ways to look at how NBA players change — and how much they cost — over the course of a career.',
+  description: 'Explore NBA careers, season trajectories, peak performance, and salaries.',
 };
 
 const analyses = [
@@ -51,12 +50,26 @@ const analyses = [
     ],
     icon: CircleDollarSign,
   },
+  {
+    title: 'NBA Season Trajectories',
+    href: '/projects/nba/season-trajectories',
+    eyebrow: 'Game by game · 1996–2026',
+    description:
+      'See how a player’s on-court results change across a season, with every appearance placed on the same 82-game team timeline.',
+    highlights: [
+      'Game plus-minus and 5, 10, or 15-appearance rolling averages',
+      'Player comparison on a shared team-game axis',
+      'Visible gaps for missed games and trade transitions',
+      'Minutes and box-score context for each appearance',
+    ],
+    icon: Activity,
+  },
 ] as const;
 
 const buildDetails = [
   {
     title: 'Data collection',
-    body: 'Python pipelines clean season, prediction, salary and salary-cap data before publishing it to Supabase. The site reads those tables instead of scraping data when a page loads.',
+    body: 'Python pipelines clean game logs, season, prediction, salary and salary-cap data before publishing it to Supabase. The site reads those tables instead of scraping data when a page loads.',
   },
   {
     title: 'Queries and caching',
@@ -78,7 +91,7 @@ export default function NbaAnalysisPage() {
       <PageHeader
         eyebrow="A personal basketball data project"
         title="NBA Analysis"
-        description="I wanted to know when NBA players usually peak, so I built a leakage-safe forecasting pipeline to find out. It now covers individual career trends, league-wide peak patterns, next-season forecasts corrected for survivorship bias, and salary analysis across different cap eras."
+        description="I wanted to know when NBA players usually peak, so I built a leakage-safe forecasting pipeline to find out. It now covers game-by-game season trajectories, individual career trends, league-wide peak patterns, next-season forecasts corrected for survivorship bias, and salary analysis across different cap eras."
       />
 
       <section className="flex flex-col gap-5" aria-label="NBA analysis projects">
