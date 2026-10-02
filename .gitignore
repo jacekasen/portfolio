@@ -43,3 +43,9 @@ next-env.d.ts
 
 # claude code worktrees
 .claude/worktrees/
+
+
+# cs2 radar data
+*.json.gz
+*.gz
+public/data/cs2/radar/v2/
