@@ -4,14 +4,14 @@ import { PageHeader } from '@/components/PageHeader';
 import { Cs2RadarPlayerSearch } from '@/components/cs2/radar/Cs2RadarPlayerSearch';
 import { Cs2SubNav } from '@/components/cs2/Cs2SubNav';
 import { Cs2TrendDashboard } from '@/components/cs2/Cs2TrendDashboard';
+import { cs2Copy } from '@/lib/cs2/dataset';
 import { getRadarManifest } from '@/lib/cs2/manifest';
 import { fetchPlayerMapHistory } from '@/lib/cs2/trends';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'CS2 Map-to-Map Performance Trends | Jace Kasen',
-  description:
-    'Map-to-map performance trends and rolling window smoothing on HLTV Rating 3.0 across 65 tier-1 CS2 tournaments.',
+  description: `Map-to-map performance trends and rolling window smoothing on HLTV Rating 3.0 across ${cs2Copy.tournaments} tier-1 CS2 tournaments.`,
 };
 
 type PageProps = {

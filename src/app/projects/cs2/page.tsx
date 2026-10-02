@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Activity, ArrowRight, Crosshair, Github, LineChart } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
+import { cs2Copy } from '@/lib/cs2/dataset';
 
 export const metadata = {
   title: 'Counter-Strike 2 Analysis | Jace Kasen',
@@ -12,7 +13,7 @@ const analyses = [
   {
     title: 'Map-to-Map Performance Trends',
     href: '/projects/cs2/trends',
-    eyebrow: 'Individual match history · 65 tournaments',
+    eyebrow: `Individual match history · ${cs2Copy.tournaments} tournaments`,
     description:
       'Track map-to-map variance of HLTV Rating 3.0 across tier-1 tournaments, comparing 5, 10, 15, and 20-map moving averages against career baselines.',
     highlights: [
@@ -40,7 +41,7 @@ const analyses = [
   {
     title: '2D Radar Duel & Kill Analytics',
     href: '/projects/cs2/radar',
-    eyebrow: 'Spatial combat telemetry · 598,000+ events',
+    eyebrow: `Spatial combat telemetry · ${cs2Copy.combatEvents} events`,
     description:
       'Interactive top-down radar spatial projections rendering player duel locations, directional kill vectors, and trade attribution on official competitive maps.',
     highlights: [
@@ -56,11 +57,11 @@ const analyses = [
 const buildDetails = [
   {
     title: 'Data collection & ingestion',
-    body: 'An automated Python pipeline downloads and verifies tournament demos across 65 tier-1 events. Uses browser TLS impersonation, request jitter, circuit-breaker error handling, and SQLite WAL mode to track match processing state without data loss.',
+    body: `An automated Python pipeline downloads and verifies tournament demos across ${cs2Copy.tournaments} tier-1 events. Uses browser TLS impersonation, request jitter, circuit-breaker error handling, and SQLite WAL mode to track match processing state without data loss.`,
   },
   {
     title: 'Polars ETL & event normalization',
-    body: 'Processes >380 GB of raw match replays into a compact 472 MB partitioned Parquet datastore (>99.8% storage reduction). Extracts and normalizes 598,000+ combat events with sub-tick precision.',
+    body: `Processes ${cs2Copy.rawReplaySize} of raw match replays into a compact ${cs2Copy.parquetSize} partitioned Parquet datastore (${cs2Copy.storageReduction} storage reduction). Extracts and normalizes ${cs2Copy.combatEvents} combat events with sub-tick precision.`,
   },
   {
     title: 'Spatial projection & trade attribution',
@@ -78,7 +79,7 @@ export default function Cs2LandingPage() {
       <PageHeader
         eyebrow="A personal Counter-Strike 2 telemetry project"
         title="Counter-Strike 2 Analysis"
-        description="I wanted to analyze professional CS2 telemetry at scale, so I built an automated ETL pipeline that parsed >380 GB of tier-1 tournament replays into compact Parquet datastores. It powers map-to-map performance trends, rolling form indicators, and interactive 2D radar duel heatmaps."
+        description={`I wanted to analyze professional CS2 telemetry at scale, so I built an automated ETL pipeline that parsed ${cs2Copy.rawReplaySize} of tier-1 tournament replays into compact Parquet datastores. It powers map-to-map performance trends, rolling form indicators, and interactive 2D radar duel heatmaps.`}
       />
 
       <section className="flex flex-col gap-5" aria-label="Counter-Strike 2 analysis projects">

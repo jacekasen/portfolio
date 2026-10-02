@@ -1,3 +1,5 @@
+import { cs2Copy } from '@/lib/cs2/dataset';
+
 export interface Project {
   title: string;
   eyebrow: string;
@@ -17,16 +19,14 @@ export const projects: Project[] = [
     title: 'Counter-Strike 2 Analytics & ETL Pipeline',
     eyebrow: 'Automated ETL pipeline & 2D radar spatial analytics',
     kind: 'independent',
-    description:
-      'An automated ETL pipeline and interactive Next.js platform ingesting 1,787 matches across 65 tournaments, reducing >380 GB of raw match replays into a compact 472 MB partitioned Parquet datastore.',
-    buildDetails:
-      'Engineered an automated ETL pipeline ingesting 1,787 matches across 65 tournaments, reducing >380 GB of raw match replays into a compact 472 MB partitioned Parquet datastore (>99.8% storage reduction). Extracted and normalized 598,000+ combat events using Polars, computing 2D radar spatial projections and implementing 3-second sliding-window algorithms for trade-kill attribution. Built a resilient ingestion crawler with browser TLS impersonation, request jitter, circuit-breaker error handling, and SQLite WAL mode to track match processing state. Shipped an interactive Next.js dashboard featuring server-rendered tournament analytics, Canvas-based player form curves, and rating comparisons.',
+    description: `An automated ETL pipeline and interactive Next.js platform ingesting ${cs2Copy.matches} matches across ${cs2Copy.tournaments} tournaments, reducing ${cs2Copy.rawReplaySize} of raw match replays into a compact ${cs2Copy.parquetSize} partitioned Parquet datastore.`,
+    buildDetails: `Engineered an automated ETL pipeline ingesting ${cs2Copy.matches} matches across ${cs2Copy.tournaments} tournaments, reducing ${cs2Copy.rawReplaySize} of raw match replays into a compact ${cs2Copy.parquetSize} partitioned Parquet datastore (${cs2Copy.storageReduction} storage reduction). Extracted and normalized ${cs2Copy.combatEvents} combat events using Polars, computing 2D radar spatial projections and implementing 3-second sliding-window algorithms for trade-kill attribution. Built a resilient ingestion crawler with browser TLS impersonation, request jitter, circuit-breaker error handling, and SQLite WAL mode to track match processing state. Shipped an interactive Next.js dashboard featuring server-rendered tournament analytics, Canvas-based player form curves, and rating comparisons.`,
     tags: ['Python', 'Polars', 'Next.js', 'Snappy Parquet', 'SQLite', 'Supabase'],
     github: 'https://github.com/jacekasen/cs2',
     demo: '/projects/cs2',
     highlights: [
-      'Automated ETL pipeline ingesting 1,787 matches across 65 tournaments (>99.8% storage reduction)',
-      '598,000+ combat events with 2D radar projections and 3-second trade attribution',
+      `Automated ETL pipeline ingesting ${cs2Copy.matches} matches across ${cs2Copy.tournaments} tournaments (${cs2Copy.storageReduction} storage reduction)`,
+      `${cs2Copy.combatEvents} combat events with 2D radar projections and 3-second trade attribution`,
       'Resilient ingestion crawler with browser TLS impersonation and SQLite WAL tracking',
       'Server-rendered tournament analytics, Canvas player form curves, and rating comparisons',
     ],
